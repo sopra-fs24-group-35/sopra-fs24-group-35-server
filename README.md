@@ -1,6 +1,6 @@
 # SoPra RESTful Service Template FS24
 
-## Getting started with Spring Boot
+## Getting started with Spring Boot TEST
 -   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 -   Guides: http://spring.io/guides
     -   Building a RESTful Web Service: http://spring.io/guides/gs/rest-service/

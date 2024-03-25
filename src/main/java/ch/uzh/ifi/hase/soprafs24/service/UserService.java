@@ -5,7 +5,6 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDate;
 
 /**
  * User Service
@@ -30,19 +30,80 @@ public class UserService {
 
   private final UserRepository userRepository;
 
-  @Autowired
+  
   public UserService(@Qualifier("userRepository") UserRepository userRepository) {
     this.userRepository = userRepository;
+  }
+
+  public User getUserByUsername(String username) {
+    return this.userRepository.findByUsername(username);
+  }
+
+
+  public User getUserById(Long user_id) {
+    boolean exists = checkIfUserExistsId(user_id, true);
+    if (!exists) {
+      return null;
+    }
+    return this.userRepository.getById(user_id);
   }
 
   public List<User> getUsers() {
     return this.userRepository.findAll();
   }
 
+  public User loginUser(User userData) {
+    try {
+      boolean exists = checkIfUserExistsUsername(userData, true);
+      if (!exists) {
+        return null;
+      }
+      User user = getUserByUsername(userData.getUsername());
+      if (userData.getPassword().equals(user.getPassword())) {
+        user.setToken(UUID.randomUUID().toString());
+        user.setStatus(UserStatus.ONLINE);
+        return user;
+      }
+      else {
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Login failed. The password is wrong.");
+      }
+    }
+    catch(Exception e) {
+      throw e;
+    }
+
+  }
+
+  public User logoutUser(Long user_id) {
+    
+    boolean exists = checkIfUserExistsId(user_id, true);
+    if (!exists) {
+      return null;
+    }
+    User user = getUserById(user_id);
+    user.setStatus(UserStatus.OFFLINE);
+    return user;
+
+  }
+
+  public void checkAuthorization(Long user_id, String token) {
+    User userById = userRepository.getById(user_id);
+    if (userById == null || !userById.getToken().equals(token)) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+      "Authorization failed. The user is not allowed to access data on the server.");
+    }
+    return;
+  }
+
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
-    newUser.setStatus(UserStatus.OFFLINE);
-    checkIfUserExists(newUser);
+    newUser.setStatus(UserStatus.ONLINE);
+    LocalDate date = LocalDate.now();
+    newUser.setCreationDate(date);
+    boolean exists = checkIfUserExistsUsername(newUser, false);
+    if (!exists) {
+      return null;
+    }
     // saves the given entity but data is only persisted in the database once
     // flush() is called
     newUser = userRepository.save(newUser);
@@ -50,6 +111,28 @@ public class UserService {
 
     log.debug("Created Information for User: {}", newUser);
     return newUser;
+  }
+
+  public User updateUser(User userData, Long id) {
+    boolean exists = checkIfUserExistsUsername(userData, false);
+    if (!exists) {
+      return null;
+    }
+    // get user from repository
+    User toUpdate = getUserById(id);
+    // Update Username and Birthday
+    if (userData.getUsername() != null) {
+      toUpdate.setUsername(userData.getUsername());
+    }
+    if (userData.getBirthday() != null) {
+      toUpdate.setBirthday(userData.getBirthday());
+    }
+    
+    toUpdate = userRepository.save(toUpdate);
+    userRepository.flush();
+
+    log.debug("Updated Information for User: {}", toUpdate);
+    return toUpdate;
   }
 
   /**
@@ -62,18 +145,27 @@ public class UserService {
    * @throws org.springframework.web.server.ResponseStatusException
    * @see User
    */
-  private void checkIfUserExists(User userToBeCreated) {
-    User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-    User userByName = userRepository.findByName(userToBeCreated.getName());
 
-    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-    if (userByUsername != null && userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-          String.format(baseErrorMessage, "username and the name", "are"));
-    } else if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
-    } else if (userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
+   // Check if user exists by username
+  private boolean checkIfUserExistsUsername(User userToBeCreated, boolean shouldExist) {
+    User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
+    // shouldExist: if true, an error is thrown if the user doesn't exist (and vice versa)
+    if (shouldExist && userByUsername == null) {
+      return false;
+    } else if (!shouldExist && userByUsername != null) {
+      return false;
     }
+    return true;
+  }
+  // Check if user exists by ID
+  private boolean checkIfUserExistsId(Long user_id, boolean shouldExist) {
+    User userById = this.userRepository.getById(user_id);
+    // shouldExist: if true, an error is thrown if the user doesn't exist (and vice versa)
+    if (shouldExist && userById == null) {
+      return false;
+    } else if (!shouldExist && userById != null) {
+      return false;
+    }
+    return true;
   }
 }

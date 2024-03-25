@@ -21,7 +21,7 @@ public class Application {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public String helloWorld() {
-    return "The application is running.";
+    return "The application is running! Amazing!";
   }
 
   @Bean
@@ -29,7 +29,8 @@ public class Application {
     return new WebMvcConfigurer() {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
+        registry.addMapping("/**").allowedOrigins("*").allowedMethods("*")
+        .exposedHeaders("Authorization");
       }
     };
   }
