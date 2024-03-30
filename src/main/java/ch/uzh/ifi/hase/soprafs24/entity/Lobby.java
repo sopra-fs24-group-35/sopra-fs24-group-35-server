@@ -19,8 +19,8 @@ public class Lobby implements Serializable {
     @Column(nullable = false, unique = true)
     private String code;
 
-    @Column(nullable = false)
-    private List<Long> players = new ArrayList<Long>();
+    @Column(nullable = true)
+    private ArrayList<Long> players = new ArrayList<Long>();
 
     @Column(nullable = true, unique = true)
     private Long gameId;
@@ -41,11 +41,11 @@ public class Lobby implements Serializable {
     this.code = code;
     }
 
-    public List<Long> getPlayers(){
+    public ArrayList<Long> getPlayers(){
         return players;
     }
 
-    public void setPlayers(List<Long> players){
+    public void setPlayers(ArrayList<Long> players){
         this.players = players;
     }
 
