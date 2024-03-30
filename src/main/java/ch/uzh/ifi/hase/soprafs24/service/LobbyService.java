@@ -46,11 +46,13 @@ public class LobbyService{
 
     public Lobby createLobby(Lobby newLobby){
 
-        //Creator of Lobby is already in Player list
         boolean alreadyExists = checkIfLobbyExistsId(newLobby.getId(), false);
         if (!alreadyExists){
             return null;
         }
+
+        //Creator of Lobby is already in players
+        newLobby.removePlayers(null);
 
         //Set the Lobby join Code
         newLobby.setCode(String.valueOf(rand.nextInt(10000)));
