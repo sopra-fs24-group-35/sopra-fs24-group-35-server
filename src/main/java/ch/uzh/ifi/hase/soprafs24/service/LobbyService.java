@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 
 @Service
 @Transactional
@@ -20,6 +20,8 @@ public class LobbyService{
     private final Logger log = LoggerFactory.getLogger(LobbyService.class);
 
     private final LobbyRepository lobbyRepository;
+
+    Random rand = new Random();
 
   
     public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
@@ -45,11 +47,13 @@ public class LobbyService{
     public Lobby createLobby(Lobby newLobby){
 
         //Creator of Lobby is already in Player list
-
         boolean alreadyExists = checkIfLobbyExistsId(newLobby.getId(), false);
         if (!alreadyExists){
             return null;
         }
+
+        //Set the Lobby join Code
+        newLobby.setCode(String.valueOf(rand.nextInt(10000)));
 
         // add new Lobby to repository
         newLobby = lobbyRepository.save(newLobby);
@@ -69,6 +73,24 @@ public class LobbyService{
         toUpdate.addPlayers(player_id);
 
         //update Repository
+        toUpdate = lobbyRepository.save(toUpdate);
+        lobbyRepository.flush();
+
+        return toUpdate;
+    }
+
+    public Lobby removePlayer(Long player_id, Long lobby_id){
+        boolean exists = checkIfLobbyExistsId(lobby_id, true);
+        if (!exists){
+            return null;
+        }
+
+        Lobby toUpdate = getLobbyById(lobby_id);
+        
+        //remove Player
+        toUpdate.removePlayers(player_id);
+
+        //save in repository
         toUpdate = lobbyRepository.save(toUpdate);
         lobbyRepository.flush();
 
