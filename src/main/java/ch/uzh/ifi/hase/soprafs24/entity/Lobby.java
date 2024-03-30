@@ -16,12 +16,13 @@ public class Lobby implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @GeneratedValue
+    @Column(nullable = false, unique = true)
     private String code;
 
-    @GeneratedValue
+    @Column(nullable = false)
     private List<Long> players = new ArrayList<Long>();
 
+    @Column(nullable = true, unique = true)
     private Long gameId;
 
     public Long getId() {

@@ -28,15 +28,26 @@ public class LobbyController{
     }
 
     @GetMapping("/lobby/{id}")
-    public String getMethodName(@RequestParam String param){
-        return new String();
+    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseBody
+    public LobbyGetDTO getLobby(@PathVariable("id") Long id){
+
+        //find Lobby
+        Lobby lobby = lobbyService.getLobbyById(id);
+
+        //return Lobby
+        return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
     }
 
     @PostMapping("/lobby")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public LobbyGetDTO createLobby(@RequestBody  LobbyPostDTO lobbyPostDTO){
+
+        //transform input
         Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
+
+        //create Lobby
         Lobby createdLobby = lobbyService.createLobby(playerInput);
         return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(createdLobby);
     }
@@ -45,7 +56,18 @@ public class LobbyController{
     @ResponseStatus(HttpStatus.ACCEPTED)
     @ResponseBody
     public LobbyGetDTO updateLobby(@RequestBody Long player_id, String code){
+
+        //update Lobby
         Lobby updatedLobby = lobbyService.updateLobby(player_id, code);
+        return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
+    }
+
+    @PostMapping("/lobby/{id}/remove")
+    @ResponseStatus(HttpStatus.GONE)
+    @ResponseBody
+    public LobbyGetDTO removePlayer(@PathVariable("id") Long id,
+    @RequestBody Long player_id){
+        Lobby updatedLobby = lobbyService.removePlayer(player_id, id);
         return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
     }
     
