@@ -11,5 +11,14 @@ public class RiskCard implements Serializable {
 
     @Column(nullable = false, unique = false)
     private String type;
+
+    // Getter and setter for type
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
     
 }
