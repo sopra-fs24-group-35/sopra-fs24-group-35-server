@@ -52,7 +52,6 @@ public class LobbyService{
         }
 
         //Creator of Lobby is already in players
-        newLobby.removePlayers(null);
 
         //Set the Lobby join Code
         newLobby.setCode(String.valueOf(rand.nextInt(10000)));
@@ -64,7 +63,10 @@ public class LobbyService{
         return newLobby;
     }
 
-    public Lobby updateLobby(Long player_id, String code){
+    public Lobby updateLobby(Lobby playerInput){
+
+        String code = playerInput.getCode();
+
         boolean exists = checkIfLobbyExistsCode(code, true);
         if(!exists){
             return null;
@@ -72,7 +74,9 @@ public class LobbyService{
         
         Lobby toUpdate = getLobbyByCode(code);
         //add new player
-        toUpdate.addPlayers(player_id);
+        for(Long player : playerInput.getPlayers()){
+            toUpdate.addPlayers(player);
+        }
 
         //update Repository
         toUpdate = lobbyRepository.save(toUpdate);
@@ -81,7 +85,7 @@ public class LobbyService{
         return toUpdate;
     }
 
-    public Lobby removePlayer(Long player_id, Long lobby_id){
+    public Lobby removePlayer(Lobby playerInput, Long lobby_id){
         boolean exists = checkIfLobbyExistsId(lobby_id, true);
         if (!exists){
             return null;
@@ -90,7 +94,9 @@ public class LobbyService{
         Lobby toUpdate = getLobbyById(lobby_id);
         
         //remove Player
-        toUpdate.removePlayers(player_id);
+        for (Long player: playerInput.getPlayers()){
+            toUpdate.removePlayers(player);
+        }
 
         //save in repository
         toUpdate = lobbyRepository.save(toUpdate);
@@ -111,7 +117,7 @@ public class LobbyService{
     }
 
     private boolean checkIfLobbyExistsCode(String code, boolean shouldExist){
-        Lobby lobbyByCode = this.lobbyRepository.findByCode(code);
+        Lobby lobbyByCode = lobbyRepository.findByCode(code);
 
         if (shouldExist && lobbyByCode == null) {
             return false;
