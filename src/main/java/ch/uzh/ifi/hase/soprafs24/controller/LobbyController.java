@@ -28,7 +28,7 @@ public class LobbyController{
     }
 
     @GetMapping("/lobbies/{id}")
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public LobbyGetDTO getLobby(@PathVariable("id") Long id){
 
@@ -39,7 +39,7 @@ public class LobbyController{
         return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
     }
 
-    @PostMapping("/lobbies/")
+    @PostMapping("/lobbies")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public LobbyGetDTO createLobby(@RequestBody  LobbyPostDTO lobbyPostDTO){
@@ -53,21 +53,31 @@ public class LobbyController{
     }
 
     @PostMapping("/lobbies/update")
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LobbyGetDTO updateLobby(@RequestBody Long player_id, String code){
+    public LobbyGetDTO updateLobby(@RequestBody LobbyPostDTO lobbyPostDTO){
+        
+        Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
 
         //update Lobby
-        Lobby updatedLobby = lobbyService.updateLobby(player_id, code);
+        Lobby updatedLobby = lobbyService.updateLobby(playerInput);
+
+        if (updatedLobby == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The Lobby with the given Code '%s' doesn't exist.", playerInput.getCode()));
+        }
+
         return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
     }
 
     @PostMapping("/lobbies/{id}/remove")
-    @ResponseStatus(HttpStatus.GONE)
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public LobbyGetDTO removePlayer(@PathVariable("id") Long id,
-    @RequestBody Long player_id){
-        Lobby updatedLobby = lobbyService.removePlayer(player_id, id);
+        @RequestBody LobbyPostDTO lobbyPostDTO){
+
+        Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
+
+        Lobby updatedLobby = lobbyService.removePlayer(playerInput, id);
         return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
     }
 }

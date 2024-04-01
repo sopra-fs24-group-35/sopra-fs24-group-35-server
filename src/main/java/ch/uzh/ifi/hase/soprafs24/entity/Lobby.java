@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.*;
 import java.io.Serializable;
 
