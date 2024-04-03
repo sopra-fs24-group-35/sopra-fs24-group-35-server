@@ -4,6 +4,9 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 
+import ch.uzh.ifi.hase.soprafs24.entity.UserList;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserListPostDTO;
+
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
@@ -38,6 +41,9 @@ public interface DTOMapper {
   @Mapping(source = "status", target = "status")
   @Mapping(source = "birthday", target = "birthday")
   UserGetDTO convertEntityToUserGetDTO(User user);
+
+  @Mapping(source = "userIdList", target = "userIdList")
+  UserList convertUserListPostDTOtoEntity(UserListPostDTO userListPostDTO);
 
   @Mapping(source = "code", target = "code")
   @Mapping(source = "players", target = "players")
