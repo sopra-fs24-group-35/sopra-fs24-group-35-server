@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.UserList;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserListPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
@@ -50,6 +52,25 @@ public class UserController {
     for (User user : users) {
       userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
     }
+    return userGetDTOs;
+  }
+
+  @PostMapping("/users/lobbies")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<UserGetDTO> getLobbyUsers(@RequestBody UserListPostDTO userListPostDTO){
+    
+    UserList userInput = DTOMapper.INSTANCE.convertUserListPostDTOtoEntity(userListPostDTO);
+
+    //Create List to store all users
+    List<UserGetDTO> userGetDTOs = new ArrayList<>();
+
+    //Go through each id which is stored in the userInput
+    //Get the user through the id and store it as UserGetDTO in the output list
+    for (Long id : userInput.getUserIdList()) {
+      userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(userService.getUserById(id)));
+    }
+
     return userGetDTOs;
   }
 
