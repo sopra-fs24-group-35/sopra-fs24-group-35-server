@@ -4,26 +4,32 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
-@Embeddable
+
+@Entity
+@Table(name = "CONTINENT")
 public class Continent implements Serializable {
 
-    @Column(nullable = false, unique = false)
-    private ArrayList<Territory> territories;
+    @Id
+    @GeneratedValue
+    private Long continentId;
 
-    @Column(nullable = false, unique = false)
+    @OneToMany(targetEntity=Territory.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Territory> territories;
+
+    @Column(nullable = true, unique = false)
     private String name;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private int additionalTroopBonus;
 
     // Getters and setters for territories
-    public ArrayList<Territory> getTerritories() {
+    public List<Territory> getTerritories() {
         return territories;
     }
 
-    public void setTerritories(ArrayList<Territory> territories) {
+    public void setTerritories(List<Territory> territories) {
         this.territories = territories;
     }
 

@@ -4,32 +4,38 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
-@Embeddable
+
+@Entity
+@Table(name = "BOARD")
 public class Board implements Serializable {
 
-    @Column(nullable = false, unique = false)
-    private ArrayList<Continent> continents;
+    @Id
+    @GeneratedValue
+    private Long boardId;
 
-    @Column(nullable = false, unique = false)
-    private ArrayList<Territory> territories;
+    @OneToMany(targetEntity=Continent.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Continent> continents;
+
+    @OneToMany(targetEntity=Territory.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Territory> territories;
 
     // Getter and setter for continents
-    public ArrayList<Continent> getContinents() {
+    public List<Continent> getContinents() {
         return continents;
     }
 
-    public void setContinents(ArrayList<Continent> continents) {
+    public void setContinents(List<Continent> continents) {
         this.continents = continents;
     }
 
     // Getter and setter for territories
-    public ArrayList<Territory> getTerritories() {
+    public List<Territory> getTerritories() {
         return territories;
     }
 
-    public void setTerritories(ArrayList<Territory> territories) {
+    public void setTerritories(List<Territory> territories) {
         this.territories = territories;
     }
 }

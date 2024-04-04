@@ -2,18 +2,24 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
-@Embeddable
+@Entity
+@Table(name = "PLAYER")
 public class Player implements Serializable {
 
-    @Column(nullable = false, unique = false)
+    @Id
+    @GeneratedValue
+    private Long playerId;
+
+    @Column(nullable = true, unique = false)
     private String username;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private Boolean ready;
 
-    @Column(nullable = false, unique = false)
-    private RiskCard riskCards;
+    @OneToMany(targetEntity=RiskCard.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<RiskCard> riskCards;
 
     // Getter and setter for username
     public String getUsername() {
@@ -34,11 +40,11 @@ public class Player implements Serializable {
     }
 
     // Getter and setter for riskCards
-    public RiskCard getRiskCards() {
+    public List<RiskCard> getRiskCards() {
         return riskCards;
     }
 
-    public void setRiskCards(RiskCard riskCards) {
+    public void setRiskCards(List<RiskCard> riskCards) {
         this.riskCards = riskCards;
     }
     

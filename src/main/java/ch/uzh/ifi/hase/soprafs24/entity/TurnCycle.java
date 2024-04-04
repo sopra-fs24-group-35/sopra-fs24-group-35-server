@@ -2,21 +2,28 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
-@Embeddable
+@Entity
+@Table(name = "TURNCYCLE")
 public class TurnCycle implements Serializable {
 
-    @Column(nullable = false, unique = false)
+    @Id
+    @GeneratedValue
+    private Long turnCycleId;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "playerId")
     private Player currentPlayer;
 
-    @Column(nullable = false, unique = false)
-    private ArrayList<Player> playerCycle;
+    @OneToMany(targetEntity=Player.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Player> playerCycle;
 
-    @Column(nullable = false, unique = false)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "phaseId")
     private Phase currentPhase;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private int timeLeftForCycle;
 
     // Getter and setter for currentPlayer
@@ -29,11 +36,11 @@ public class TurnCycle implements Serializable {
     }
 
     // Getter and setter for playerCycle
-    public ArrayList<Player> getPlayerCycle() {
+    public List<Player> getPlayerCycle() {
         return playerCycle;
     }
 
-    public void setPlayerCycle(ArrayList<Player> playerCycle) {
+    public void setPlayerCycle(List<Player> playerCycle) {
         this.playerCycle = playerCycle;
     }
 

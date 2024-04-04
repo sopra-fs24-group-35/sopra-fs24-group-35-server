@@ -3,8 +3,11 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 
 import javax.persistence.*;
+
+import org.dom4j.Branch;
+
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "GAME")
@@ -16,13 +19,15 @@ public class Game implements Serializable {
     @GeneratedValue
     private Long gameId;
 
-    @Column(nullable = false, unique = false)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "boardId")
     private Board board;
 
-    @Column(nullable = false, unique = false)
-    private ArrayList<Player> players;
+    @OneToMany(targetEntity=Player.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Player> players;
 
-    @Column(nullable = false, unique = false)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "turnCycleId")
     private TurnCycle turnCycle;
 
     // Getter and setter for gameId
@@ -44,11 +49,11 @@ public class Game implements Serializable {
     }
 
     // Getter and setter for players
-    public ArrayList<Player> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
     }
 
-    public void setPlayers(ArrayList<Player> players) {
+    public void setPlayers(List<Player> players) {
         this.players = players;
     }
 

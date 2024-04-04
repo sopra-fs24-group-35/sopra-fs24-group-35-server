@@ -6,10 +6,15 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 
-@Embeddable
+@Entity
+@Table(name = "PHASE")
 public class Phase implements Serializable{
 
-    @Column(nullable = false, unique = false)
+    @Id
+    @GeneratedValue
+    private Long phaseId;
+
+    @Column(nullable = true, unique = false)
     private String currentPhase;
 
     // Getter and setter for currentPhase

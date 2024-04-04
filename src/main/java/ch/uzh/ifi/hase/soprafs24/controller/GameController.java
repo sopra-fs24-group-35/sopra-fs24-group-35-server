@@ -36,7 +36,7 @@ public class GameController {
     public GameGetDTO getGameById(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
         @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
-        lobbyService.checkAuthorization(lobbyId, token);
+        //lobbyService.checkAuthorization(lobbyId, token);
         // fetch user in the internal representation
         Game game = gameService.getGameById(gameId);
         if (game == null) {
@@ -66,11 +66,11 @@ public class GameController {
     public ResponseEntity updateGame(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
         @RequestBody GamePostDTO gamePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
-        lobbyService.checkAuthorization(lobbyId, token);
+        //lobbyService.checkAuthorization(lobbyId, token);
         // convert API user to internal representation
         Game thingsToUpdate = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // update game data
-        Game toUpdate = gameService.updateGame(thingsToUpdate);
+        Game toUpdate = gameService.updateGame(thingsToUpdate, gameId);
         if (toUpdate == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game update failed");
         }
@@ -82,11 +82,11 @@ public class GameController {
     public ResponseEntity deleteGame(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
         @RequestBody GamePostDTO gamePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
-        lobbyService.checkAuthorization(lobbyId, token);
+        //lobbyService.checkAuthorization(lobbyId, token);
         // convert API user to internal representation
         Game gameToDelete = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // delete game data
-        Game toDelete = gameService.deleteGame(gameToDelete);
+        Game toDelete = gameService.deleteGame(gameToDelete, gameId);
         if (toDelete == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game deletion failed");
         }
