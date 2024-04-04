@@ -5,16 +5,23 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Embeddable
+
+
+@Entity
+@Table(name = "TERRITORY")
 public class Territory implements Serializable {
+
+    @Id
+    @GeneratedValue
+    private Long territoryId;
     
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private String name;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private String owner;
 
-    @Column(nullable = false, unique = false)
+    @Column(nullable = true, unique = false)
     private int troops;
 
      // Getter and setter for name

@@ -7,8 +7,8 @@ import ch.uzh.ifi.hase.soprafs24.entity.Game;
 @Repository("gameRepository")
 public interface GameRepository extends JpaRepository<Game, Long> {
 
-    Game getById(Long gameId);
+    Game getByGameId(Long gameId);
 
-    void deleteById(Long gameId);
+    void deleteByGameId(Long gameId);
     
 }

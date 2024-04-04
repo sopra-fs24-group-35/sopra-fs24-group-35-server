@@ -6,10 +6,15 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 
-@Embeddable
+@Entity
+@Table(name = "RISKCARD")
 public class RiskCard implements Serializable {
 
-    @Column(nullable = false, unique = false)
+    @Id
+    @GeneratedValue
+    private Long cardId;
+
+    @Column(nullable = true, unique = false)
     private String type;
 
     // Getter and setter for type
