@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.UserList;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserListPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
@@ -32,24 +34,22 @@ public class UserController {
     this.userService = userService;
   }
 
-  @GetMapping("/users")
+  @PostMapping("/users/lobbies")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<UserGetDTO> getAllUsers(
-    @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token, 
-    @RequestHeader(name = "User_ID", required = true, defaultValue = "") String user_id) {
-    // check if request is authorized
-    System.out.println(token);
-    System.out.println(user_id);
-    userService.checkAuthorization(Long.parseLong(user_id), token);
+  public List<UserGetDTO> getLobbyUsers(@RequestBody UserListPostDTO userListPostDTO){
     
+    UserList userInput = DTOMapper.INSTANCE.convertUserListPostDTOtoEntity(userListPostDTO);
+
+    //Create List to store all users
     List<UserGetDTO> userGetDTOs = new ArrayList<>();
-    // fetch all users in the internal representation
-    List<User> users = userService.getUsers();
-    // convert each user to the API representation
-    for (User user : users) {
-      userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+
+    //Go through each id which is stored in the userInput
+    //Get the user through the id and store it as UserGetDTO in the output list
+    for (Long id : userInput.getUserIdList()) {
+      userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(userService.getUserById(id)));
     }
+
     return userGetDTOs;
   }
 

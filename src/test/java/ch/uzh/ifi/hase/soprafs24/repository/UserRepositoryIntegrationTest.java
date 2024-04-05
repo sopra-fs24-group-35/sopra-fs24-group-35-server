@@ -10,8 +10,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.time.LocalDate;
-
 @DataJpaTest
 public class UserRepositoryIntegrationTest {
 
@@ -29,7 +27,6 @@ public class UserRepositoryIntegrationTest {
     user.setUsername("firstname@lastname");
     user.setPassword("12345678");
     user.setStatus(UserStatus.OFFLINE);
-    user.setCreationDate(LocalDate.of(2000, 1, 1));
     user.setToken("1");
 
     entityManager.persist(user);
@@ -43,7 +40,6 @@ public class UserRepositoryIntegrationTest {
     assertEquals(found.getUsername(), user.getUsername());
     assertEquals(found.getToken(), user.getToken());
     assertEquals(found.getStatus(), user.getStatus());
-    assertEquals(found.getBirthday(), user.getBirthday());
     assertEquals(found.getPassword(), user.getPassword());
   }
 
@@ -55,7 +51,6 @@ public class UserRepositoryIntegrationTest {
     user.setUsername("firstname@lastname");
     user.setPassword("12345678");
     user.setStatus(UserStatus.OFFLINE);
-    user.setCreationDate(LocalDate.of(2000, 1, 1));
     user.setToken("1");
 
     entityManager.persist(user);
@@ -69,7 +64,6 @@ public class UserRepositoryIntegrationTest {
     assertEquals(found.getUsername(), user.getUsername());
     assertEquals(found.getToken(), user.getToken());
     assertEquals(found.getStatus(), user.getStatus());
-    assertEquals(found.getBirthday(), user.getBirthday());
     assertEquals(found.getPassword(), user.getPassword());
     
   }
