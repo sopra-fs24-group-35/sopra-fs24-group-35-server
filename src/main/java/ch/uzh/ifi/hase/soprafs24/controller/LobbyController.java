@@ -30,7 +30,10 @@ public class LobbyController{
     @GetMapping("/lobbies/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LobbyGetDTO getLobby(@PathVariable("id") Long id){
+    public LobbyGetDTO getLobby(@PathVariable("id") Long id,
+    @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token){
+        //Check Authorization
+        lobbyService.checkAuthorization(id, token);
 
         //find Lobby
         Lobby lobby = lobbyService.getLobbyById(id);
@@ -42,20 +45,23 @@ public class LobbyController{
     @PostMapping("/lobbies")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public LobbyGetDTO createLobby(@RequestBody  LobbyPostDTO lobbyPostDTO){
+    public LobbyGetDTO createLobby(@RequestBody  LobbyPostDTO lobbyPostDTO, HttpServletResponse response){
 
         //transform input
         Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
 
         //create Lobby
         Lobby createdLobby = lobbyService.createLobby(playerInput);
+
+        //Also send token back through header
+        response.addHeader("Authorization", createdLobby.getToken());
         return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(createdLobby);
     }
 
     @PostMapping("/lobbies/update")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LobbyGetDTO updateLobby(@RequestBody LobbyPostDTO lobbyPostDTO){
+    public LobbyGetDTO updateLobby(@RequestBody LobbyPostDTO lobbyPostDTO, HttpServletResponse response){
         
         Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
 
@@ -66,18 +72,24 @@ public class LobbyController{
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The Lobby with the given Code '%s' doesn't exist.", playerInput.getCode()));
         }
 
+        //Also send token back
+        response.addHeader("Authorization", updatedLobby.getToken());
+
         return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
     }
 
     @PostMapping("/lobbies/{id}/remove")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LobbyGetDTO removePlayer(@PathVariable("id") Long id,
+    public void removePlayer(@PathVariable("id") Long id,
         @RequestBody LobbyPostDTO lobbyPostDTO){
 
         Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
 
         Lobby updatedLobby = lobbyService.removePlayer(playerInput, id);
-        return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
+
+        /*if (updatedLobby == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The Lobby with the given ID '%s' doesn't exist.", playerInput.getId()));
+        }*/
     }
 }

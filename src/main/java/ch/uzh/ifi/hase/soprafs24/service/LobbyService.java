@@ -10,18 +10,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Random;
+import java.util.UUID;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 @Service
 @Transactional
 public class LobbyService{
 
-    private final Logger log = LoggerFactory.getLogger(LobbyService.class);
-
     private final LobbyRepository lobbyRepository;
 
     Random rand = new Random();
+
+    @PersistenceContext
+    private EntityManager manager;
 
   
     public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
@@ -44,6 +48,18 @@ public class LobbyService{
         return this.lobbyRepository.getById(lobby_id);
     }
 
+    public void checkAuthorization(Long lobby_id, String token) {
+        Lobby lobbyById = lobbyRepository.getById(lobby_id);
+        if (lobbyById == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            String.format("The Lobby with the ID %s doesn't exist.", lobby_id));
+        } else if (!lobbyById.getToken().equals(token)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+            "Authorization failed. The user is not allowed to access this Lobby.");
+        }
+        return;
+    }
+
     public Lobby createLobby(Lobby newLobby){
 
         boolean alreadyExists = checkIfLobbyExistsId(newLobby.getId(), false);
@@ -51,7 +67,11 @@ public class LobbyService{
             return null;
         }
 
-        //Creator of Lobby is already in players
+        //Set Creator of Lobby as owner
+        newLobby.setOwnerId(newLobby.getPlayers().get(0));
+
+        //Set the token of the Lobby
+        newLobby.setToken(UUID.randomUUID().toString());
 
         //Set the Lobby join Code
         newLobby.setCode(String.valueOf(rand.nextInt(10000)));
@@ -74,9 +94,7 @@ public class LobbyService{
         
         Lobby toUpdate = getLobbyByCode(code);
         //add new player
-        for(Long player : playerInput.getPlayers()){
-            toUpdate.addPlayers(player);
-        }
+        toUpdate.addPlayers(playerInput.getPlayers().get(0));
 
         //update Repository
         toUpdate = lobbyRepository.save(toUpdate);
@@ -93,9 +111,20 @@ public class LobbyService{
 
         Lobby toUpdate = getLobbyById(lobby_id);
         
+        Long playerId = playerInput.getPlayers().get(0);
         //remove Player
-        for (Long player: playerInput.getPlayers()){
-            toUpdate.removePlayers(player);
+        toUpdate.removePlayers(playerId);
+
+        //Check if player is LobbyOwner
+        if (toUpdate.getOwnerId().equals(playerId)){
+            //If no more players are in Lobby, delete Lobby
+            if (toUpdate.getPlayers().isEmpty()) {
+                manager.remove(toUpdate);
+                return null;
+            } //Else make next Player LobbyOwner
+            else {
+                toUpdate.setOwnerId(toUpdate.getPlayers().get(0));
+            }
         }
 
         //save in repository
