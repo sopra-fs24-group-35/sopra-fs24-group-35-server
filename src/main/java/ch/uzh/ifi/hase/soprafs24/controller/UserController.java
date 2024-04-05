@@ -34,27 +34,6 @@ public class UserController {
     this.userService = userService;
   }
 
-  @GetMapping("/users")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<UserGetDTO> getAllUsers(
-    @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token, 
-    @RequestHeader(name = "User_ID", required = true, defaultValue = "") String user_id) {
-    // check if request is authorized
-    System.out.println(token);
-    System.out.println(user_id);
-    userService.checkAuthorization(Long.parseLong(user_id), token);
-    
-    List<UserGetDTO> userGetDTOs = new ArrayList<>();
-    // fetch all users in the internal representation
-    List<User> users = userService.getUsers();
-    // convert each user to the API representation
-    for (User user : users) {
-      userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
-    }
-    return userGetDTOs;
-  }
-
   @PostMapping("/users/lobbies")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody

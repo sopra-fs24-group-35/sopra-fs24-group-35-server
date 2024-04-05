@@ -47,10 +47,6 @@ public class UserService {
     return this.userRepository.getById(user_id);
   }
 
-  public List<User> getUsers() {
-    return this.userRepository.findAll();
-  }
-
   public User loginUser(User userData) {
     try {
       boolean exists = checkIfUserExistsUsername(userData, true);
