@@ -32,7 +32,6 @@ public class UserServiceTest {
     testUser.setId(1L);
     testUser.setUsername("testUsername");
     testUser.setPassword("12345678");
-    testUser.setBirthday(null);
     testUser.setStatus(UserStatus.ONLINE);
 
     // when -> any object is being save in the userRepository -> return the dummy
