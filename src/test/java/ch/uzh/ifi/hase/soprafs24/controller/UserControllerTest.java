@@ -19,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
-import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -44,36 +43,6 @@ public class UserControllerTest {
 
   @MockBean
   private UserService userService;
-
-  @Test
-  public void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
-    // given
-    User user = new User();
-    //user.setName("Firstname Lastname");
-    user.setUsername("firstname@lastname");
-    user.setPassword("12345678");
-    user.setToken(("abc"));
-    user.setStatus(UserStatus.OFFLINE);
-
-    List<User> allUsers = Collections.singletonList(user);
-
-    // this mocks the UserService -> we define above what the userService should
-    // return when getUsers() is called
-    given(userService.getUsers()).willReturn(allUsers);
-
-    // when
-    MockHttpServletRequestBuilder getRequest = get("/users")
-      .contentType(MediaType.APPLICATION_JSON)
-      .header("User_ID", "1")
-      .header("Authorization", "abc");
-
-    // then
-    mockMvc.perform(getRequest).andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        //.andExpect(jsonPath("$[0].name", is(user.getName())))
-        .andExpect(jsonPath("$[0].username", is(user.getUsername())))
-        .andExpect(jsonPath("$[0].status", is(user.getStatus().toString())));
-  }
 
   @Test
   public void givenUser_whenGetUser_thenReturnJsonUser() throws Exception {
@@ -128,12 +97,10 @@ public class UserControllerTest {
     user.setUsername("testUsername");
     user.setToken("abc");
     user.setPassword("12345678");
-    user.setCreationDate(LocalDate.of(2000, 1, 1));
     user.setStatus(UserStatus.ONLINE);
 
     UserPostDTO userPostDTO = new UserPostDTO();
     userPostDTO.setUsername("testUsername");
-    userPostDTO.setBirthday(null);
 
     given(userService.createUser(Mockito.any())).willReturn(user);
 
@@ -145,8 +112,7 @@ public class UserControllerTest {
     mockMvc.perform(postRequest).andExpect(status().isCreated())
         .andExpect(jsonPath("$.id", is(user.getId().intValue())))
         .andExpect(jsonPath("$.username", is(user.getUsername())))
-        .andExpect(jsonPath("$.status", is(user.getStatus().toString())))
-        .andExpect(jsonPath("$.creationDate", is(user.getCreationDate().toString())));
+        .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
   }
 
 
@@ -155,7 +121,6 @@ public class UserControllerTest {
     // given
     UserPostDTO userPostDTO = new UserPostDTO();
     userPostDTO.setUsername("testUsername");
-    userPostDTO.setBirthday(null);
 
     given(userService.createUser(Mockito.any())).willReturn(null);
 
@@ -178,8 +143,6 @@ public class UserControllerTest {
     user.setUsername("testUsername");
     user.setToken("abc");
     user.setPassword("12345678");
-    user.setCreationDate(LocalDate.of(2000, 1, 1));
-    user.setBirthday(LocalDate.of(2000, 7, 7));
     user.setStatus(UserStatus.ONLINE);
 
     UserPostDTO userPostDTO = new UserPostDTO();;
@@ -198,9 +161,7 @@ public class UserControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id", is(user.getId().intValue())))
         .andExpect(jsonPath("$.username", is(user.getUsername())))
-        .andExpect(jsonPath("$.status", is(user.getStatus().toString())))
-        .andExpect(jsonPath("$.creationDate", is(user.getCreationDate().toString())))
-        .andExpect(jsonPath("$.birthday", is(user.getBirthday().toString())));
+        .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
   }
 
   @Test
@@ -208,7 +169,6 @@ public class UserControllerTest {
     // given
     UserPostDTO userPostDTO = new UserPostDTO();;
     userPostDTO.setUsername("testUsername");
-    userPostDTO.setBirthday(null);
 
     given(userService.loginUser(Mockito.any())).willReturn(null);
 
@@ -230,12 +190,10 @@ public class UserControllerTest {
     user.setUsername("testUsername");
     user.setToken("abc");
     user.setPassword("12345678");
-    user.setCreationDate(LocalDate.of(2000, 1, 1));
     user.setStatus(UserStatus.OFFLINE);
 
     UserPostDTO userPostDTO = new UserPostDTO();;
     userPostDTO.setUsername("testUsername");
-    userPostDTO.setBirthday(null);
 
     given(userService.logoutUser(Mockito.any())).willReturn(user);
 
@@ -259,7 +217,6 @@ public class UserControllerTest {
     // given
     UserPostDTO userPostDTO = new UserPostDTO();;
     userPostDTO.setUsername("testUsername");
-    userPostDTO.setBirthday(null);
 
     given(userService.logoutUser(Mockito.any())).willReturn(null);
 
@@ -284,12 +241,10 @@ public class UserControllerTest {
     user.setUsername("testUsername");
     user.setToken("abc");
     user.setPassword("12345678");
-    user.setCreationDate(LocalDate.of(2000, 1, 1));
     user.setStatus(UserStatus.OFFLINE);
 
     UserPostDTO userPostDTO = new UserPostDTO();;
     userPostDTO.setUsername("testUsername");
-    userPostDTO.setBirthday(null);
 
     given(userService.updateUser(Mockito.any(), Mockito.any())).willReturn(user);
 
@@ -310,7 +265,6 @@ public class UserControllerTest {
     // given
     UserPostDTO userPostDTO = new UserPostDTO();;
     userPostDTO.setUsername("testUsername");
-    userPostDTO.setBirthday(null);
 
     given(userService.updateUser(Mockito.any(), Mockito.any())).willReturn(null);
 
