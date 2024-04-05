@@ -29,14 +29,4 @@ public class UserPostDTO {
   public void setPassword(String password) {
     this.password = password;
   }
-
-  public LocalDate getBirthday() {
-    return birthday;
-  }
-
-  public void setBirthday(LocalDate birthday) {
-    this.birthday = birthday;
-  }
-
-
 }

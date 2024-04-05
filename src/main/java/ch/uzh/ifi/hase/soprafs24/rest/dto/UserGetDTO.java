@@ -31,18 +31,6 @@ public class UserGetDTO {
     return birthday;
   }
 
-  public void setBirthday(LocalDate birthday) {
-    this.birthday = birthday;
-  }
-
-  public LocalDate getCreationDate() {
-    return creationDate;
-  }
-
-  public void setCreationDate(LocalDate creationDate) {
-    this.creationDate = creationDate;
-  }
-
   public UserStatus getStatus() {
     return status;
   }
