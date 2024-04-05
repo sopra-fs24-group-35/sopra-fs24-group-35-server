@@ -13,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
-import java.time.LocalDate;
 
 /**
  * User Service
@@ -98,8 +97,6 @@ public class UserService {
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.ONLINE);
-    LocalDate date = LocalDate.now();
-    newUser.setCreationDate(date);
     boolean exists = checkIfUserExistsUsername(newUser, false);
     if (!exists) {
       return null;
@@ -123,9 +120,6 @@ public class UserService {
     // Update Username and Birthday
     if (userData.getUsername() != null) {
       toUpdate.setUsername(userData.getUsername());
-    }
-    if (userData.getBirthday() != null) {
-      toUpdate.setBirthday(userData.getBirthday());
     }
     
     toUpdate = userRepository.save(toUpdate);
