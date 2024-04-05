@@ -1,17 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-import java.time.LocalDate;
 
 public class UserPostDTO {
 
   private String username;
 
   private String password;
-
-  private LocalDate birthday;
-
-  
-
 
 
   public String getUsername() {
