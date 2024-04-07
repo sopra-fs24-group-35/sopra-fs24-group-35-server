@@ -36,13 +36,7 @@ public class GameService {
     }
 
     public Game createGame(Game newGame) {
-        System.out.println("NEWGAME:");
-        System.out.println(newGame);
-        System.out.println("ENDNEWGAME");
         Game initializedGame = initializeGame(newGame);
-        System.out.println("IGAME:");
-        System.out.println(initializedGame);
-        System.out.println("ENDIGAME");
         initializedGame = gameRepository.save(initializedGame);
         gameRepository.flush();
 
