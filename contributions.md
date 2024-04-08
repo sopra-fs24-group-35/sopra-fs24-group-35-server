@@ -19,7 +19,6 @@
     08.04.2024
         Links: 
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/39
-            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/44
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/37
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/36
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/24
