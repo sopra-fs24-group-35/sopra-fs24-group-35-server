@@ -91,5 +91,17 @@
             When scrolling through the server-sided engineering tasks on GitHub that aren't assigned yet, I noticed that there exist some which I have done by a lare part by accident, because of some overlapping with the three engineering tasks above. However I think this isn't necessarily a bad thing, because the way is going to be well paved when they're being implemented in the future. 
 
 
-#### [Name] [(GitHub Username)]:
+#### Marlon Anderes [(SylverSezari)]:
+    08.04.2024
+        Links:
+            Issue #49:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/49
+
+            Issue #24:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/24
+
+            Issue #61:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/61
+
+            I created the Lobby Class, LobbyController and LobbyService and everything else to do with Lobby in the server and modified the user so it fits our purposes. I also created the UserList class so it is easier to return a list of users.
 
