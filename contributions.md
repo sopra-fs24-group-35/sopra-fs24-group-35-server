@@ -10,7 +10,8 @@
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/31
 
         Description:  
-            Struggled with the branches in git and getting the users in the lobby to show because of a missing REST request. Now everything is working properly. Also helped implementing a way to join lobby using the lobby code.  
+            Struggled with the branches in git and getting the users in the lobby to show because of a missing REST request.  
+            Now everything is working properly. Also helped implementing a way to join lobby using the lobby code.  
 
 #### [Name] [(GitHub Username)]:
 
