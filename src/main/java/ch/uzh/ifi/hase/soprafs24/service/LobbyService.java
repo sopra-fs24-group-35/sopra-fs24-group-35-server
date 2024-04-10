@@ -62,11 +62,6 @@ public class LobbyService{
 
     public Lobby createLobby(Lobby newLobby){
 
-        boolean alreadyExists = checkIfLobbyExistsId(newLobby.getId(), false);
-        if (!alreadyExists){
-            return null;
-        }
-
         //Set Creator of Lobby as owner
         newLobby.setOwnerId(newLobby.getPlayers().get(0));
 
