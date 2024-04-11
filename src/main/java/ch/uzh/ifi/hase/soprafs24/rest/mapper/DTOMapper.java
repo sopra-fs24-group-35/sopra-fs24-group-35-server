@@ -33,6 +33,7 @@ public interface DTOMapper {
 
   DTOMapper INSTANCE = Mappers.getMapper(DTOMapper.class);
 
+  //User
   @Mapping(source = "username", target = "username")
   @Mapping(source = "password", target = "password")
   User convertUserPostDTOtoEntity(UserPostDTO userPostDTO);
@@ -42,19 +43,7 @@ public interface DTOMapper {
   @Mapping(source = "status", target = "status")
   UserGetDTO convertEntityToUserGetDTO(User user);
 
-  //@Mapping(source = "gameId", target = "gameId")
-  @Mapping(source = "board", target = "board")
-  @Mapping(source = "players", target = "players")
-  @Mapping(source = "turnCycle", target = "turnCycle")
-  Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
-
-  @Mapping(source = "gameId", target = "gameId")
-  @Mapping(source = "board", target = "board")
-  @Mapping(source = "players", target = "players")
-  @Mapping(source = "turnCycle", target = "turnCycle")
-  GameGetDTO convertEntityToGameGetDTO(Game game);
-
-
+  //Lobby
   @Mapping(source = "userIdList", target = "userIdList")
   UserList convertUserListPostDTOtoEntity(UserListPostDTO userListPostDTO);
 
@@ -67,4 +56,16 @@ public interface DTOMapper {
   @Mapping(source = "players", target = "players")
   @Mapping(source = "gameId", target = "gameId")
   LobbyGetDTO convertEntityToLobbyGetDTO(Lobby lobby);
+
+  //Game
+  @Mapping(source = "board", target = "board")
+  @Mapping(source = "players", target = "players")
+  @Mapping(source = "turnCycle", target = "turnCycle")
+  Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
+
+  @Mapping(source = "gameId", target = "gameId")
+  @Mapping(source = "board", target = "board")
+  @Mapping(source = "players", target = "players")
+  @Mapping(source = "turnCycle", target = "turnCycle")
+  GameGetDTO convertEntityToGameGetDTO(Game game);
 }
