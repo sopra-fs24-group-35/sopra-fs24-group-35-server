@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +26,11 @@ import javax.servlet.http.HttpServletResponse;
 public class GameController {
 
     private final GameService gameService;
+    private final LobbyService lobbyService;
 
-    GameController(GameService gameService) {
+    GameController(GameService gameService, LobbyService lobbyService) {
         this.gameService = gameService;
+        this.lobbyService = lobbyService;
     }
     
     // get game information
@@ -36,7 +39,7 @@ public class GameController {
     public GameGetDTO getGameById(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
         @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
-        //lobbyService.checkAuthorization(lobbyId, token);
+        lobbyService.checkAuthorization(lobbyId, token);
         // fetch user in the internal representation
         Game game = gameService.getGameById(gameId);
         if (game == null) {
@@ -66,7 +69,7 @@ public class GameController {
     public ResponseEntity updateGame(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
         @RequestBody GamePostDTO gamePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
-        //lobbyService.checkAuthorization(lobbyId, token);
+        lobbyService.checkAuthorization(lobbyId, token);
         // convert API user to internal representation
         Game thingsToUpdate = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // update game data
@@ -82,7 +85,7 @@ public class GameController {
     public ResponseEntity deleteGame(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
         @RequestBody GamePostDTO gamePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
-        //lobbyService.checkAuthorization(lobbyId, token);
+        lobbyService.checkAuthorization(lobbyId, token);
         // convert API user to internal representation
         Game gameToDelete = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // delete game data
