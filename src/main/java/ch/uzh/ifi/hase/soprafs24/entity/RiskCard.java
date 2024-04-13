@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 // Risk Card
+
 @Entity
 @Table(name = "RISKCARD")
 public class RiskCard implements Serializable {
