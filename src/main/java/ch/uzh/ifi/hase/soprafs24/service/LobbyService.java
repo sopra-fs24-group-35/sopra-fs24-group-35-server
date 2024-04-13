@@ -67,33 +67,7 @@ public class LobbyService{
         }
     }
 
-    public void addGameToLobby(long lobbyId, long gameId) {
-
-        //get lobby from repository
-        Lobby toUpdate = getLobbyById(lobbyId);
-
-        //add the game to the lobby
-        toUpdate.setGameId(gameId);
-
-        //update Repository
-        toUpdate = lobbyRepository.save(toUpdate);
-        lobbyRepository.flush();
-
-    }
-
-    public void removeGameFromLobby(long lobbyId) {
-
-        //get lobby from repository
-        Lobby toUpdate = getLobbyById(lobbyId);
-
-        //remove the game from the lobby
-        toUpdate.setGameId(null);
-
-        //update Repository
-        toUpdate = lobbyRepository.save(toUpdate);
-        lobbyRepository.flush();
-
-    }
+    
 
     public Lobby createLobby(Lobby newLobby){
 
@@ -166,6 +140,39 @@ public class LobbyService{
         }
 
         //save in repository
+        toUpdate = lobbyRepository.save(toUpdate);
+        lobbyRepository.flush();
+
+        return toUpdate;
+    }
+
+
+    public Lobby startGame(Long lobby_id, Long game_id){
+        boolean exists = checkIfLobbyExistsId(lobby_id, true);
+        if (!exists){
+            return null;
+        }
+
+        Lobby toUpdate = getLobbyById(lobby_id);
+
+        toUpdate.setGameId(game_id);
+
+        toUpdate = lobbyRepository.save(toUpdate);
+        lobbyRepository.flush();
+
+        return toUpdate;
+    }
+
+    public Lobby endGame(Long lobby_id){
+        boolean exists = checkIfLobbyExistsId(lobby_id, true);
+        if (!exists){
+            return null;
+        }
+
+        Lobby toUpdate = getLobbyById(lobby_id);
+
+        toUpdate.setGameId(null);
+
         toUpdate = lobbyRepository.save(toUpdate);
         lobbyRepository.flush();
 

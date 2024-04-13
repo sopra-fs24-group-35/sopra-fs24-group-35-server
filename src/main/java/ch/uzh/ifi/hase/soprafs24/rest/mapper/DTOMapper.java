@@ -12,6 +12,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.UserListPostDTO;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPutDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
 
 import org.mapstruct.*;
@@ -47,12 +48,16 @@ public interface DTOMapper {
   @Mapping(source = "userIdList", target = "userIdList")
   UserList convertUserListPostDTOtoEntity(UserListPostDTO userListPostDTO);
 
-  @Mapping(source = "code", target = "code")
   @Mapping(source = "players", target = "players")
   Lobby convertLobbyPostDTOtoEntity(LobbyPostDTO lobbyPostDTO);
 
+  @Mapping(source = "code", target = "code")
+  @Mapping(source = "players", target = "players")
+  Lobby convertLobbyPutDTOtoEntity(LobbyPutDTO lobbyPutDTO);
+
   @Mapping(source = "id", target = "id")
   @Mapping(source = "code", target = "code")
+  @Mapping(source = "ownerId", target = "ownerId")
   @Mapping(source = "players", target = "players")
   @Mapping(source = "gameId", target = "gameId")
   LobbyGetDTO convertEntityToLobbyGetDTO(Lobby lobby);
