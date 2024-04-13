@@ -7,6 +7,7 @@ public class LobbyGetDTO {
 
     private Long id;
     private String code;
+    private Long ownerId;
     private List<Long> players = new ArrayList<Long>();
     private Long gameId;
 
@@ -24,6 +25,14 @@ public class LobbyGetDTO {
 
     public void setCode(String code) {
     this.code = code;
+    }
+
+    public Long getOwnerId(){
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId){
+        this.ownerId = ownerId;
     }
 
     public List<Long> getPlayers(){
