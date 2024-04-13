@@ -3,8 +3,18 @@ package ch.uzh.ifi.hase.soprafs24.rest.dto;
 import java.util.ArrayList;
 
 
-public class LobbyPostDTO {
+public class LobbyPutDTO {
+
+    private String code;
     private ArrayList<Long> players = new ArrayList<Long>();
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+    this.code = code;
+    }
 
     public ArrayList<Long> getPlayers(){
         return players;
