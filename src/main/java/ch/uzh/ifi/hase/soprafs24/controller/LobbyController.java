@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPutDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.springframework.http.HttpStatus;
@@ -58,12 +59,12 @@ public class LobbyController{
         return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(createdLobby);
     }
 
-    @PostMapping("/lobbies/update")
+    @PutMapping("/lobbies/update")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LobbyGetDTO updateLobby(@RequestBody LobbyPostDTO lobbyPostDTO, HttpServletResponse response){
+    public LobbyGetDTO updateLobby(@RequestBody LobbyPutDTO lobbyPutDTO, HttpServletResponse response){
         
-        Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
+        Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPutDTOtoEntity(lobbyPutDTO);
 
         //update Lobby
         Lobby updatedLobby = lobbyService.updateLobby(playerInput);
@@ -78,13 +79,13 @@ public class LobbyController{
         return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
     }
 
-    @PostMapping("/lobbies/{id}/remove")
+    @PutMapping("/lobbies/{id}/remove")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void removePlayer(@PathVariable("id") Long id,
-        @RequestBody LobbyPostDTO lobbyPostDTO){
+        @RequestBody LobbyPutDTO lobbyPutDTO){
 
-        Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
+        Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPutDTOtoEntity(lobbyPutDTO);
 
         Lobby updatedLobby = lobbyService.removePlayer(playerInput, id);
 
