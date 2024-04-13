@@ -129,6 +129,38 @@ public class LobbyService{
         return toUpdate;
     }
 
+    public Lobby startGame(Long lobby_id, Long game_id){
+        boolean exists = checkIfLobbyExistsId(lobby_id, true);
+        if (!exists){
+            return null;
+        }
+
+        Lobby toUpdate = getLobbyById(lobby_id);
+
+        toUpdate.setGameId(game_id);
+
+        toUpdate = lobbyRepository.save(toUpdate);
+        lobbyRepository.flush();
+
+        return toUpdate;
+    }
+
+    public Lobby endGame(Long lobby_id){
+        boolean exists = checkIfLobbyExistsId(lobby_id, true);
+        if (!exists){
+            return null;
+        }
+
+        Lobby toUpdate = getLobbyById(lobby_id);
+
+        toUpdate.setGameId(null);
+
+        toUpdate = lobbyRepository.save(toUpdate);
+        lobbyRepository.flush();
+
+        return toUpdate;
+    }
+
     private boolean checkIfLobbyExistsId(Long lobby_id, boolean shouldExist){
         Lobby lobbyById = this.lobbyRepository.getById(lobby_id);
         // shouldExist: if true, an error is thrown if the user doesn't exist (and vice versa)

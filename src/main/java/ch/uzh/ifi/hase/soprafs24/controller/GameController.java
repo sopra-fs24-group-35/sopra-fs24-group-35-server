@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
@@ -8,6 +9,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
+import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +54,8 @@ public class GameController {
     @PostMapping("/lobbies/{lobbyId}/game")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public GameGetDTO createGame(@RequestBody GamePostDTO gamePostDTO, HttpServletResponse response) {
+    public GameGetDTO createGame(@PathVariable("lobbyId") Long lobbyId,
+        @RequestBody GamePostDTO gamePostDTO, HttpServletResponse response) {
         // convert API game to internal representation
         Game gameInput = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // create game
@@ -60,6 +63,10 @@ public class GameController {
         if (createdGame == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("Game creation failed."));
         }
+
+        //link game to Lobby
+        lobbyService.startGame(lobbyId, createdGame.getGameId());
+
         // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(createdGame);
     }
@@ -86,6 +93,9 @@ public class GameController {
         @RequestBody GamePostDTO gamePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
         lobbyService.checkAuthorization(lobbyId, token);
+
+        // set GameId in Lobby to null
+        lobbyService.endGame(lobbyId);
         // convert API user to internal representation
         Game gameToDelete = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // delete game data
