@@ -57,6 +57,10 @@ public class Game implements Serializable {
         this.players = players;
     }
 
+    public void addPlayers(Player player) {
+        this.players.add(player);
+    }
+
     // Getter and setter for turnCycle
     public TurnCycle getTurnCycle() {
         return turnCycle;

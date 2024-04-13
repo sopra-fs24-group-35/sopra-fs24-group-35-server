@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ch.uzh.ifi.hase.soprafs24.service.UserService;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
+import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
@@ -22,6 +24,8 @@ import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 public class GameService {
     
     private final Logger log = LoggerFactory.getLogger(GameService.class);
+
+    private UserService userService;
 
     private final GameRepository gameRepository;
 
@@ -85,6 +89,29 @@ public class GameService {
 
         log.debug("Deleted a Game");
         return;
+    }
+
+    public Game addPlayers(ArrayList<Long> players, Long gameId){
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game deletion failed, because there is no game with this id.");
+        }
+        //Get game
+        Game updatedGame = getGameById(gameId);
+
+        //Create players from their id and add them to player list
+        for(Long id: players){
+            Player player = new Player();
+            player.setPlayerId(id);
+            player.setUsername(userService.getUserById(id).getUsername());
+            updatedGame.addPlayers(player);
+        }
+
+        //Save Game in repository
+        updatedGame = gameRepository.save(updatedGame);
+        gameRepository.flush();
+
+        return updatedGame;
     }
 
 
@@ -467,10 +494,6 @@ public class GameService {
         board.setTerritories(territories);
 
         game.setBoard(board);
-
-        //PLAYERS-----------------------------------------------
-
-        game.setPlayers(null);
 
         //TURN CYCLE-----------------------------------------------
 
