@@ -42,24 +42,23 @@ public class GameController {
         lobbyService.checkAuthorization(lobbyId, token);
         // fetch user in the internal representation
         Game game = gameService.getGameById(gameId);
-        if (game == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The game with the given ID doesn't exist.");
-        }
         // convert user to the API representation
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(game);
     }
 
+    // create new game
     @PostMapping("/lobbies/{lobbyId}/game")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public GameGetDTO createGame(@RequestBody GamePostDTO gamePostDTO, HttpServletResponse response) {
+    public GameGetDTO createGame(@PathVariable("lobbyId") Long lobbyId, @RequestBody GamePostDTO gamePostDTO, HttpServletResponse response) {
         // convert API game to internal representation
         Game gameInput = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
+        // check if lobby exists
+        lobbyService.checkIfExists(lobbyId);
         // create game
         Game createdGame = gameService.createGame(gameInput);
-        if (createdGame == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("Game creation failed."));
-        }
+        // add game to the lobby
+        lobbyService.addGameToLobby(lobbyId, createdGame.getGameId());
         // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(createdGame);
     }
@@ -73,10 +72,7 @@ public class GameController {
         // convert API user to internal representation
         Game thingsToUpdate = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // update game data
-        Game toUpdate = gameService.updateGame(thingsToUpdate, gameId);
-        if (toUpdate == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game update failed");
-        }
+        gameService.updateGame(thingsToUpdate, gameId);
         return ResponseEntity.noContent().build();
     }
 
@@ -88,11 +84,12 @@ public class GameController {
         lobbyService.checkAuthorization(lobbyId, token);
         // convert API user to internal representation
         Game gameToDelete = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
+        // check if lobby exists
+        lobbyService.checkIfExists(lobbyId);
         // delete game data
-        Game toDelete = gameService.deleteGame(gameToDelete, gameId);
-        if (toDelete == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game deletion failed");
-        }
+        gameService.deleteGame(gameId);
+        // remove game from lobby
+        lobbyService.removeGameFromLobby(lobbyId);
         return ResponseEntity.noContent().build();
     }
 }
