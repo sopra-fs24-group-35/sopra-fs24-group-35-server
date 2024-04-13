@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 
-
+//Territory entity
 @Entity
 @Table(name = "TERRITORY")
 public class Territory implements Serializable {
