@@ -60,7 +60,50 @@ public class LobbyService{
         return;
     }
 
+    public void checkIfExists(long lobbyId) {
+        if (checkIfLobbyExistsId(lobbyId, true) == false) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "No lobby with this ID exists to add a game to.");
+        }
+    }
+
+    public void addGameToLobby(long lobbyId, long gameId) {
+
+        //get lobby from repository
+        Lobby toUpdate = getLobbyById(lobbyId);
+
+        //add the game to the lobby
+        toUpdate.setGameId(gameId);
+
+        //update Repository
+        toUpdate = lobbyRepository.save(toUpdate);
+        lobbyRepository.flush();
+
+    }
+
+    public void removeGameFromLobby(long lobbyId) {
+
+        //get lobby from repository
+        Lobby toUpdate = getLobbyById(lobbyId);
+
+        //remove the game from the lobby
+        toUpdate.setGameId(null);
+
+        //update Repository
+        toUpdate = lobbyRepository.save(toUpdate);
+        lobbyRepository.flush();
+
+    }
+
     public Lobby createLobby(Lobby newLobby){
+
+        //Throw error if there is no players list with at least one player ID
+        try {
+            newLobby.getPlayers().get(0);
+        } catch(Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "Lobby creation failed. No player id could be found in the players list of the request DTO, so the lobby owner can't be set.");
+        }
 
         //Set Creator of Lobby as owner
         newLobby.setOwnerId(newLobby.getPlayers().get(0));

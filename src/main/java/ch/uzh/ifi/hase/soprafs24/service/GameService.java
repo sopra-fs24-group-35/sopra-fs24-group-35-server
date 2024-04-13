@@ -7,7 +7,9 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
@@ -30,13 +32,19 @@ public class GameService {
     public Game getGameById(Long gameId) {
         boolean exists = checkIfGameExists(gameId, true);
         if (!exists) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No game with this id could be found.");
         }
+        log.debug("Sent out game information");
         return this.gameRepository.getByGameId(gameId);
     }
 
     public Game createGame(Game newGame) {
+        
+        // do game initialization
         Game initializedGame = initializeGame(newGame);
+
+        // save to repository
         initializedGame = gameRepository.save(initializedGame);
         gameRepository.flush();
 
@@ -44,30 +52,39 @@ public class GameService {
         return initializedGame;
     }
 
-    public Game updateGame(Game updatedGame, Long gameId) {
+    public void updateGame(Game updatedGame, Long gameId) {
+
+        // throww error if game with the given id doesn't exist
         boolean exists = checkIfGameExists(gameId, true);
         if (!exists) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game update failed, because there is no game with this id.");
         }
+
+        // update game
         updatedGame = doConsequences(updatedGame, gameRepository.getByGameId(updatedGame.getGameId()));
+
+        // save updated game to repository
         updatedGame = gameRepository.save(updatedGame);
         gameRepository.flush();
 
         log.debug("Updated a Game");
-        System.out.println("Updated a game");
-        return updatedGame;
+        return;
     }
 
-    public Game deleteGame(Game toDelete, Long gameId) {
+    public void deleteGame(Long gameId) {
+
+        // throw error if game with given id doesn't exist
         boolean exists = checkIfGameExists(gameId, true);
         if (!exists) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game deletion failed, because there is no game with this id.");
         }
-        gameRepository.deleteById(toDelete.getGameId());
+
+        // delete game
+        gameRepository.deleteById(gameId);
         gameRepository.flush();
 
         log.debug("Deleted a Game");
-        return toDelete;
+        return;
     }
 
 
