@@ -102,7 +102,7 @@ public class GameController {
         
         return ResponseEntity.noContent().build();
     }
-
+    
     @PostMapping("/lobbies/{lobbyId}/game/{gameId}/attacks")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -116,5 +116,5 @@ public class GameController {
 
         // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(updatedGame);
-    }
+    } 
 }

@@ -11,7 +11,5 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     Game getByGameId(Long gameId);
 
     void deleteByGameId(Long gameId);
-
-    Territory getByName(String name);
     
 }
