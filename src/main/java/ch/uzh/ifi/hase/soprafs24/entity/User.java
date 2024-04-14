@@ -37,6 +37,9 @@ public class User implements Serializable {
   @Column(nullable = false)
   private UserStatus status;
 
+  @Column(nullable = true)
+  private int avatarId;
+
   public Long getId() {
     return id;
   }
@@ -76,4 +79,13 @@ public class User implements Serializable {
   public void setStatus(UserStatus status) {
     this.status = status;
   }
+
+  public int getAvatarId() {
+    return this.avatarId;
+  }
+
+  public void setAvatarId(int avatarId) {
+    this.avatarId = avatarId;
+  }
+
 }
