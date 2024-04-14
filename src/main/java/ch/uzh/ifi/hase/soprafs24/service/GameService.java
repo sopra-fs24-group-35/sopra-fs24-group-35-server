@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.Collections;
 
 import javax.transaction.Transactional;
 
@@ -15,6 +17,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Board;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
+import ch.uzh.ifi.hase.soprafs24.entity.Attack;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 
 @Service
@@ -87,6 +90,86 @@ public class GameService {
         return;
     }
 
+    public Game executeAttack(Attack attack, Long gameId) {
+        // check if game with the given id exists
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No game with this id could be found.");
+        }
+
+        // get game from repository
+        Game game = this.gameRepository.getByGameId(gameId);
+
+        // find territories of interest in the game entity
+        Territory attackingTerritory = null;
+        Territory defendingTerritory = null;
+        for (int i = 0; i < game.getBoard().getTerritories().size(); i++) {
+            if (game.getBoard().getTerritories().get(i).getName().equals(attack.getAttackingTerritory())) {
+                attackingTerritory = game.getBoard().getTerritories().get(i);
+            } else if (game.getBoard().getTerritories().get(i).getName().equals(attack.getDefendingTerritory())) {
+                defendingTerritory = game.getBoard().getTerritories().get(i);
+            }
+        }
+
+        // check if both territories are found
+        if (attackingTerritory == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "No attacking territory with the given name exists.");
+        }
+        if (defendingTerritory == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "No defending territory with the given name exists.");
+        }
+
+        // specify how many troops the attacker and the defender use each
+        int troopsFromAtk = Math.min(attackingTerritory.getTroops() - 1, Math.min(attack.getTroopsAmount(), 3));
+        int troopsFromDef = Math.min(defendingTerritory.getTroops(), 2);
+
+        // do dice rolling
+        Random rand = new Random(); 
+        ArrayList<Integer> atkRolls = new ArrayList<>();
+        ArrayList<Integer> defRolls = new ArrayList<>();
+
+
+        // attacker rolls dice between 1 and 3 times depending on situation. Results are added to an array.
+        for (int i = 0; i < troopsFromAtk; i++) {
+            atkRolls.add(rand.nextInt(6)+1);
+        }
+        
+        // defender rolls dice between 1 and 2 times depending on situation. Results are added to an array.
+        for (int i = 0; i < troopsFromDef; i++) {
+            defRolls.add(rand.nextInt(6)+1);
+        }
+        // sort dice results of both arrays in descending order to figure out the dice pairs
+        Collections.sort(atkRolls);
+        Collections.reverse(atkRolls);
+        Collections.sort(defRolls);
+        Collections.reverse(defRolls);
+
+        // compare first pair of dices
+        if (atkRolls.get(0) > defRolls.get(0)) { // if attacker wins with the first pair
+            defendingTerritory.setTroops(defendingTerritory.getTroops() - 1); // then remove a troop from the defending territory
+        } else {
+            attackingTerritory.setTroops(attackingTerritory.getTroops() - 1); // else remove a troop from the attacking territory
+        }
+
+        // compare second pair of dices if it exists (if both arrays have at least two dice rolls)
+        if (atkRolls.size() > 1 && defRolls.size() > 1) {
+            if (atkRolls.get(1) > defRolls.get(1)) { // if attacker wins with the second pair
+                defendingTerritory.setTroops(defendingTerritory.getTroops() - 1); // then remove a troop from the defending territory
+            } else {
+                attackingTerritory.setTroops(attackingTerritory.getTroops() - 1); // else remove a troop from the attacking territory
+            }
+        }
+
+        // Now save the adjusted territories to the repository
+        gameRepository.save(game);
+        gameRepository.flush();
+
+        return game;
+    }
+
 
     // Helper function to check if a game with a certain Id exists in the repository
     private boolean checkIfGameExists(Long gameId, boolean shouldExist) {
@@ -99,6 +182,8 @@ public class GameService {
         }
         return true;
     }
+
+    
 
     // Helper function to initialize game
     private Game initializeGame(Game game) {
