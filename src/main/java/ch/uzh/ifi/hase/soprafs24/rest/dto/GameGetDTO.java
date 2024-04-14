@@ -12,6 +12,7 @@ public class GameGetDTO {
     private Board board;
     private ArrayList<Player> players;
     private TurnCycle turnCycle;
+    private String diceResult;
 
     public Long getGameId() {
         return gameId;
@@ -43,6 +44,14 @@ public class GameGetDTO {
       
     public void setTurnCycle(TurnCycle turnCycle) {
         this.turnCycle = turnCycle;
+    }
+
+    public String getDiceResult() {
+        return diceResult;
+    }
+
+    public void setDiceResult(String diceResult) {
+        this.diceResult = diceResult;
     }
 
 }

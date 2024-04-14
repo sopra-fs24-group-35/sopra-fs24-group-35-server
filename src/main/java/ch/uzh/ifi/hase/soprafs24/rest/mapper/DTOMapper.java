@@ -75,6 +75,7 @@ public interface DTOMapper {
   @Mapping(source = "board", target = "board")
   @Mapping(source = "players", target = "players")
   @Mapping(source = "turnCycle", target = "turnCycle")
+  @Mapping(source = "diceResult", target = "diceResult")
   GameGetDTO convertEntityToGameGetDTO(Game game);
 
   //Attack

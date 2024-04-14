@@ -64,7 +64,7 @@ public class GameService {
         }
 
         // update game
-        updatedGame = doConsequences(updatedGame, gameRepository.getByGameId(updatedGame.getGameId()));
+        updatedGame = doConsequences(updatedGame, gameRepository.getByGameId(gameId));
 
         // save updated game to repository
         updatedGame = gameRepository.save(updatedGame);
@@ -131,15 +131,20 @@ public class GameService {
         ArrayList<Integer> atkRolls = new ArrayList<>();
         ArrayList<Integer> defRolls = new ArrayList<>();
 
+        // Answer string
+        String diceResult = "Atk: ";
 
         // attacker rolls dice between 1 and 3 times depending on situation. Results are added to an array.
         for (int i = 0; i < troopsFromAtk; i++) {
             atkRolls.add(rand.nextInt(6)+1);
+            diceResult += atkRolls.get(i).toString() + " ";
         }
         
         // defender rolls dice between 1 and 2 times depending on situation. Results are added to an array.
+        diceResult += "Def: ";
         for (int i = 0; i < troopsFromDef; i++) {
             defRolls.add(rand.nextInt(6)+1);
+            diceResult += defRolls.get(i).toString() + " ";
         }
         // sort dice results of both arrays in descending order to figure out the dice pairs
         Collections.sort(atkRolls);
@@ -162,6 +167,9 @@ public class GameService {
                 attackingTerritory.setTroops(attackingTerritory.getTroops() - 1); // else remove a troop from the attacking territory
             }
         }
+
+        // put dice result into game entity
+        game.setDiceResult(diceResult);
 
         // Now save the adjusted territories to the repository
         gameRepository.save(game);
@@ -567,7 +575,13 @@ public class GameService {
     // Helper function to execute consequences on a game when it has been updated by a client (by comparing old state from repository vs. new state from client)
     private Game doConsequences(Game newState, Game oldState) {
         // TODO: Insert code for consequences after a game update (e.g. remove troops, change owner of territory etc.)
-        return newState;
+        
+        for (int i = 0; i < oldState.getBoard().getTerritories().size(); i++) {
+            oldState.getBoard().getTerritories().get(i).setTroops(newState.getBoard().getTerritories().get(i).getTroops());
+            oldState.getBoard().getTerritories().get(i).setOwner(newState.getBoard().getTerritories().get(i).getOwner());
+        }
+        
+        return oldState;
     }
 
 }
