@@ -7,6 +7,9 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AttackPostDTO;
+import ch.uzh.ifi.hase.soprafs24.entity.Attack;
+
 import ch.uzh.ifi.hase.soprafs24.entity.UserList;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserListPostDTO;
 
@@ -73,4 +76,10 @@ public interface DTOMapper {
   @Mapping(source = "players", target = "players")
   @Mapping(source = "turnCycle", target = "turnCycle")
   GameGetDTO convertEntityToGameGetDTO(Game game);
+
+  //Attack
+  @Mapping(source = "attackingTerritory", target = "attackingTerritory")
+  @Mapping(source = "defendingTerritory", target = "defendingTerritory")
+  @Mapping(source = "troopsAmount", target = "troopsAmount")
+  Attack convertAttackPostDTOtoEntity(AttackPostDTO attackPostDTO);
 }

@@ -2,10 +2,12 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.entity.Attack;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AttackPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
@@ -60,9 +62,6 @@ public class GameController {
         lobbyService.checkIfExists(lobbyId);
         // create game
         Game createdGame = gameService.createGame(gameInput);
-        if (createdGame == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("Game creation failed."));
-        }
 
         //link game to Lobby
         lobbyService.startGame(lobbyId, createdGame.getGameId());
@@ -102,5 +101,20 @@ public class GameController {
         gameService.deleteGame(gameId);
         
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/lobbies/{lobbyId}/game/{gameId}/attacks")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameGetDTO executeAttack(@PathVariable("gameId") Long lobbyId,
+        @RequestBody AttackPostDTO attackPostDTO, HttpServletResponse response) {
+        // convert API game to internal representation
+        Attack attack = DTOMapper.INSTANCE.convertAttackPostDTOtoEntity(attackPostDTO);
+        // execute attack
+        Game updatedGame = gameService.executeAttack(attack);
+        
+
+        // convert internal representation of user back to API
+        return DTOMapper.INSTANCE.convertEntityToGameGetDTO(updatedGame);
     }
 }
