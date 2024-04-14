@@ -7,6 +7,7 @@ public class UserGetDTO {
   private Long id;
   private String username;
   private UserStatus status;
+  private int avatarId;
   
   public Long getId() {
     return id;
@@ -30,5 +31,13 @@ public class UserGetDTO {
 
   public void setStatus(UserStatus status) {
     this.status = status;
+  }
+
+  public int getAvatarId() {
+    return this.avatarId;
+  }
+
+  public void setAvatarId(int avatarId) {
+    this.avatarId = avatarId;
   }
 }
