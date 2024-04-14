@@ -106,12 +106,12 @@ public class GameController {
     @PostMapping("/lobbies/{lobbyId}/game/{gameId}/attacks")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GameGetDTO executeAttack(@PathVariable("gameId") Long lobbyId,
+    public GameGetDTO executeAttack(@PathVariable("gameId") Long gameId,
         @RequestBody AttackPostDTO attackPostDTO, HttpServletResponse response) {
         // convert API game to internal representation
         Attack attack = DTOMapper.INSTANCE.convertAttackPostDTOtoEntity(attackPostDTO);
         // execute attack
-        Game updatedGame = gameService.executeAttack(attack);
+        Game updatedGame = gameService.executeAttack(attack, gameId);
         
 
         // convert internal representation of user back to API
