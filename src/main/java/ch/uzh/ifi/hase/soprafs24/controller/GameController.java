@@ -111,7 +111,7 @@ public class GameController {
         // convert API game to internal representation
         Attack attack = DTOMapper.INSTANCE.convertAttackPostDTOtoEntity(attackPostDTO);
         // execute attack
-        Game updatedGame = gameService.executeAttack(attack, gameId);
+        Game updatedGame = gameService.executeRepeatedAttacks(attack, gameId);
         
 
         // convert internal representation of user back to API

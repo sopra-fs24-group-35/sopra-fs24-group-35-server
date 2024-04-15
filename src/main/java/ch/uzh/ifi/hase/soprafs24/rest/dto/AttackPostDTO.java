@@ -5,6 +5,7 @@ public class AttackPostDTO {
     private String attackingTerritory;
     private String defendingTerritory;
     private int troopsAmount;
+    private int repeats;
 
     // Getter for attackingTerritory
     public String getAttackingTerritory() {
@@ -34,5 +35,15 @@ public class AttackPostDTO {
     // Setter for troopsAmount
     public void setTroopsAmount(int troopsAmount) {
         this.troopsAmount = troopsAmount;
+    }
+
+    // Getter for repeats
+    public int getRepeats() {
+        return repeats;
+    }
+
+    // Setter for repeats
+    public void setRepeats(int repeats) {
+        this.repeats = repeats;
     }
 }
