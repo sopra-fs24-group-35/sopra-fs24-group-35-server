@@ -28,6 +28,17 @@
         and implemented the Join and Create Lobby site/buttons. (DISCLAIMER: we were a team of three in the FrontEnd therefor we all helped each           other if needed)
 
 
+    15.04.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/45
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/46
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/47
+
+        Description:
+            I worked on the external API. I integrated it and made a mechanism to change and safe the avatar on registration. 
+            My problem was, that I started wrong and had to restart halfway through.
+
+
 #### Ralph Kosch (RPKosch)
 
     08.04.2024
