@@ -108,6 +108,44 @@
             I have spent a lot of time researching on how to implement the associations between the entities such that they are stored in the database in a meaningful way. I first tried to use @Embeddable and @Embedded, but it turned out that this isn't the right way to go. Finally, I learned about @OneToOne and @OneToMany annotations which turned out to work properly. However, every entity had to be equipped with a primary key (ID).
             Currently, the initializeGame() function in the GameService file is huge regarding number of lines. Maybe there is a way to strip it down. But first, we aim to achieve a "minimum viable product".
             When scrolling through the server-sided engineering tasks on GitHub that aren't assigned yet, I noticed that there exist some which I have done by a lare part by accident, because of some overlapping with the three engineering tasks above. However I think this isn't necessarily a bad thing, because the way is going to be well paved when they're being implemented in the future. 
+            
+15.04.2024
+		Links:
+
+            Issue #60:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57223763
+            Issue #55:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57215139
+            Issue #27:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57112487
+            Issue #54:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57215140
+            Issue #34:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57215141
+
+        Description:
+
+            I did the following:
+            For Issue #60:
+            - Implemented by Marlon, I did some refinements
+
+            For Issue #55:
+            - Created executeAttack function which performs an attack with dice rolling and performing all the consequences of the dice results
+            - Created a new attack entity and an attack DTO which can be sent by the clients to perform an attack
+            - Tested it with Postman
+
+            For Issue #27:
+            - This one was a bit redundant, since the card object has already been created by a large part.
+
+            For Issue #54:
+            - This one was also a bit redundant, because the territory entities were already implemented
+
+            For Issue #34:
+            - Closely related to #55
+            - I have designed the executeAttack function such that the attacker can choose how many troops he wants to attack with. The information is sent via the attack DTO.
+
+            The biggest part was the implementation of the executeAttack function. A lot of thinking went into this, not only the best way to implement the dice rolling and evaluation, but also how the client should tell the server to execute an attack. Originally this was planned to be done via the Game DTO, but it appeared to be much more easy to create a new attack DTO for this, despite violation of our REST specification, but this is an advantage of an agile process.
+
 
 
 #### Marlon Anderes [(SylverSezari)]:
