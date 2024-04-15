@@ -12,6 +12,15 @@
         Description:  
             Struggled with the branches in git and getting the users in the lobby to show because of a missing REST request.  
             Now everything is working properly. Also helped implementing a way to join lobby using the lobby code. 
+    
+    15.04.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/35#issue-2200270336
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/33#issue-2200246624
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/30#issue-2200193611
+
+        Description:
+            Fixed several REST requests, added a start game functionality in the lobby screen and made an adjacency dictionary for all the territories.
 
 
 #### Nico (Eposs111)
