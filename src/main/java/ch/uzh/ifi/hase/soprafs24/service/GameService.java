@@ -122,9 +122,15 @@ public class GameService {
             "No defending territory with the given name exists.");
         }
 
+
         // specify how many troops the attacker and the defender use each
         int troopsFromAtk = Math.min(attackingTerritory.getTroops() - 1, Math.min(attack.getTroopsAmount(), 3));
         int troopsFromDef = Math.min(defendingTerritory.getTroops(), 2);
+
+        // check if attacker has more than one troop in his territory, otherwise leave game state unchanged and return
+        if (troopsFromAtk == 0) {
+            return game;
+        }
 
         // do dice rolling
         Random rand = new Random(); 
@@ -167,6 +173,13 @@ public class GameService {
                 attackingTerritory.setTroops(attackingTerritory.getTroops() - 1); // else remove a troop from the attacking territory
             }
         }
+
+        // if attacker has beaten all troops of the defending territory, he gets ownership of it and attacking troops are transferred to it
+        if (defendingTerritory.getTroops() <= 0) {
+            defendingTerritory.setOwner(attackingTerritory.getOwner());
+            defendingTerritory.setTroops(troopsFromAtk);
+        }
+
 
         // put dice result into game entity
         game.setDiceResult(diceResult);
@@ -576,6 +589,7 @@ public class GameService {
     private Game doConsequences(Game newState, Game oldState) {
         // TODO: Insert code for consequences after a game update (e.g. remove troops, change owner of territory etc.)
         
+        // This function simply transfers territory stats from the incoming request to the repository game
         for (int i = 0; i < oldState.getBoard().getTerritories().size(); i++) {
             oldState.getBoard().getTerritories().get(i).setTroops(newState.getBoard().getTerritories().get(i).getTroops());
             oldState.getBoard().getTerritories().get(i).setOwner(newState.getBoard().getTerritories().get(i).getOwner());
