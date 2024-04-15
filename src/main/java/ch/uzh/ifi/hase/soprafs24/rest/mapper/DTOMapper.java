@@ -82,5 +82,6 @@ public interface DTOMapper {
   @Mapping(source = "attackingTerritory", target = "attackingTerritory")
   @Mapping(source = "defendingTerritory", target = "defendingTerritory")
   @Mapping(source = "troopsAmount", target = "troopsAmount")
+  @Mapping(source = "repeats", target = "repeats")
   Attack convertAttackPostDTOtoEntity(AttackPostDTO attackPostDTO);
 }

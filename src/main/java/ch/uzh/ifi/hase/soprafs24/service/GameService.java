@@ -90,8 +90,7 @@ public class GameService {
         return;
     }
 
-    public Game executeAttack(Attack attack, Long gameId) {
-        // check if game with the given id exists
+    public Game executeRepeatedAttacks(Attack attack, Long gameId) {
         boolean exists = checkIfGameExists(gameId, true);
         if (!exists) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -122,15 +121,35 @@ public class GameService {
             "No defending territory with the given name exists.");
         }
 
+        // repeat attacks as many times as 'repeat' specifies, but only do it as long as there are enough troops on both territories.
+        String diceResult = "";
+        game.setDiceResult(diceResult);
+        for (int i = 0; i < attack.getRepeats(); i++) {
+            if (defendingTerritory.getTroops() > 0 && attackingTerritory.getTroops() > 1) {
+                game = executeAttack(game, attack, attackingTerritory, defendingTerritory);
+            }
+        }
+
+        // if attacker has beaten all troops of the defending territory, he gets ownership of it and attacking troops are transferred to it
+        int troopsFromAtk = Math.min(attackingTerritory.getTroops() - 1, Math.min(attack.getTroopsAmount(), 3));
+        if (defendingTerritory.getTroops() <= 0) {
+            defendingTerritory.setOwner(attackingTerritory.getOwner());
+            defendingTerritory.setTroops(troopsFromAtk);
+        }
+
+        // Now save the adjusted territories to the repository
+        gameRepository.save(game);
+        gameRepository.flush();
+
+        return game;
+    }
+
+    public Game executeAttack(Game game, Attack attack, Territory attackingTerritory, Territory defendingTerritory) {
+        
 
         // specify how many troops the attacker and the defender use each
         int troopsFromAtk = Math.min(attackingTerritory.getTroops() - 1, Math.min(attack.getTroopsAmount(), 3));
         int troopsFromDef = Math.min(defendingTerritory.getTroops(), 2);
-
-        // check if attacker has more than one troop in his territory, otherwise leave game state unchanged and return
-        if (troopsFromAtk == 0) {
-            return game;
-        }
 
         // do dice rolling
         Random rand = new Random(); 
@@ -138,7 +157,8 @@ public class GameService {
         ArrayList<Integer> defRolls = new ArrayList<>();
 
         // Answer string
-        String diceResult = "Atk: ";
+        String diceResult = game.getDiceResult();
+        diceResult += "Atk: ";
 
         // attacker rolls dice between 1 and 3 times depending on situation. Results are added to an array.
         for (int i = 0; i < troopsFromAtk; i++) {
@@ -174,19 +194,11 @@ public class GameService {
             }
         }
 
-        // if attacker has beaten all troops of the defending territory, he gets ownership of it and attacking troops are transferred to it
-        if (defendingTerritory.getTroops() <= 0) {
-            defendingTerritory.setOwner(attackingTerritory.getOwner());
-            defendingTerritory.setTroops(troopsFromAtk);
-        }
-
 
         // put dice result into game entity
         game.setDiceResult(diceResult);
 
-        // Now save the adjusted territories to the repository
-        gameRepository.save(game);
-        gameRepository.flush();
+        
 
         return game;
     }
