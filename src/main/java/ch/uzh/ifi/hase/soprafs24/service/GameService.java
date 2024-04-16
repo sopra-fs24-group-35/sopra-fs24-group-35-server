@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.transaction.Transactional;
 
@@ -18,6 +19,8 @@ import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -125,6 +128,40 @@ public class GameService {
             return false;
         }
         return true;
+    }
+
+    public Game randomizedBeginning(Game game){
+        int AmountOfPlayers = game.getPlayers().size();
+        int TerritoryPerPlayer = (game.getBoard().getTerritories().size() / AmountOfPlayers);
+
+        List<Player> playerList = game.getPlayers();
+
+        //Shuffle territory list so destribution is random
+        Collections.shuffle(game.getBoard().getTerritories());
+        int i=0;
+        int y=0;
+
+        //distribute Territory
+        for (Territory territory : (game.getBoard().getTerritories())) {
+            territory.setOwner(playerList.get(y).getUsername());
+            i=i+1;
+            if (i>=TerritoryPerPlayer){
+                y=y+1;
+                i=0;
+            }
+            //If there is a rest amount, distribute it one by one to players
+            if (y>=AmountOfPlayers){
+                i=0;
+                y=0;
+                TerritoryPerPlayer=1;
+            }
+        }
+
+        game = gameRepository.save(game);
+        gameRepository.flush();
+
+        return game;
+        //Randomly place troops in territory
     }
 
     // Helper function to initialize game
