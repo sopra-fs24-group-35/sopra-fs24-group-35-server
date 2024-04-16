@@ -13,6 +13,7 @@ import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +31,10 @@ import javax.servlet.http.HttpServletResponse;
 public class GameController {
 
     private final GameService gameService;
-    private final LobbyService lobbyService;
 
-    GameController(GameService gameService, LobbyService lobbyService) {
+        
+    GameController(GameService gameService) {
         this.gameService = gameService;
-        this.lobbyService = lobbyService;
     }
     
     // get game information
@@ -43,7 +43,7 @@ public class GameController {
     public GameGetDTO getGameById(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
         @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
-        lobbyService.checkAuthorization(lobbyId, token);
+        gameService.checkAuthorization(lobbyId, token);
         // fetch user in the internal representation
         Game game = gameService.getGameById(gameId);
         // convert user to the API representation
@@ -59,12 +59,12 @@ public class GameController {
         // convert API game to internal representation
         Game gameInput = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // check if lobby exists
-        lobbyService.checkIfExists(lobbyId);
+        gameService.checkIfLobbyExists(lobbyId);
         // create game
         Game createdGame = gameService.createGame(gameInput);
 
         //link game to Lobby
-        lobbyService.startGame(lobbyId, createdGame.getGameId());
+        gameService.startGame(lobbyId, createdGame.getGameId());
 
         // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(createdGame);
@@ -75,7 +75,7 @@ public class GameController {
     public ResponseEntity updateGame(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
         @RequestBody GamePostDTO gamePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
-        lobbyService.checkAuthorization(lobbyId, token);
+        gameService.checkAuthorization(lobbyId, token);
         // convert API user to internal representation
         Game thingsToUpdate = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // update game data
@@ -88,15 +88,15 @@ public class GameController {
     public ResponseEntity deleteGame(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
         @RequestBody GamePostDTO gamePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
-        lobbyService.checkAuthorization(lobbyId, token);
+        gameService.checkAuthorization(lobbyId, token);
 
         
         // convert API user to internal representation
         Game gameToDelete = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // check if lobby exists
-        lobbyService.checkIfExists(lobbyId);
+        gameService.checkIfLobbyExists(lobbyId);
         // set GameId in Lobby to null
-        lobbyService.endGame(lobbyId);
+        gameService.endGame(lobbyId);
         // delete game data
         gameService.deleteGame(gameId);
         

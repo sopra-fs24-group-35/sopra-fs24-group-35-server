@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Collections;
@@ -8,17 +9,21 @@ import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
 import ch.uzh.ifi.hase.soprafs24.entity.Attack;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 
 @Service
 @Transactional
@@ -27,9 +32,27 @@ public class GameService {
     private final Logger log = LoggerFactory.getLogger(GameService.class);
 
     private final GameRepository gameRepository;
+    private final LobbyService lobbyService;
 
-    public GameService(@Qualifier("gameRepository") GameRepository gameRepository) {
+    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
         this.gameRepository = gameRepository;
+        this.lobbyService = new LobbyService(lobbyRepository);
+    }
+
+    public void checkAuthorization(Long lobby_id, String token) {
+        lobbyService.checkAuthorization(lobby_id, token);
+    }
+
+    public Lobby startGame(Long lobby_id, Long game_id){
+        return lobbyService.startGame(lobby_id, game_id);
+    }
+
+    public Lobby endGame(Long lobby_id){
+        return lobbyService.endGame(lobby_id);
+    }
+
+    public void checkIfLobbyExists(long lobbyId) {
+        lobbyService.checkIfExists(lobbyId);
     }
 
     public Game getGameById(Long gameId) {
