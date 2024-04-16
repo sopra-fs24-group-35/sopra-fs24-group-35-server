@@ -157,6 +157,8 @@ public class GameService {
             }
         }
 
+        Collections.shuffle(game.getPlayers());
+
         game = gameRepository.save(game);
         gameRepository.flush();
 
