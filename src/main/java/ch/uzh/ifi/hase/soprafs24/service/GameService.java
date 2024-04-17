@@ -15,12 +15,17 @@ import ch.uzh.ifi.hase.soprafs24.service.UserService;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
+import ch.uzh.ifi.hase.soprafs24.entity.Phase;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
+import ch.uzh.ifi.hase.soprafs24.entity.TurnCycle;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 
 import java.util.List;
+import java.util.Arrays;
+import java.util.Random;
 
 @Service
 @Transactional
@@ -28,12 +33,13 @@ public class GameService {
     
     private final Logger log = LoggerFactory.getLogger(GameService.class);
 
-    private UserService userService;
-
     private final GameRepository gameRepository;
 
-    public GameService(@Qualifier("gameRepository") GameRepository gameRepository) {
+    private UserService userService;
+
+    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, UserService userService) {
         this.gameRepository = gameRepository;
+        this.userService = userService;
     }
 
     public Game getGameById(Long gameId) {
@@ -101,14 +107,18 @@ public class GameService {
         }
         //Get game
         Game updatedGame = getGameById(gameId);
-
+        
         //Create players from their id and add them to player list
         for(Long id: players){
             Player player = new Player();
             player.setPlayerId(id);
             player.setUsername(userService.getUserById(id).getUsername());
+            System.out.println(player.getPlayerId());
+            System.out.println(player.getUsername());
             updatedGame.addPlayers(player);
         }
+
+
 
         //Save Game in repository
         updatedGame = gameRepository.save(updatedGame);
@@ -136,16 +146,52 @@ public class GameService {
 
         List<Player> playerList = game.getPlayers();
 
+        Random rand = new Random();
+
         //Shuffle territory list so destribution is random
         Collections.shuffle(game.getBoard().getTerritories());
         int i=0;
         int y=0;
 
+        //amount of troops every player gets, is dependent on amount of players
+        int maxTroops = 0;
+        if (AmountOfPlayers == 2){
+            maxTroops = 40-TerritoryPerPlayer;
+        } else if (AmountOfPlayers == 3) {
+            maxTroops = 35-TerritoryPerPlayer;
+        } else if (AmountOfPlayers == 4) {
+            maxTroops = 30-TerritoryPerPlayer;
+        } else if (AmountOfPlayers == 5) {
+            maxTroops = 25-TerritoryPerPlayer;
+        } else if (AmountOfPlayers >= 6) {
+            maxTroops = 20-TerritoryPerPlayer;
+        }
+        int troopPerTerritory = 0;
+        int maxTroopsVar = maxTroops;
+
         //distribute Territory
         for (Territory territory : (game.getBoard().getTerritories())) {
             territory.setOwner(playerList.get(y).getUsername());
             i=i+1;
+            //Assign random amount of Troops from (0 to 4) + 1 to country if maxTroops is bigger than 1
+            if (maxTroopsVar > 4) {
+                troopPerTerritory = rand.nextInt(5);
+                territory.setTroops(troopPerTerritory+1);
+                maxTroopsVar -= troopPerTerritory;
+            } else if (maxTroopsVar > 1) {
+                troopPerTerritory = (maxTroops);
+                territory.setTroops(troopPerTerritory+1);
+                maxTroopsVar = 1;
+            } else if (maxTroopsVar == 1) {
+                territory.setTroops(maxTroopsVar);
+            }
+
+            //as soon as territory per player has been reached, distribute left over troops and move to next player
             if (i>=TerritoryPerPlayer){
+                if (maxTroopsVar > 1) {
+                    territory.setTroops(maxTroopsVar + territory.getTroops());
+                }
+                maxTroopsVar = maxTroops;
                 y=y+1;
                 i=0;
             }
@@ -154,16 +200,31 @@ public class GameService {
                 i=0;
                 y=0;
                 TerritoryPerPlayer=1;
+                maxTroopsVar = 1;
+                maxTroops = 1;
             }
         }
 
+        //randomize order of players
         Collections.shuffle(game.getPlayers());
+
+        //create TurnCycle for game
+        TurnCycle turnCycle = new TurnCycle();
+        turnCycle.setCurrentPlayer(game.getPlayers().get(0));
+        turnCycle.setPlayerCycle(game.getPlayers());
+
+        //Create Phase beginning
+        Phase beginning = new Phase();
+        beginning.setCurrentPhase("setup");
+        turnCycle.setCurrentPhase(beginning);
+
+        //save turn cycle to game
+        game.setTurnCycle(turnCycle);
 
         game = gameRepository.save(game);
         gameRepository.flush();
 
         return game;
-        //Randomly place troops in territory
     }
 
     // Helper function to initialize game
@@ -533,10 +594,6 @@ public class GameService {
         board.setTerritories(territories);
 
         game.setBoard(board);
-
-        //TURN CYCLE-----------------------------------------------
-
-        game.setTurnCycle(null);
 
         return game;
     }
