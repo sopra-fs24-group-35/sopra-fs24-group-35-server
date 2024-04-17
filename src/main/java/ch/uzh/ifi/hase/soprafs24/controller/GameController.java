@@ -67,6 +67,7 @@ public class GameController {
         //link game to Lobby
         Lobby lobby = lobbyService.startGame(lobbyId, createdGame.getGameId());
         createdGame = gameService.addPlayers(lobby.getPlayers(), createdGame.getGameId());
+        createdGame = gameService.randomizedBeginning(createdGame);
 
         // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(createdGame);
