@@ -19,7 +19,7 @@ public class Territory implements Serializable {
     private String name;
 
     @Column(nullable = true, unique = false)
-    private String owner;
+    private Long owner;
 
     @Column(nullable = true, unique = false)
     private int troops;
@@ -34,11 +34,11 @@ public class Territory implements Serializable {
     }
 
     // Getter and setter for owner
-    public String getOwner() {
+    public Long getOwner() {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(Long owner) {
         this.owner = owner;
     }
 

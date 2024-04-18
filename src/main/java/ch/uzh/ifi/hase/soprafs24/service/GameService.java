@@ -113,8 +113,8 @@ public class GameService {
             Player player = new Player();
             player.setPlayerId(id);
             player.setUsername(userService.getUserById(id).getUsername());
-            System.out.println(player.getPlayerId());
-            System.out.println(player.getUsername());
+            //System.out.println(player.getPlayerId());
+            //System.out.println(player.getUsername());
             updatedGame.addPlayers(player);
         }
 
@@ -171,7 +171,7 @@ public class GameService {
 
         //distribute Territory
         for (Territory territory : (game.getBoard().getTerritories())) {
-            territory.setOwner(playerList.get(y).getUsername());
+            territory.setOwner(playerList.get(y).getPlayerId());
             i=i+1;
             //Assign random amount of Troops from (0 to 4) + 1 to country if maxTroops is bigger than 1
             if (maxTroopsVar > 4) {
