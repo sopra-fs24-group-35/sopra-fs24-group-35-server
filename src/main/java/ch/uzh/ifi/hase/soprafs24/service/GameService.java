@@ -1,14 +1,18 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Collections;
 
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
@@ -18,6 +22,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Phase;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
 import ch.uzh.ifi.hase.soprafs24.entity.TurnCycle;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
@@ -26,6 +31,9 @@ import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Random;
+import ch.uzh.ifi.hase.soprafs24.entity.Attack;
+import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 
 @Service
 @Transactional
@@ -34,18 +42,36 @@ public class GameService {
     private final Logger log = LoggerFactory.getLogger(GameService.class);
 
     private final GameRepository gameRepository;
+    private final LobbyService lobbyService;
 
     private UserService userService;
 
-    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, UserService userService) {
+    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
         this.gameRepository = gameRepository;
         this.userService = userService;
+        this.lobbyService = new LobbyService(lobbyRepository);
+    }
+
+    public void checkAuthorization(Long lobby_id, String token) {
+        lobbyService.checkAuthorization(lobby_id, token);
+    }
+
+    public Lobby startGame(Long lobby_id, Long game_id){
+        return lobbyService.startGame(lobby_id, game_id);
+    }
+
+    public Lobby endGame(Long lobby_id){
+        return lobbyService.endGame(lobby_id);
+    }
+
+    public void checkIfLobbyExists(long lobbyId) {
+        lobbyService.checkIfExists(lobbyId);
     }
 
     public Game getGameById(Long gameId) {
         boolean exists = checkIfGameExists(gameId, true);
         if (!exists) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
             "No game with this id could be found.");
         }
         log.debug("Sent out game information");
@@ -70,11 +96,11 @@ public class GameService {
         // throww error if game with the given id doesn't exist
         boolean exists = checkIfGameExists(gameId, true);
         if (!exists) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game update failed, because there is no game with this id.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game update failed, because there is no game with this id.");
         }
 
         // update game
-        updatedGame = doConsequences(updatedGame, gameRepository.getByGameId(updatedGame.getGameId()));
+        updatedGame = doConsequences(updatedGame, gameRepository.getByGameId(gameId));
 
         // save updated game to repository
         updatedGame = gameRepository.save(updatedGame);
@@ -112,8 +138,7 @@ public class GameService {
                 return territory;
             }
         }
-
-        return null;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Territory with name %s not found.", territoryName));
 
     }
 
@@ -142,6 +167,119 @@ public class GameService {
         gameRepository.flush();
 
         return updatedGame;
+    }
+
+    public Game executeRepeatedAttacks(Attack attack, Long gameId) {
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No game with this id could be found.");
+        }
+
+        // get game from repository
+        Game game = this.gameRepository.getByGameId(gameId);
+
+        // find territories of interest in the game entity
+        Territory attackingTerritory = null;
+        Territory defendingTerritory = null;
+        for (int i = 0; i < game.getBoard().getTerritories().size(); i++) {
+            if (game.getBoard().getTerritories().get(i).getName().equals(attack.getAttackingTerritory())) {
+                attackingTerritory = game.getBoard().getTerritories().get(i);
+            } else if (game.getBoard().getTerritories().get(i).getName().equals(attack.getDefendingTerritory())) {
+                defendingTerritory = game.getBoard().getTerritories().get(i);
+            }
+        }
+
+        // check if both territories are found
+        if (attackingTerritory == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "No attacking territory with the given name exists.");
+        }
+        if (defendingTerritory == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "No defending territory with the given name exists.");
+        }
+
+        // repeat attacks as many times as 'repeat' specifies, but only do it as long as there are enough troops on both territories.
+        String diceResult = "";
+        game.setDiceResult(diceResult);
+        for (int i = 0; i < attack.getRepeats(); i++) {
+            if (defendingTerritory.getTroops() > 0 && attackingTerritory.getTroops() > 1) {
+                game = executeAttack(game, attack, attackingTerritory, defendingTerritory);
+            }
+        }
+
+        // if attacker has beaten all troops of the defending territory, he gets ownership of it and attacking troops are transferred to it
+        int troopsFromAtk = Math.min(attackingTerritory.getTroops() - 1, Math.min(attack.getTroopsAmount(), 3));
+        if (defendingTerritory.getTroops() <= 0) {
+            defendingTerritory.setOwner(attackingTerritory.getOwner());
+            defendingTerritory.setTroops(troopsFromAtk);
+        }
+
+        // Now save the adjusted territories to the repository
+        gameRepository.save(game);
+        gameRepository.flush();
+
+        return game;
+    }
+
+    public Game executeAttack(Game game, Attack attack, Territory attackingTerritory, Territory defendingTerritory) {
+        
+
+        // specify how many troops the attacker and the defender use each
+        int troopsFromAtk = Math.min(attackingTerritory.getTroops() - 1, Math.min(attack.getTroopsAmount(), 3));
+        int troopsFromDef = Math.min(defendingTerritory.getTroops(), 2);
+
+        // do dice rolling
+        Random rand = new Random(); 
+        ArrayList<Integer> atkRolls = new ArrayList<>();
+        ArrayList<Integer> defRolls = new ArrayList<>();
+
+        // Answer string
+        String diceResult = game.getDiceResult();
+        diceResult += "Atk: ";
+
+        // attacker rolls dice between 1 and 3 times depending on situation. Results are added to an array.
+        for (int i = 0; i < troopsFromAtk; i++) {
+            atkRolls.add(rand.nextInt(6)+1);
+            diceResult += atkRolls.get(i).toString() + " ";
+        }
+        
+        // defender rolls dice between 1 and 2 times depending on situation. Results are added to an array.
+        diceResult += "Def: ";
+        for (int i = 0; i < troopsFromDef; i++) {
+            defRolls.add(rand.nextInt(6)+1);
+            diceResult += defRolls.get(i).toString() + " ";
+        }
+        // sort dice results of both arrays in descending order to figure out the dice pairs
+        Collections.sort(atkRolls);
+        Collections.reverse(atkRolls);
+        Collections.sort(defRolls);
+        Collections.reverse(defRolls);
+
+        // compare first pair of dices
+        if (atkRolls.get(0) > defRolls.get(0)) { // if attacker wins with the first pair
+            defendingTerritory.setTroops(defendingTerritory.getTroops() - 1); // then remove a troop from the defending territory
+        } else {
+            attackingTerritory.setTroops(attackingTerritory.getTroops() - 1); // else remove a troop from the attacking territory
+        }
+
+        // compare second pair of dices if it exists (if both arrays have at least two dice rolls)
+        if (atkRolls.size() > 1 && defRolls.size() > 1) {
+            if (atkRolls.get(1) > defRolls.get(1)) { // if attacker wins with the second pair
+                defendingTerritory.setTroops(defendingTerritory.getTroops() - 1); // then remove a troop from the defending territory
+            } else {
+                attackingTerritory.setTroops(attackingTerritory.getTroops() - 1); // else remove a troop from the attacking territory
+            }
+        }
+
+
+        // put dice result into game entity
+        game.setDiceResult(diceResult);
+
+        
+
+        return game;
     }
 
 
@@ -243,6 +381,7 @@ public class GameService {
 
         return game;
     }
+    
 
     // Helper function to initialize game
     private Game initializeGame(Game game) {
@@ -618,7 +757,14 @@ public class GameService {
     // Helper function to execute consequences on a game when it has been updated by a client (by comparing old state from repository vs. new state from client)
     private Game doConsequences(Game newState, Game oldState) {
         // TODO: Insert code for consequences after a game update (e.g. remove troops, change owner of territory etc.)
-        return newState;
+        
+        // This function simply transfers territory stats from the incoming request to the repository game
+        for (int i = 0; i < oldState.getBoard().getTerritories().size(); i++) {
+            oldState.getBoard().getTerritories().get(i).setTroops(newState.getBoard().getTerritories().get(i).getTroops());
+            oldState.getBoard().getTerritories().get(i).setOwner(newState.getBoard().getTerritories().get(i).getOwner());
+        }
+        
+        return oldState;
     }
 
 }

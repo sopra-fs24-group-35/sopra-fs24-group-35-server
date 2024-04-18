@@ -31,6 +31,9 @@ public class Game implements Serializable {
     @JoinColumn(name = "turnCycleId")
     private TurnCycle turnCycle;
 
+    @Column(nullable = true, unique = false)
+    private String diceResult;
+
     // Getter and setter for gameId
     public Long getGameId() {
         return gameId;
@@ -69,6 +72,14 @@ public class Game implements Serializable {
 
     public void setTurnCycle(TurnCycle turnCycle) {
         this.turnCycle = turnCycle;
+    }
+
+    public String getDiceResult() {
+        return diceResult;
+    }
+
+    public void setDiceResult(String diceResult) {
+        this.diceResult = diceResult;
     }
 
     
