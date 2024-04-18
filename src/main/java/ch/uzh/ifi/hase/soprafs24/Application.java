@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
-@EnableJpaRepositories
+
 @RestController
 @SpringBootApplication
 public class Application {

@@ -55,9 +55,11 @@ public class GameController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public GameGetDTO createGame(@PathVariable("lobbyId") Long lobbyId,
-        @RequestBody GamePostDTO gamePostDTO, HttpServletResponse response) {
+        @RequestBody GamePostDTO gamePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // convert API game to internal representation
         Game gameInput = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
+        // check if request is authorized
+        gameService.checkAuthorization(lobbyId, token);
         // check if lobby exists
         gameService.checkIfLobbyExists(lobbyId);
         // create game

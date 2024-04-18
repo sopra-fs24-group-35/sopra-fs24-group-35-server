@@ -58,7 +58,7 @@ public class GameService {
     public Game getGameById(Long gameId) {
         boolean exists = checkIfGameExists(gameId, true);
         if (!exists) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
             "No game with this id could be found.");
         }
         log.debug("Sent out game information");
@@ -83,7 +83,7 @@ public class GameService {
         // throww error if game with the given id doesn't exist
         boolean exists = checkIfGameExists(gameId, true);
         if (!exists) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game update failed, because there is no game with this id.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game update failed, because there is no game with this id.");
         }
 
         // update game
