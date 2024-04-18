@@ -6,6 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AttackPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
@@ -467,6 +468,65 @@ public class GameControllerTest {
             .andExpect(status().isUnauthorized());
     }
 
+    // POST/attack tests ----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void attack_validInput_executeAttack() throws Exception {
+        // given
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setBoard(null);
+        game.setPlayers(null);
+        game.setTurnCycle(null);
+        game.setDiceResult("Atk 1 2 Def 3 4");
+
+        AttackPostDTO attackPostDTO = new AttackPostDTO();
+
+        given(gameService.executeRepeatedAttacks(Mockito.any(), Mockito.any())).willReturn(game);
+
+        // when/then -> do the request + validate the result
+        MockHttpServletRequestBuilder postRequest = post("/lobbies/1/game/1/attacks")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(attackPostDTO))
+            .header("Authorization", "abc");
+        
+        mockMvc.perform(postRequest)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.gameId", is(game.getGameId().intValue())))
+            .andExpect(jsonPath("$.board", is(game.getBoard())))
+            .andExpect(jsonPath("$.players", is(game.getPlayers())))
+            .andExpect(jsonPath("$.turnCycle", is(game.getTurnCycle())))
+            .andExpect(jsonPath("$.diceResult", is(game.getDiceResult().toString())));
+    }
+
+    @Test
+    public void attack_invalidInput_notAuthorized() throws Exception {
+        // given
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setBoard(null);
+        game.setPlayers(null);
+        game.setTurnCycle(null);
+        game.setDiceResult("Atk 1 2 Def 3 4");
+
+        AttackPostDTO attackPostDTO = new AttackPostDTO();
+
+        given(gameService.executeRepeatedAttacks(Mockito.any(), Mockito.any())).willReturn(game);
+        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
+
+        // when/then -> do the request + validate the result
+        MockHttpServletRequestBuilder postRequest = post("/lobbies/1/game/1/attacks")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(attackPostDTO))
+            .header("Authorization", "abc");
+        
+        mockMvc.perform(postRequest)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isUnauthorized());
+    }
+
+    // helpers
 
     private String asJsonString(final Object object) {
         try {

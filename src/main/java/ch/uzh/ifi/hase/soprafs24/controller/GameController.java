@@ -108,10 +108,12 @@ public class GameController {
     @PostMapping("/lobbies/{lobbyId}/game/{gameId}/attacks")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GameGetDTO executeAttack(@PathVariable("gameId") Long gameId,
-        @RequestBody AttackPostDTO attackPostDTO, HttpServletResponse response) {
+    public GameGetDTO executeAttack(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
+        @RequestBody AttackPostDTO attackPostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // convert API game to internal representation
         Attack attack = DTOMapper.INSTANCE.convertAttackPostDTOtoEntity(attackPostDTO);
+        // check if request is authorized
+        gameService.checkAuthorization(lobbyId, token);
         // execute attack
         Game updatedGame = gameService.executeRepeatedAttacks(attack, gameId);
         
