@@ -8,6 +8,7 @@ import org.dom4j.Branch;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "GAME")
@@ -24,7 +25,7 @@ public class Game implements Serializable {
     private Board board;
 
     @OneToMany(targetEntity=Player.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Player> players;
+    private List<Player> players = new ArrayList<Player>();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "turnCycleId")
@@ -55,6 +56,10 @@ public class Game implements Serializable {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+
+    public void addPlayers(Player player) {
+        this.players.add(player);
     }
 
     // Getter and setter for turnCycle

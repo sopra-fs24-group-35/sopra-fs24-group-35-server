@@ -9,7 +9,7 @@ import java.util.List;
 public class Player implements Serializable {
 
     @Id
-    @GeneratedValue
+    //@GeneratedValue
     private Long playerId;
 
     @Column(nullable = true, unique = false)
@@ -20,6 +20,15 @@ public class Player implements Serializable {
 
     @OneToMany(targetEntity=RiskCard.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<RiskCard> riskCards;
+
+    //Getter and setter for playerId
+    public Long getPlayerId(){
+        return playerId;
+    }
+
+    public void setPlayerId(Long playerId){
+        this.playerId = playerId;
+    }
 
     // Getter and setter for username
     public String getUsername() {
