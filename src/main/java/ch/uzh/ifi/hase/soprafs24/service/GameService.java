@@ -4,6 +4,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Collections;
+import java.util.HashMap;
 
 import javax.transaction.Transactional;
 
@@ -19,7 +20,6 @@ import ch.uzh.ifi.hase.soprafs24.service.UserService;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
-import ch.uzh.ifi.hase.soprafs24.entity.Phase;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
@@ -29,8 +29,11 @@ import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Arrays;
 import java.util.Random;
+
+import ch.uzh.ifi.hase.soprafs24.constant.Phase;
 import ch.uzh.ifi.hase.soprafs24.entity.Attack;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
@@ -101,6 +104,11 @@ public class GameService {
 
         // update game
         updatedGame = doConsequences(updatedGame, gameRepository.getByGameId(gameId));
+
+        // If reinforcement phase, then distribute troops to current player
+        if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
+            updatedGame = distributeTroops(updatedGame, updatedGame.getTurnCycle().getCurrentPlayer().getPlayerId());
+        }
 
         // save updated game to repository
         updatedGame = gameRepository.save(updatedGame);
@@ -220,6 +228,22 @@ public class GameService {
         gameRepository.save(game);
         gameRepository.flush();
 
+        return game;
+    }
+
+    private Game distributeTroops(Game game, Long playerId) {
+        Board board = game.getBoard();
+        int count = 0;
+        for (Territory territory : board.getTerritories()) {
+            if (territory.getOwner() == playerId) {
+                count++;
+            }
+        }
+        for (Player player : game.getPlayers()) {
+            if (player.getPlayerId() ==  playerId) {
+                player.setTroopBonus(Math.min(count/3, 3)); // set bonus to number of owned territories/3 and minimum 3
+            }
+        }
         return game;
     }
 
@@ -369,9 +393,7 @@ public class GameService {
         turnCycle.setPlayerCycle(game.getPlayers());
 
         //Create Phase phase
-        Phase phase = new Phase();
-        phase.setCurrentPhase("setup");
-        turnCycle.setCurrentPhase(phase);
+        turnCycle.setCurrentPhase(Phase.REINFORCEMENT);
 
         //save turn cycle to game
         game.setTurnCycle(turnCycle);
