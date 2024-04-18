@@ -11,6 +11,9 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AttackPostDTO;
+import ch.uzh.ifi.hase.soprafs24.entity.Attack;
+
 import ch.uzh.ifi.hase.soprafs24.entity.UserList;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserListPostDTO;
 
@@ -78,6 +81,7 @@ public interface DTOMapper {
   @Mapping(source = "board", target = "board")
   @Mapping(source = "players", target = "players")
   @Mapping(source = "turnCycle", target = "turnCycle")
+  @Mapping(source = "diceResult", target = "diceResult")
   GameGetDTO convertEntityToGameGetDTO(Game game);
 
   //Territory
@@ -85,4 +89,11 @@ public interface DTOMapper {
   @Mapping(source = "owner", target = "owner")
   @Mapping(source = "troops", target = "troops")
   TerritoryGetDTO convertEntityToTerritoryGetDTO(Territory territory);
+  
+  //Attack
+  @Mapping(source = "attackingTerritory", target = "attackingTerritory")
+  @Mapping(source = "defendingTerritory", target = "defendingTerritory")
+  @Mapping(source = "troopsAmount", target = "troopsAmount")
+  @Mapping(source = "repeats", target = "repeats")
+  Attack convertAttackPostDTOtoEntity(AttackPostDTO attackPostDTO);
 }

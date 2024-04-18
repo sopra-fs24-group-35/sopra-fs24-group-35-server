@@ -4,7 +4,7 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 
-
+//Territory entity
 @Entity
 @Table(name = "TERRITORY")
 public class Territory implements Serializable {
