@@ -100,6 +100,23 @@ public class GameService {
         return;
     }
 
+    public Territory getTerritory(Long gameId, String territoryName){
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game deletion failed, because there is no game with this id.");
+        }
+
+        Game game = getGameById(gameId);
+        for (Territory territory : game.getBoard().getTerritories()) {
+            if (territory.getName().equals(territoryName)){
+                return territory;
+            }
+        }
+
+        return null;
+
+    }
+
     public Game addPlayers(ArrayList<Long> players, Long gameId){
         boolean exists = checkIfGameExists(gameId, true);
         if (!exists) {

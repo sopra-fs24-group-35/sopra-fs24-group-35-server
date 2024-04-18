@@ -1,9 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.entity.Territory;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.TerritoryGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
@@ -46,6 +48,26 @@ public class GameController {
         Game game = gameService.getGameById(gameId);
         // convert user to the API representation
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(game);
+    }
+
+    @GetMapping("/lobbies/{lobbyId}/game/{gameId}/territory/{territoryName}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public TerritoryGetDTO getTerritoryByName(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
+        @PathVariable("territoryName") String territoryName,
+        @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
+
+        // check if request is authorized
+        lobbyService.checkAuthorization(lobbyId, token);
+
+        //fetch the territory
+        Territory territory = gameService.getTerritory(gameId, territoryName);
+
+        if (territory == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Territory with name %s not found.", territoryName));
+        }
+
+        return DTOMapper.INSTANCE.convertEntityToTerritoryGetDTO(territory);
     }
 
     // create new game

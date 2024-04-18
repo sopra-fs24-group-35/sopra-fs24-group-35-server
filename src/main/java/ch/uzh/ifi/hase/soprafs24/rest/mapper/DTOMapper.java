@@ -1,9 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
+
+import ch.uzh.ifi.hase.soprafs24.entity.Territory;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.TerritoryGetDTO;
+
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 
@@ -75,4 +79,10 @@ public interface DTOMapper {
   @Mapping(source = "players", target = "players")
   @Mapping(source = "turnCycle", target = "turnCycle")
   GameGetDTO convertEntityToGameGetDTO(Game game);
+
+  //Territory
+  @Mapping(source = "name", target = "name")
+  @Mapping(source = "owner", target = "owner")
+  @Mapping(source = "troops", target = "troops")
+  TerritoryGetDTO convertEntityToTerritoryGetDTO(Territory territory);
 }
