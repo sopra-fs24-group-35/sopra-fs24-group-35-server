@@ -156,7 +156,7 @@ public class GameService {
         //amount of troops every player gets, is dependent on amount of players
         int maxTroops = 0;
         if (AmountOfPlayers == 2){
-            maxTroops = 40-TerritoryPerPlayer;
+            maxTroops = 50-TerritoryPerPlayer;
         } else if (AmountOfPlayers == 3) {
             maxTroops = 35-TerritoryPerPlayer;
         } else if (AmountOfPlayers == 4) {
@@ -213,10 +213,10 @@ public class GameService {
         turnCycle.setCurrentPlayer(game.getPlayers().get(0));
         turnCycle.setPlayerCycle(game.getPlayers());
 
-        //Create Phase beginning
-        Phase beginning = new Phase();
-        beginning.setCurrentPhase("setup");
-        turnCycle.setCurrentPhase(beginning);
+        //Create Phase phase
+        Phase phase = new Phase();
+        phase.setCurrentPhase("setup");
+        turnCycle.setCurrentPhase(phase);
 
         //save turn cycle to game
         game.setTurnCycle(turnCycle);
