@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyPutDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,9 +62,9 @@ public class LobbyController{
     @PutMapping("/lobbies")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public LobbyGetDTO updateLobby(@RequestBody LobbyPostDTO lobbyPostDTO, HttpServletResponse response){
+    public LobbyGetDTO updateLobby(@RequestBody LobbyPutDTO lobbyPutDTO, HttpServletResponse response){
         
-        Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
+        Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPutDTOtoEntity(lobbyPutDTO);
 
         //update Lobby
         Lobby updatedLobby = lobbyService.updateLobby(playerInput);
