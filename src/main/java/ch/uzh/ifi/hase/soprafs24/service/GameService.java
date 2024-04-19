@@ -46,7 +46,7 @@ public class GameService {
 
     private UserService userService;
 
-    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
+    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UserService userService) {
         this.gameRepository = gameRepository;
         this.userService = userService;
         this.lobbyService = new LobbyService(lobbyRepository);
