@@ -22,6 +22,16 @@
         Description:
             Fixed several REST requests, added a start game functionality in the lobby screen and made an adjacency dictionary for all the territories.
 
+    15.04.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/20
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/18
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/15
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/11
+
+        Description:
+            Added a modal which opens after selecting two territories to handle the attacks, shows the defending user and attacking user, shows the defending territory name and attacking territory name and their respective troop amounts. Also added selectors to select the amount of troops the attacker wants to use to attack and another selector to select how many times the attacker attacks.
+
 
 #### Nico (Eposs111)
 
