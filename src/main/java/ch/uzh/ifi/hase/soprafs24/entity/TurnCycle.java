@@ -1,6 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
+
+import ch.uzh.ifi.hase.soprafs24.constant.Phase;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -19,8 +22,7 @@ public class TurnCycle implements Serializable {
     @OneToMany(targetEntity=Player.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Player> playerCycle;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "phaseId")
+    @Column(nullable = true, unique = false)
     private Phase currentPhase;
 
     @Column(nullable = true, unique = false)
