@@ -71,6 +71,7 @@ test {
     useJUnitPlatform()
     testLogging.showStandardStreams = true
     maxParallelForks = 1
+    finalizedBy jacocoTestReport
 }
 
 File secretPropsFile = file('./local.properties')
