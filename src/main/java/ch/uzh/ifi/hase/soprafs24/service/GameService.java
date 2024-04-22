@@ -213,7 +213,7 @@ public class GameService {
         game.setDiceResult(diceResult);
         for (int i = 0; i < attack.getRepeats(); i++) {
             if (defendingTerritory.getTroops() > 0 && attackingTerritory.getTroops() > 1) {
-                game = executeAttack(game, attack, attackingTerritory, defendingTerritory);
+                game = executeAttack(game, attack, attackingTerritory, defendingTerritory, new Random());
             }
         }
 
@@ -247,15 +247,14 @@ public class GameService {
         return game;
     }
 
-    public Game executeAttack(Game game, Attack attack, Territory attackingTerritory, Territory defendingTerritory) {
+    public Game executeAttack(Game game, Attack attack, Territory attackingTerritory, Territory defendingTerritory, Random rand) {
         
 
         // specify how many troops the attacker and the defender use each
         int troopsFromAtk = Math.min(attackingTerritory.getTroops() - 1, Math.min(attack.getTroopsAmount(), 3));
         int troopsFromDef = Math.min(defendingTerritory.getTroops(), 2);
 
-        // do dice rolling
-        Random rand = new Random(); 
+        // do dice rolling 
         ArrayList<Integer> atkRolls = new ArrayList<>();
         ArrayList<Integer> defRolls = new ArrayList<>();
 
