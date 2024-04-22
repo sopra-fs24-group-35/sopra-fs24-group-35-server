@@ -119,7 +119,7 @@
             Currently, the initializeGame() function in the GameService file is huge regarding number of lines. Maybe there is a way to strip it down. But first, we aim to achieve a "minimum viable product".
             When scrolling through the server-sided engineering tasks on GitHub that aren't assigned yet, I noticed that there exist some which I have done by a lare part by accident, because of some overlapping with the three engineering tasks above. However I think this isn't necessarily a bad thing, because the way is going to be well paved when they're being implemented in the future. 
 
-15.04.2024
+    15.04.2024
 		Links:
 
             Issue #60:
@@ -163,6 +163,31 @@
             - Tested it with Postman
 
             The biggest part was the implementation of the executeAttack function. A lot of thinking went into this, not only the best way to implement the dice rolling and evaluation, but also how the client should tell the server to execute an attack. Originally this was planned to be done via the Game DTO, but it appeared to be much more easy to create a new attack DTO for this, despite violation of our REST specification, but this is an advantage of an agile process.
+
+    22.04.2024
+		Links:
+
+			Issue #69:
+			https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=60045233
+			Issue #35:
+			https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57114279
+
+        Description:
+
+        I did the following:
+        For Issue #69:
+        - Written Rest controller tests for GameController
+        - Written GameRepository integration tests
+        - Written GameService unit tests
+        - Written GameService integration tests
+        - Jacoco-Report
+
+        For Issue #35:
+        - Created code such that the server calculates the amount of troops a player should get each round
+        - The result is saved to the player object, and can be read by the client
+
+        A lot of time went into testing and it took longer than those 8h suggested by the dev task. The main issue was several errors appearing, especially with the integration tests. The GameService integration tests for example worked individually just fine, but failed when run together. It took a long time to figure that out.
+
 
 
 
