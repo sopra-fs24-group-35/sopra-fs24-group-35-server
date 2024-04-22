@@ -126,7 +126,10 @@
         - Redesigned this Task because screen was always flickering while reloading
 
         Overall:
-        I struggled really hard on this task: Implemented the tracking of the buttons only in the picture. Also if the picture Ratio is too wide or to high. If the picture ratio is always the same it's not a problem but it I pull the window a new column left and right and on top and on button can appear that also scales with the picture itself. Was really hard to find this fix. 
+        I struggled really hard on this task: Implemented the tracking of the buttons only in the
+        picture. Also if the picture Ratio is too wide or to high. If the picture ratio is always the 
+        same it's not a problem but it I pull the window a new column left and right and on top and on
+        button can appear that also scales with the picture itself. Was really hard to find this fix. 
 
 #### Robin Burkard (roburkUZH):
 
