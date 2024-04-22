@@ -85,6 +85,40 @@
         Added FormField and FormFieldPassword
         Adjusted Login and Registration Code
 
+    15.04.2024  -> WIll be Updated
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/45
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/46
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/47
+
+        Description:
+            I worked on the external API. I integrated it and made a mechanism to change and safe the avatar on registration. 
+            My problem was, that I started wrong and had to restart halfway through.
+
+    22.04.2024
+        Links:
+            Issue #69:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=60045233
+            Issue #35:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57114279
+
+        Description:
+    
+        I did the following:
+        For Issue #69:
+        - Updated Design for the Game itself
+        - Implemented the tracking of the buttons only in the picture. Also if the picture Ratio is too wide or to high.
+        - Redifined buttons for easier use of multiple of them. 
+        - Written Code that buttons Redefine themselves for the ratio of the picture
+        - Implemented all the Button on the correct location of the map with the corresponding id
+    
+        For Issue #75:
+        - Implemented Tracking of the last two clicked buttons
+        - Implemnted a Line and a arrow from Territorie A to territorie B for better visability
+        - Implemented Math Formula that for all distances the arrow is visable
+        - Implemented reset when somebody Clicks another Territorie
+        - Redesigned this Task because screen was always flickering while reloading
+
 #### Robin Burkard (roburkUZH):
 
 	08.04.2024
