@@ -97,15 +97,21 @@
 
     22.04.2024
         Links:
-            Issue #69:
-            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=60045233
-            Issue #35:
-            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57114279
+            Issue #26:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57221163
+            Issue #27:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57221161
+            Issue #12:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57215178
+            Issue #11 (Mechanic Implemented):
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=57215179
+            Issue #75:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=60475125
 
         Description:
     
         I did the following:
-        For Issue #69:
+        For Issue #26, #27, #12 and #11:
         - Updated Design for the Game itself
         - Implemented the tracking of the buttons only in the picture. Also if the picture Ratio is too wide or to high.
         - Redifined buttons for easier use of multiple of them. 
@@ -118,6 +124,9 @@
         - Implemented Math Formula that for all distances the arrow is visable
         - Implemented reset when somebody Clicks another Territorie
         - Redesigned this Task because screen was always flickering while reloading
+
+        Overall:
+        I struggled really hard on this task: Implemented the tracking of the buttons only in the picture. Also if the picture Ratio is too wide or to high. If the picture ratio is always the same it's not a problem but it I pull the window a new column left and right and on top and on button can appear that also scales with the picture itself. Was really hard to find this fix. 
 
 #### Robin Burkard (roburkUZH):
 
