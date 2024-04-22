@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -41,6 +42,7 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     public void createLobby_validInput() {
         // check that repository is empty
         assertFalse(lobbyRepository.findById(1L).isPresent());
@@ -59,6 +61,7 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     public void getLobbyById_validInput() {
         // check that repository is empty
         assertFalse(lobbyRepository.findById(1L).isPresent());
@@ -83,6 +86,7 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     public void updateLobby_validInput() {
         // check that repository is empty
         assertFalse(lobbyRepository.findById(1L).isPresent());
@@ -114,6 +118,7 @@ public class LobbyServiceIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     public void deleteLobby_validInput() {
         // check that repository is empty
         assertFalse(lobbyRepository.findById(1L).isPresent());

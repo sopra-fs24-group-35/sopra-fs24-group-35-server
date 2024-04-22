@@ -141,7 +141,7 @@ public class LobbyService{
             //If no more players are in Lobby, delete Lobby
             if (toUpdate.getPlayers().isEmpty()) {
                 manager.remove(toUpdate);
-                return null;
+                return toUpdate;
             } //Else make next Player LobbyOwner
             else {
                 toUpdate.setOwnerId(toUpdate.getPlayers().get(0));
