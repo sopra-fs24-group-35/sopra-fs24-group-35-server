@@ -334,11 +334,14 @@ public class GameService {
                 territory.setTroops(troopPerTerritory+1);
                 maxTroopsVar -= troopPerTerritory;
             } else if (maxTroopsVar > 1) {
-                troopPerTerritory = (maxTroops);
+                troopPerTerritory = (maxTroopsVar-1);
                 territory.setTroops(troopPerTerritory+1);
                 maxTroopsVar = 1;
             } else if (maxTroopsVar == 1) {
-                territory.setTroops(maxTroopsVar);
+                territory.setTroops(maxTroopsVar+1);
+                maxTroopsVar -= 1;
+            } else {
+                territory.setTroops(1);
             }
 
             //as soon as territory per player has been reached, distribute left over troops and move to next player
