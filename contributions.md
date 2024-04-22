@@ -57,7 +57,16 @@
             I worked on the external API. I integrated it and made a mechanism to change and safe the avatar on registration. 
             My problem was, that I started wrong and had to restart halfway through.
 
+    15.04.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/49
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/48
 
+    Description:
+            I was busy displaying the Avatars on the bottom right part of the screen. I took about 10 to accomplish this because a set function 
+            did not worl. I managed to fix it in the end but have no idea how. Further I fixed some other bugs and refined int issue 48.
+
+            
 #### Ralph Kosch (RPKosch)
 
     08.04.2024
