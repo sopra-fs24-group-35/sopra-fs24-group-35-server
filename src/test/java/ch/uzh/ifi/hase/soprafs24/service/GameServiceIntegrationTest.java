@@ -194,7 +194,7 @@ public class GameServiceIntegrationTest {
 
         // then check that the amount of troops is changed to 10
         assertNotNull(fetchedGame);
-        // assertEquals(fetchedGame.getBoard().getTerritories().get(0).getTroops(), 10);
+        assertEquals(fetchedGame.getBoard().getTerritories().get(0).getTroops(), 10);
     }
 
     @Test

@@ -79,14 +79,15 @@ public class LobbyController{
         return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(updatedLobby);
     }
 
-    @DeleteMapping("/lobbies/{id}")
+    @PutMapping("/lobbies/{id}/remove")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void removePlayer(@PathVariable("id") Long id,
         @RequestBody LobbyPostDTO lobbyPostDTO){
-
+        System.out.println("LPD");
+        System.out.println(lobbyPostDTO.toString());
         Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
-
+        System.out.println(playerInput.toString());
         Lobby updatedLobby = lobbyService.removePlayer(playerInput, id);
 
         /*if (updatedLobby == null) {

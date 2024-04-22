@@ -20,11 +20,11 @@ public class Game implements Serializable {
     @GeneratedValue
     private Long gameId;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "boardId")
     private Board board;
 
-    @OneToMany(targetEntity=Player.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(targetEntity=Player.class,cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<Player> players = new ArrayList<Player>();
 
     @OneToOne(cascade = CascadeType.ALL)
