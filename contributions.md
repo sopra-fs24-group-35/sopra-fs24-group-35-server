@@ -261,7 +261,7 @@
             Issue #61:
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/61
 
-            I created the Lobby Class, LobbyController and LobbyService and everything else to do with Lobby in the server and modified the user so it fits our purposes. I also created the UserList class so it is easier to return a list of users.
+        I created the Lobby Class, LobbyController and LobbyService and everything else to do with Lobby in the server and modified the user so it fits our purposes. I also created the UserList class so it is easier to return a list of users.
 
 
     15.04.2024
@@ -275,6 +275,31 @@
             Issue #68
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/68
 
-            I have linked the lobby and game together with Robin. I have also created a new function in GameController so all players are created and added to the game.
-            I have also created a way to randomly distribute territories but it is not yet comiited.
+        I have linked the lobby and game together with Robin. I have also created a new function in GameController so all players are created and added to the game.
+        I have also created a way to randomly distribute territories but it is not yet comiited.
+
+
+    22.04.2024
+        Links:
+            Issue #46:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/46
+
+            Issue #47:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/47
+
+            Issue #68:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/68
+
+            Issue #73:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/73
+
+            Issue #70:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/70
+
+            In Progress
+            Issue #71:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/71
+
+        I have implemented the necessary methods to initiate a random beginning at the start of a new game. I have also made a function to return just one territory for the client.
+        I have made various smaller changes to the code to make it easier for the client. I have started and am nearly finished with writing test for the LobbyController and LobbyService.
 
