@@ -44,7 +44,8 @@
 
     Description:
         I worked/help worked on the design aspect of the Website in the frontend. We focused on making a (kind of) good looking website
-        and implemented the Join and Create Lobby site/buttons. (DISCLAIMER: we were a team of three in the FrontEnd therefor we all helped each           other if needed)
+        and implemented the Join and Create Lobby site/buttons. (DISCLAIMER: we were a team of three in the FrontEnd therefor we all helped each
+        other if needed). 
 
 
     15.04.2024
@@ -64,7 +65,9 @@
 
     Description:
             I was busy displaying the Avatars on the bottom right part of the screen. I took about 10 to accomplish this because a set function 
-            did not worl. I managed to fix it in the end but have no idea how. Further I fixed some other bugs and refined int issue 48.
+            did not worl. I managed to fix it in the end but have no idea how. Further I fixed some other bugs and refined int issue 48. I also
+            made sure that the Lobby redirects to "/risk/gameId" instead of "/risk". (All of this worked once but somehow now there are errors
+            despite me not doing anything before it broke)
 
             
 #### Ralph Kosch (RPKosch)
