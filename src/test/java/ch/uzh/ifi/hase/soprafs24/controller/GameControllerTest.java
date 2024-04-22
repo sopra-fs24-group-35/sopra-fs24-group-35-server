@@ -156,8 +156,7 @@ public class GameControllerTest {
             .content(asJsonString(gamePostDTO))
             .header("Authorization", "abc");
             
-            
-        
+        // perform validation -> check if the method returns the correct HTTP response (Code: 201, correct Game DTO in the JSON of the body)
         mockMvc.perform(postRequest)
             .andDo(MockMvcResultHandlers.print())
             .andExpect(status().isCreated())
