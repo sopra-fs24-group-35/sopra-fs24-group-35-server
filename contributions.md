@@ -22,7 +22,7 @@
         Description:
             Fixed several REST requests, added a start game functionality in the lobby screen and made an adjacency dictionary for all the territories.
 
-    15.04.2024
+    22.04.2024
         Links:
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/20
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/18
