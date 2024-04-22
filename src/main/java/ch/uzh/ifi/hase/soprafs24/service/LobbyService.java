@@ -35,7 +35,8 @@ public class LobbyService{
     public Lobby getLobbyByCode(String code){
         boolean exists = checkIfLobbyExistsCode(code, true);
         if(!exists){
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            String.format("The Lobby with the Code %s doesn't exist.", code));
         }
         return this.lobbyRepository.findByCode(code);
     }
@@ -43,7 +44,8 @@ public class LobbyService{
     public Lobby getLobbyById(Long lobby_id){
         boolean exists = checkIfLobbyExistsId(lobby_id, true);
         if (!exists){
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            String.format("The Lobby with the ID %s doesn't exist.", lobby_id));
         }
         return this.lobbyRepository.getById(lobby_id);
     }
@@ -75,7 +77,7 @@ public class LobbyService{
         try {
             newLobby.getPlayers().get(0);
         } catch(Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,
             "Lobby creation failed. No player id could be found in the players list of the request DTO, so the lobby owner can't be set.");
         }
 
@@ -101,12 +103,18 @@ public class LobbyService{
 
         boolean exists = checkIfLobbyExistsCode(code, true);
         if(!exists){
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            String.format("The Lobby with the Code %s doesn't exist.", code));
         }
         
         Lobby toUpdate = getLobbyByCode(code);
         //add new player
-        toUpdate.addPlayers(playerInput.getPlayers().get(0));
+        try {
+            toUpdate.addPlayers(playerInput.getPlayers().get(0));
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,
+            "Entering Lobby failed. No player id could be found in the players list of the request DTO, so you can't be added to player list.");
+        }
 
         //update Repository
         toUpdate = lobbyRepository.save(toUpdate);
@@ -118,7 +126,8 @@ public class LobbyService{
     public Lobby removePlayer(Lobby playerInput, Long lobby_id){
         boolean exists = checkIfLobbyExistsId(lobby_id, true);
         if (!exists){
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            String.format("The Lobby with the ID %s doesn't exist.", lobby_id));
         }
 
         Lobby toUpdate = getLobbyById(lobby_id);
@@ -132,7 +141,7 @@ public class LobbyService{
             //If no more players are in Lobby, delete Lobby
             if (toUpdate.getPlayers().isEmpty()) {
                 manager.remove(toUpdate);
-                return null;
+                return toUpdate;
             } //Else make next Player LobbyOwner
             else {
                 toUpdate.setOwnerId(toUpdate.getPlayers().get(0));
