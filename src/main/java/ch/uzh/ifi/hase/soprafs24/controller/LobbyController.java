@@ -39,6 +39,10 @@ public class LobbyController{
         //find Lobby
         Lobby lobby = lobbyService.getLobbyById(id);
 
+        if (lobby == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Getting Lobby failed. There exists no lobby with ID %s.", id));
+        }
+
         //return Lobby
         return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby);
     }
@@ -53,6 +57,10 @@ public class LobbyController{
 
         //create Lobby
         Lobby createdLobby = lobbyService.createLobby(playerInput);
+
+        if (createdLobby == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Creating Lobby failed. Players is missing."));
+        }
 
         //Also send token back through header
         response.addHeader("Authorization", createdLobby.getToken());
@@ -69,8 +77,9 @@ public class LobbyController{
         //update Lobby
         Lobby updatedLobby = lobbyService.updateLobby(playerInput);
 
-        if (updatedLobby == null) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The Lobby with the given Code '%s' doesn't exist.", playerInput.getCode()));
+        if (updatedLobby == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            String.format("Updating Lobby failed. There either exists no lobby with code %s or players is missing.", playerInput.getCode()));
         }
 
         //Also send token back
@@ -84,14 +93,14 @@ public class LobbyController{
     @ResponseBody
     public void removePlayer(@PathVariable("id") Long id,
         @RequestBody LobbyPostDTO lobbyPostDTO){
-        System.out.println("LPD");
-        System.out.println(lobbyPostDTO.toString());
+
         Lobby playerInput = DTOMapper.INSTANCE.convertLobbyPostDTOtoEntity(lobbyPostDTO);
-        System.out.println(playerInput.toString());
+
         Lobby updatedLobby = lobbyService.removePlayer(playerInput, id);
 
-        /*if (updatedLobby == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("The Lobby with the given ID '%s' doesn't exist.", playerInput.getId()));
-        }*/
+        if (updatedLobby == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            String.format("The Lobby with the given ID '%s' doesn't exist or player is not found.", id));
+        }
     }
 }
