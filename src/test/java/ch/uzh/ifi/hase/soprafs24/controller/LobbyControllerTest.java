@@ -246,7 +246,7 @@ public class LobbyControllerTest {
     given(lobbyService.removePlayer(Mockito.any(), Mockito.any())).willReturn(lobby);
 
     //when
-    MockHttpServletRequestBuilder putRequest = put("/lobbies/1")
+    MockHttpServletRequestBuilder putRequest = put("/lobbies/1/remove")
     .contentType(MediaType.APPLICATION_JSON)
     .content(asJsonString(lobbyPostDTO));
 
@@ -267,7 +267,7 @@ public class LobbyControllerTest {
     given(lobbyService.removePlayer(Mockito.any(), Mockito.any())).willReturn(null);
 
     //when
-    MockHttpServletRequestBuilder putRequest = put("/lobbies/1")
+    MockHttpServletRequestBuilder putRequest = put("/lobbies/1/remove")
     .contentType(MediaType.APPLICATION_JSON)
     .content(asJsonString(lobbyPostDTO));
 
@@ -299,7 +299,7 @@ public class LobbyControllerTest {
     given(lobbyService.removePlayer(Mockito.any(), Mockito.any())).willReturn(null);
 
     //when
-    MockHttpServletRequestBuilder putRequest = put("/lobbies/1")
+    MockHttpServletRequestBuilder putRequest = put("/lobbies/1/remove")
     .contentType(MediaType.APPLICATION_JSON)
     .content(asJsonString(lobbyPostDTO));
 
