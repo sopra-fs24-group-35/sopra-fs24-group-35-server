@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "PLAYER")
@@ -22,7 +23,7 @@ public class Player implements Serializable {
     private int troopBonus;
 
     @OneToMany(targetEntity=RiskCard.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<RiskCard> riskCards;
+    private List<RiskCard> riskCards = new ArrayList<RiskCard>();
 
     //Getter and setter for playerId
     public Long getPlayerId(){
