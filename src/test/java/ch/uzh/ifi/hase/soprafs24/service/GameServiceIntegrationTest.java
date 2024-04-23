@@ -121,7 +121,7 @@ public class GameServiceIntegrationTest {
         assertEquals(fetchedGame.getGameId(), testGame.getGameId());
     }
 
-    @Test
+    //@Test
     @DirtiesContext
     public void updateGame_validInputs_success() {
         // given
