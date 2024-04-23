@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.hasItems;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -116,8 +117,8 @@ public class LobbyControllerTest {
     mockMvc.perform(postRequest).andExpect(status().isCreated())
     .andExpect(jsonPath("$.id", is(lobby.getId().intValue())))
     .andExpect(jsonPath("$.code", is(lobby.getCode())))
-    .andExpect(jsonPath("$.ownerId", is(lobby.getOwnerId().intValue())));
-    //.andExpect(jsonPath(("$.players"), is(lobby.getPlayers())));  (not working)
+    .andExpect(jsonPath("$.ownerId", is(lobby.getOwnerId().intValue())))
+    .andExpect(jsonPath(("$.players"), hasItems(2)));
   }
 
   @Test
@@ -170,8 +171,8 @@ public class LobbyControllerTest {
     mockMvc.perform(putRequest).andExpect(status().isOk())
     .andExpect(jsonPath("$.id", is(lobby.getId().intValue())))
     .andExpect(jsonPath("$.code", is(lobby.getCode())))
-    .andExpect(jsonPath("$.ownerId", is(lobby.getOwnerId().intValue())));
-    // .andExpect(jsonPath("$.players", is(lobby.getPlayers()))); (not working)
+    .andExpect(jsonPath("$.ownerId", is(lobby.getOwnerId().intValue())))
+    .andExpect(jsonPath("$.players", hasItems(2, 3)));
   }
 
   @Test
