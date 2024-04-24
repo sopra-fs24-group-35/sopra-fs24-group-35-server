@@ -400,6 +400,9 @@ public class GameService {
         //save turn cycle to game
         game.setTurnCycle(turnCycle);
 
+        //Distribute troops for reinforcement phase for first player
+        game = distributeTroops(game, game.getTurnCycle().getCurrentPlayer().getPlayerId());
+
         game = gameRepository.save(game);
         gameRepository.flush();
 
