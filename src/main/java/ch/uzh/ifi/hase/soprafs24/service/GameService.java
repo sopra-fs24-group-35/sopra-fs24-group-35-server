@@ -285,6 +285,23 @@ public class GameService {
             if (player.getPlayerId() ==  playerId) {
                 player.setTroopBonus(Math.max(count/3, 3)); // set bonus to number of owned territories/3 and minimum 3
             }
+
+            //Add the continent bonus if player has all territories
+            for (Continent continent : board.getContinents()) {
+                int size = continent.getTerritories().size();
+                int territoriesOwned = 0;
+                
+                //Check ownership of each territory
+                for (Territory territory : continent.getTerritories()) {
+                    if (territory.getOwner() == player.getPlayerId()){
+                        territoriesOwned += 1;
+                    }
+                }
+
+                if (territoriesOwned == size){
+                    player.setTroopBonus(player.getTroopBonus() + continent.getAdditionalTroopBonus());
+                }
+            }
         }
         return game;
     }
