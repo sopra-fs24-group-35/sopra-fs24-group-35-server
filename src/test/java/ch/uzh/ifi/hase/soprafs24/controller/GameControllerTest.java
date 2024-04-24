@@ -4,7 +4,10 @@ import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.constant.Phase;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
+import ch.uzh.ifi.hase.soprafs24.entity.TurnCycle;
+import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AttackPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
@@ -33,6 +36,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -252,18 +256,41 @@ public class GameControllerTest {
         territories.add(paradeplatz);
         board.setTerritories(territories);
 
+        //create 2 players
+        Player player1 = new Player();
+        player1.setPlayerId(2L);
+
+        Player player2 = new Player();
+        player2.setPlayerId(3L);
+
+        List<Player> players = new ArrayList<Player>();
+        players.add(player1);
+        players.add(player2);
+
+        //create TurnCycleBefore and TurnCycleAfter
+        TurnCycle turnCycleBefore = new TurnCycle();
+        turnCycleBefore.setCurrentPlayer(player1);
+        turnCycleBefore.setPlayerCycle(players);
+        turnCycleBefore.setCurrentPhase(Phase.REINFORCEMENT);
+
+        TurnCycle turnCycleAfter = new TurnCycle();
+        turnCycleAfter.setCurrentPlayer(player1);
+        turnCycleAfter.setPlayerCycle(players);
+        turnCycleAfter.setCurrentPhase(Phase.ATTACK);
+
         // create Game with this board
         Game game = new Game();
         game.setGameId(1L);
         game.setBoard(board);
-        game.setPlayers(null);
-        game.setTurnCycle(null);
+        game.setPlayers(players);
+        game.setTurnCycle(turnCycleAfter);
 
 
         GamePostDTO gamePostDTO = new GamePostDTO();
         gamePostDTO.setBoard(board);
+        gamePostDTO.setTurnCycle(turnCycleBefore);
 
-        doNothing().when(gameService).updateGame(Mockito.any(), Mockito.any());
+        given(gameService.updateGame(Mockito.any(), Mockito.any())).willReturn(game);
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1")
@@ -274,8 +301,8 @@ public class GameControllerTest {
 
         // then
         mockMvc.perform(putRequest)
-            .andExpect(status().isNoContent());
-            
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.turnCycle.currentPhase", is(game.getTurnCycle().getCurrentPhase().toString())));
     }
 
     
@@ -341,7 +368,7 @@ public class GameControllerTest {
         gamePostDTO.setBoard(board);
 
         doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
-        doNothing().when(gameService).updateGame(Mockito.any(), Mockito.any());
+        given(gameService.updateGame(Mockito.any(), Mockito.any())).willReturn(game);
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1")
@@ -455,7 +482,7 @@ public class GameControllerTest {
         gamePostDTO.setBoard(board);
 
         doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
-        doNothing().when(gameService).updateGame(Mockito.any(), Mockito.any());
+        given(gameService.updateGame(Mockito.any(), Mockito.any())).willReturn(game);
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/1/game/1")
