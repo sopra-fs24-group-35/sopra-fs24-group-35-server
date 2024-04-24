@@ -94,7 +94,7 @@ public class GameService {
         return initializedGame;
     }
 
-    public void updateGame(Game updatedGame, Long gameId) {
+    public Game updateGame(Game updatedGame, Long gameId) {
 
         // throww error if game with the given id doesn't exist
         boolean exists = checkIfGameExists(gameId, true);
@@ -118,7 +118,7 @@ public class GameService {
         gameRepository.flush();
 
         log.debug("Updated a Game");
-        return;
+        return updatedGame;
     }
 
     public void deleteGame(Long gameId) {
@@ -277,7 +277,7 @@ public class GameService {
         }
         for (Player player : game.getPlayers()) {
             if (player.getPlayerId() ==  playerId) {
-                player.setTroopBonus(Math.min(count/3, 3)); // set bonus to number of owned territories/3 and minimum 3
+                player.setTroopBonus(Math.max(count/3, 3)); // set bonus to number of owned territories/3 and minimum 3
             }
         }
         return game;
