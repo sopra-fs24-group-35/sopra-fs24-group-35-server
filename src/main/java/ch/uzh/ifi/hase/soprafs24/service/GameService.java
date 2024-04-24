@@ -144,9 +144,10 @@ public class GameService {
         game.getTurnCycle().setCurrentPhase(phase.next());
 
         // if it's a new player's turn, update TurnCycle
-        if (phase == Phase.REINFORCEMENT) {
+        if (game.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
             Player nextPlayer = nextPlayer(currentPlayer, game.getTurnCycle());
+            System.out.println(nextPlayer);
             game.getTurnCycle().setCurrentPlayer(nextPlayer);
         }
         return game;
@@ -156,17 +157,21 @@ public class GameService {
         int position = 0;
 
         // find current player in player cycle array
-        for (int i = 0; i < turnCycle.getPlayerCycle().size(); i++) {
-            if (turnCycle.getCurrentPlayer().getPlayerId() == currentPlayer.getPlayerId()) {
-                position = i;
-            } 
+        for (Player player : turnCycle.getPlayerCycle()) {
+            if (player.getPlayerId() == currentPlayer.getPlayerId()){
+                break;
+            } else {
+                position += 1;
+            }
         }
 
-        // calculate position of next player
-        position = (position+1)%turnCycle.getPlayerCycle().size();
-
+        Player nextPlayer;
         // get tha next player
-        Player nextPlayer = turnCycle.getPlayerCycle().get(position);
+        if ((position + 1) > turnCycle.getPlayerCycle().size()-1){
+            nextPlayer = turnCycle.getPlayerCycle().get(0);
+        } else {
+            nextPlayer = turnCycle.getPlayerCycle().get(position+1);
+        }
         return nextPlayer;
     }
 
