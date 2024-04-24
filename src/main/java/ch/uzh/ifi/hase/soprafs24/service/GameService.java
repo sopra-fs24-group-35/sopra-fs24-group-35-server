@@ -258,6 +258,7 @@ public class GameService {
         if (defendingTerritory.getTroops() <= 0) {
             defendingTerritory.setOwner(attackingTerritory.getOwner());
             defendingTerritory.setTroops(troopsFromAtk);
+            attackingTerritory.setTroops(attackingTerritory.getTroops() - troopsFromAtk);
         }
 
         // Now save the adjusted territories to the repository

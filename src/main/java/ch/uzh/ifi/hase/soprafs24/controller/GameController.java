@@ -109,13 +109,11 @@ public class GameController {
     @DeleteMapping("/lobbies/{lobbyId}/game/{gameId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity deleteGame(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
-        @RequestBody GamePostDTO gamePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
+        @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
+
         // check if request is authorized
         gameService.checkAuthorization(lobbyId, token);
 
-        
-        // convert API user to internal representation
-        Game gameToDelete = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // check if lobby exists
         gameService.checkIfLobbyExists(lobbyId);
         // set GameId in Lobby to null
