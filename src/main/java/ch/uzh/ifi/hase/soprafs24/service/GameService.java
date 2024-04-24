@@ -765,6 +765,7 @@ public class GameService {
         Board board = new Board();
 
         ArrayList<Continent> continents = new ArrayList<>();
+        continents.add(africa);
         continents.add(europe);
         continents.add(asia);
         continents.add(australia);
@@ -772,6 +773,12 @@ public class GameService {
         continents.add(southAmerica);
 
         ArrayList<Territory> territories = new ArrayList<>();
+        territories.add(northAfrica);
+        territories.add(egypt);
+        territories.add(congo);
+        territories.add(eastAfrica);
+        territories.add(southAfrica);
+        territories.add(madagascar);
         territories.add(iceland);
         territories.add(scandinavia);
         territories.add(greatBritain);
