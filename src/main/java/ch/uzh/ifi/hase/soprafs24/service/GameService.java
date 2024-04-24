@@ -141,7 +141,7 @@ public class GameService {
         Phase phase = game.getTurnCycle().getCurrentPhase();
 
         // update phase
-        phase.next();
+        game.getTurnCycle().setCurrentPhase(phase.next());
 
         // if it's a new player's turn, update TurnCycle
         if (phase == Phase.REINFORCEMENT) {
