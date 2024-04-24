@@ -105,6 +105,9 @@ public class GameService {
         // update game
         updatedGame = doConsequences(updatedGame, gameRepository.getByGameId(gameId));
 
+        // update Turn Cycle:
+        updatedGame = nextPhase(updatedGame);
+
         // If reinforcement phase, then distribute troops to current player
         if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             updatedGame = distributeTroops(updatedGame, updatedGame.getTurnCycle().getCurrentPlayer().getPlayerId());
@@ -132,6 +135,39 @@ public class GameService {
 
         log.debug("Deleted a Game");
         return;
+    }
+
+    private Game nextPhase(Game game) {
+        Phase phase = game.getTurnCycle().getCurrentPhase();
+
+        // update phase
+        phase.next();
+
+        // if it's a new player's turn, update TurnCycle
+        if (phase == Phase.REINFORCEMENT) {
+            Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+            Player nextPlayer = nextPlayer(currentPlayer, game.getTurnCycle());
+            game.getTurnCycle().setCurrentPlayer(nextPlayer);
+        }
+        return game;
+    }
+
+    private Player nextPlayer(Player currentPlayer, TurnCycle turnCycle) {
+        int position = 0;
+
+        // find current player in player cycle array
+        for (int i = 0; i < turnCycle.getPlayerCycle().size(); i++) {
+            if (turnCycle.getCurrentPlayer().getPlayerId() == currentPlayer.getPlayerId()) {
+                position = i;
+            } 
+        }
+
+        // calculate position of next player
+        position = (position+1)%turnCycle.getPlayerCycle().size();
+
+        // get tha next player
+        Player nextPlayer = turnCycle.getPlayerCycle().get(position);
+        return nextPlayer;
     }
 
     public Territory getTerritory(Long gameId, String territoryName){
@@ -783,8 +819,6 @@ public class GameService {
 
     // Helper function to execute consequences on a game when it has been updated by a client (by comparing old state from repository vs. new state from client)
     private Game doConsequences(Game newState, Game oldState) {
-        // TODO: Insert code for consequences after a game update (e.g. remove troops, change owner of territory etc.)
-        
         // This function simply transfers territory stats from the incoming request to the repository game
         for (int i = 0; i < oldState.getBoard().getTerritories().size(); i++) {
             oldState.getBoard().getTerritories().get(i).setTroops(newState.getBoard().getTerritories().get(i).getTroops());
