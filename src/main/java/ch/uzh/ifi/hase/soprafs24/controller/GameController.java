@@ -135,8 +135,21 @@ public class GameController {
         gameService.checkAuthorization(lobbyId, token);
         // execute attack
         Game updatedGame = gameService.executeRepeatedAttacks(attack, gameId);
-        
+        // convert internal representation of user back to API
+        return DTOMapper.INSTANCE.convertEntityToGameGetDTO(updatedGame);
+    } 
 
+    @PutMapping("lobbies/{lobbyId}/game/{gameId}/transfer")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameGetDTO transferTroops(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
+    @RequestBody AttackPostDTO attackPostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
+        // convert API game to internal representation
+        Attack attack = DTOMapper.INSTANCE.convertAttackPostDTOtoEntity(attackPostDTO);
+        // check if request is authorized
+        gameService.checkAuthorization(lobbyId, token);
+        // execute attack
+        Game updatedGame = gameService.transferTroops(attack, gameId);
         // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(updatedGame);
     } 
