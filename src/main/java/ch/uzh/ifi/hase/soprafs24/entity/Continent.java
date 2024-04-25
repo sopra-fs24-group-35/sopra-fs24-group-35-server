@@ -5,6 +5,7 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 
 @Entity
@@ -16,7 +17,7 @@ public class Continent implements Serializable {
     private Long continentId;
 
     @OneToMany(targetEntity=Territory.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Territory> territories;
+    private List<Territory> territories = new ArrayList<Territory>();
 
     @Column(nullable = true, unique = false)
     private String name;
