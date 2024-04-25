@@ -94,7 +94,7 @@ public class GameService {
         return initializedGame;
     }
 
-    public void updateGame(Game updatedGame, Long gameId) {
+    public Game updateGame(Game updatedGame, Long gameId) {
 
         // throww error if game with the given id doesn't exist
         boolean exists = checkIfGameExists(gameId, true);
@@ -105,6 +105,9 @@ public class GameService {
         // update game
         updatedGame = doConsequences(updatedGame, gameRepository.getByGameId(gameId));
 
+        // update Turn Cycle:
+        updatedGame = nextPhase(updatedGame);
+
         // If reinforcement phase, then distribute troops to current player
         if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             updatedGame = distributeTroops(updatedGame, updatedGame.getTurnCycle().getCurrentPlayer().getPlayerId());
@@ -114,8 +117,10 @@ public class GameService {
         updatedGame = gameRepository.save(updatedGame);
         gameRepository.flush();
 
+        System.out.println(updatedGame.getTurnCycle().getCurrentPlayer().getTroopBonus());
+
         log.debug("Updated a Game");
-        return;
+        return updatedGame;
     }
 
     public void deleteGame(Long gameId) {
@@ -132,6 +137,44 @@ public class GameService {
 
         log.debug("Deleted a Game");
         return;
+    }
+
+    private Game nextPhase(Game game) {
+        Phase phase = game.getTurnCycle().getCurrentPhase();
+
+        // update phase
+        game.getTurnCycle().setCurrentPhase(phase.next());
+
+        // if it's a new player's turn, update TurnCycle
+        if (game.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
+            Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+            Player nextPlayer = nextPlayer(currentPlayer, game.getTurnCycle());
+            System.out.println(nextPlayer);
+            game.getTurnCycle().setCurrentPlayer(nextPlayer);
+        }
+        return game;
+    }
+
+    private Player nextPlayer(Player currentPlayer, TurnCycle turnCycle) {
+        int position = 0;
+
+        // find current player in player cycle array
+        for (Player player : turnCycle.getPlayerCycle()) {
+            if (player.getPlayerId() == currentPlayer.getPlayerId()){
+                break;
+            } else {
+                position += 1;
+            }
+        }
+
+        Player nextPlayer;
+        // get tha next player
+        if ((position + 1) > turnCycle.getPlayerCycle().size()-1){
+            nextPlayer = turnCycle.getPlayerCycle().get(0);
+        } else {
+            nextPlayer = turnCycle.getPlayerCycle().get(position+1);
+        }
+        return nextPlayer;
     }
 
     public Territory getTerritory(Long gameId, String territoryName){
@@ -222,9 +265,42 @@ public class GameService {
         if (defendingTerritory.getTroops() <= 0) {
             defendingTerritory.setOwner(attackingTerritory.getOwner());
             defendingTerritory.setTroops(troopsFromAtk);
+            attackingTerritory.setTroops(attackingTerritory.getTroops() - troopsFromAtk);
         }
 
         // Now save the adjusted territories to the repository
+        gameRepository.save(game);
+        gameRepository.flush();
+
+        return game;
+    }
+
+    public Game transferTroops(Attack attack, Long gameId){
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No game with this id could be found.");
+        }
+
+        // get game from repository
+        Game game = this.gameRepository.getByGameId(gameId);
+
+        // find territories of interest in the game entity
+        Territory attackingTerritory = null;
+        Territory defendingTerritory = null;
+        for (int i = 0; i < game.getBoard().getTerritories().size(); i++) {
+            if (game.getBoard().getTerritories().get(i).getName().equals(attack.getAttackingTerritory())) {
+                attackingTerritory = game.getBoard().getTerritories().get(i);
+            } else if (game.getBoard().getTerritories().get(i).getName().equals(attack.getDefendingTerritory())) {
+                defendingTerritory = game.getBoard().getTerritories().get(i);
+            }
+        }
+
+        int transferingTroops = Math.min(attackingTerritory.getTroops()-1, attack.getTroopsAmount());
+
+        attackingTerritory.setTroops(attackingTerritory.getTroops() - transferingTroops);
+        defendingTerritory.setTroops(defendingTerritory.getTroops() + transferingTroops);
+
         gameRepository.save(game);
         gameRepository.flush();
 
@@ -241,7 +317,26 @@ public class GameService {
         }
         for (Player player : game.getPlayers()) {
             if (player.getPlayerId() ==  playerId) {
-                player.setTroopBonus(Math.min(count/3, 3)); // set bonus to number of owned territories/3 and minimum 3
+                player.setTroopBonus(Math.max(count/3, 3)); // set bonus to number of owned territories/3 and minimum 3
+                
+                int territoriesOwned;
+                int size;
+                //Add the continent bonus if player has all territories
+                for (Continent continent : board.getContinents()) {
+                    size = continent.getTerritories().size();
+                    territoriesOwned = 0;
+                    
+                    //Check ownership of each territory
+                    for (Territory territory : continent.getTerritories()) {
+                        if (territory.getOwner() == playerId){
+                            territoriesOwned ++;
+                        }
+                    }
+                    if (territoriesOwned == size){
+                        player.setTroopBonus(player.getTroopBonus() + continent.getAdditionalTroopBonus());
+                        System.out.println(player.getTroopBonus());
+                    }
+                }
             }
         }
         return game;
@@ -257,6 +352,9 @@ public class GameService {
         // do dice rolling 
         ArrayList<Integer> atkRolls = new ArrayList<>();
         ArrayList<Integer> defRolls = new ArrayList<>();
+
+        //Reset string because of length limit upon executing attack multiple times
+        game.setDiceResult("");
 
         // Answer string
         String diceResult = game.getDiceResult();
@@ -400,6 +498,9 @@ public class GameService {
         //save turn cycle to game
         game.setTurnCycle(turnCycle);
 
+        //Distribute troops for reinforcement phase for first player
+        game = distributeTroops(game, game.getTurnCycle().getCurrentPlayer().getPlayerId());
+
         game = gameRepository.save(game);
         gameRepository.flush();
 
@@ -453,7 +554,7 @@ public class GameService {
         territoriesAfrica.add(southAfrica);
         territoriesAfrica.add(madagascar);
         africa.setTerritories(territoriesAfrica);
-        africa.setAdditionalTroopBonus(4);
+        africa.setAdditionalTroopBonus(3);
 
         //ASIA----------------------------------------------------------------------
 
@@ -535,7 +636,7 @@ public class GameService {
         territoriesAsia.add(siam);
 
         asia.setTerritories(territoriesAsia);
-        asia.setAdditionalTroopBonus(4);
+        asia.setAdditionalTroopBonus(7);
 
         //AUSTRALIA----------------------------------------------------------------------
 
@@ -569,7 +670,7 @@ public class GameService {
         territoriesAustralia.add(easternAustralia);
 
         australia.setTerritories(territoriesAustralia);
-        australia.setAdditionalTroopBonus(4);
+        australia.setAdditionalTroopBonus(2);
 
         //EUROPE----------------------------------------------------------------------
 
@@ -621,7 +722,7 @@ public class GameService {
         territoriesEurope.add(southernEurope);
 
         europe.setTerritories(territoriesEurope);
-        europe.setAdditionalTroopBonus(4);
+        europe.setAdditionalTroopBonus(5);
 
         //NORTH AMERICA----------------------------------------------------------------------
 
@@ -685,7 +786,7 @@ public class GameService {
         territoriesNorthAmerica.add(centralAmerica);
 
         northAmerica.setTerritories(territoriesNorthAmerica);
-        northAmerica.setAdditionalTroopBonus(4);
+        northAmerica.setAdditionalTroopBonus(5);
 
         //SOUTH AMERICA----------------------------------------------------------------------
         
@@ -719,13 +820,14 @@ public class GameService {
         territoriesSouthAmerica.add(argentina);
 
         southAmerica.setTerritories(territoriesSouthAmerica);
-        southAmerica.setAdditionalTroopBonus(4);
+        southAmerica.setAdditionalTroopBonus(2);
 
         //BOARD----------------------------------------------------------------------
 
         Board board = new Board();
 
         ArrayList<Continent> continents = new ArrayList<>();
+        continents.add(africa);
         continents.add(europe);
         continents.add(asia);
         continents.add(australia);
@@ -733,6 +835,12 @@ public class GameService {
         continents.add(southAmerica);
 
         ArrayList<Territory> territories = new ArrayList<>();
+        territories.add(northAfrica);
+        territories.add(egypt);
+        territories.add(congo);
+        territories.add(eastAfrica);
+        territories.add(southAfrica);
+        territories.add(madagascar);
         territories.add(iceland);
         territories.add(scandinavia);
         territories.add(greatBritain);
@@ -780,8 +888,6 @@ public class GameService {
 
     // Helper function to execute consequences on a game when it has been updated by a client (by comparing old state from repository vs. new state from client)
     private Game doConsequences(Game newState, Game oldState) {
-        // TODO: Insert code for consequences after a game update (e.g. remove troops, change owner of territory etc.)
-        
         // This function simply transfers territory stats from the incoming request to the repository game
         for (int i = 0; i < oldState.getBoard().getTerritories().size(); i++) {
             oldState.getBoard().getTerritories().get(i).setTroops(newState.getBoard().getTerritories().get(i).getTroops());
