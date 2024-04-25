@@ -117,6 +117,8 @@ public class GameService {
         updatedGame = gameRepository.save(updatedGame);
         gameRepository.flush();
 
+        System.out.println(updatedGame.getTurnCycle().getCurrentPlayer().getTroopBonus());
+
         log.debug("Updated a Game");
         return updatedGame;
     }
@@ -330,9 +332,9 @@ public class GameService {
                             territoriesOwned ++;
                         }
                     }
-
                     if (territoriesOwned == size){
                         player.setTroopBonus(player.getTroopBonus() + continent.getAdditionalTroopBonus());
+                        System.out.println(player.getTroopBonus());
                     }
                 }
             }
@@ -549,7 +551,7 @@ public class GameService {
         territoriesAfrica.add(southAfrica);
         territoriesAfrica.add(madagascar);
         africa.setTerritories(territoriesAfrica);
-        africa.setAdditionalTroopBonus(4);
+        africa.setAdditionalTroopBonus(3);
 
         //ASIA----------------------------------------------------------------------
 
@@ -631,7 +633,7 @@ public class GameService {
         territoriesAsia.add(siam);
 
         asia.setTerritories(territoriesAsia);
-        asia.setAdditionalTroopBonus(4);
+        asia.setAdditionalTroopBonus(7);
 
         //AUSTRALIA----------------------------------------------------------------------
 
@@ -665,7 +667,7 @@ public class GameService {
         territoriesAustralia.add(easternAustralia);
 
         australia.setTerritories(territoriesAustralia);
-        australia.setAdditionalTroopBonus(4);
+        australia.setAdditionalTroopBonus(2);
 
         //EUROPE----------------------------------------------------------------------
 
@@ -717,7 +719,7 @@ public class GameService {
         territoriesEurope.add(southernEurope);
 
         europe.setTerritories(territoriesEurope);
-        europe.setAdditionalTroopBonus(4);
+        europe.setAdditionalTroopBonus(5);
 
         //NORTH AMERICA----------------------------------------------------------------------
 
@@ -781,7 +783,7 @@ public class GameService {
         territoriesNorthAmerica.add(centralAmerica);
 
         northAmerica.setTerritories(territoriesNorthAmerica);
-        northAmerica.setAdditionalTroopBonus(4);
+        northAmerica.setAdditionalTroopBonus(5);
 
         //SOUTH AMERICA----------------------------------------------------------------------
         
@@ -815,7 +817,7 @@ public class GameService {
         territoriesSouthAmerica.add(argentina);
 
         southAmerica.setTerritories(territoriesSouthAmerica);
-        southAmerica.setAdditionalTroopBonus(4);
+        southAmerica.setAdditionalTroopBonus(2);
 
         //BOARD----------------------------------------------------------------------
 
