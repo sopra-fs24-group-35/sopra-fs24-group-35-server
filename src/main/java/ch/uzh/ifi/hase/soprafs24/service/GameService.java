@@ -353,6 +353,9 @@ public class GameService {
         ArrayList<Integer> atkRolls = new ArrayList<>();
         ArrayList<Integer> defRolls = new ArrayList<>();
 
+        //Reset string because of length limit upon executing attack multiple times
+        game.setDiceResult("");
+
         // Answer string
         String diceResult = game.getDiceResult();
         diceResult += "Atk: ";
