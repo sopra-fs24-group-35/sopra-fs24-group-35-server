@@ -273,6 +273,38 @@ public class GameService {
         return game;
     }
 
+    public Game transferTroops(Attack attack, Long gameId){
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No game with this id could be found.");
+        }
+
+        // get game from repository
+        Game game = this.gameRepository.getByGameId(gameId);
+
+        // find territories of interest in the game entity
+        Territory attackingTerritory = null;
+        Territory defendingTerritory = null;
+        for (int i = 0; i < game.getBoard().getTerritories().size(); i++) {
+            if (game.getBoard().getTerritories().get(i).getName().equals(attack.getAttackingTerritory())) {
+                attackingTerritory = game.getBoard().getTerritories().get(i);
+            } else if (game.getBoard().getTerritories().get(i).getName().equals(attack.getDefendingTerritory())) {
+                defendingTerritory = game.getBoard().getTerritories().get(i);
+            }
+        }
+
+        int transferingTroops = Math.min(attackingTerritory.getTroops()-1, attack.getTroopsAmount());
+
+        attackingTerritory.setTroops(attackingTerritory.getTroops() - transferingTroops);
+        defendingTerritory.setTroops(defendingTerritory.getTroops() + transferingTroops);
+
+        gameRepository.save(game);
+        gameRepository.flush();
+
+        return game;
+    }
+
     private Game distributeTroops(Game game, Long playerId) {
         Board board = game.getBoard();
         int count = 0;
