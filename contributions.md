@@ -249,6 +249,29 @@
 
         A lot of time went into testing and it took longer than those 8h suggested by the dev task. The main issue was several errors appearing, especially with the integration tests. The GameService integration tests for example worked individually just fine, but failed when run together. It took a long time to figure that out.
 
+    26.04.2024
+		Links:
+
+            Issue #82:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=60872647
+            Issue #51:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/7?pane=issue&itemId=60919114
+
+        Description:
+
+        I did the following:
+        For Issue #82:
+        - Created the title screen for the game
+        - Designed a logo using Procreate for the title screen
+        - Adjustments in the main menu such that it starts with the title screen with all important menu options
+        - Added the logo also in the login screen
+
+        For Issue #51:
+        - Completely redrawn the background image of the map using Procreate, such that it looks way nicer and our application doesn't contain 'stolen' images anymore.
+        - Also changed the background image for the main menu/title screen
+
+        I have also spent a lot of time with bugfixing and helping to make the client work properly.
+
 
 
 
