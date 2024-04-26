@@ -34,7 +34,27 @@
             shows the defending territory name and attacking territory name and their respective troop amounts. Also added selectors to
             select the amount of troops the attacker wants to use to attack and another selector to select how many times the attacker
             attacks.
+    
+    29.04.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/14
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/13
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/11
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/15
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/20
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/18
 
+        Description:
+            Fixed many issues/bugs and connected the main game screen to the back-end. 
+            Added the attack modal to the main game screen. 
+            Fixed issues with troop movement. 
+            Fixed issues with movement after attack. Implemented game model on 
+            the client-side. Helped updating the screen for all users. 
+            Improved avatar selection on registration screen.
+            Connected client-side buttons to server territories so they update their numbers when the server gets updated.
+            Improve game flow and UI "prettiness".
+            Various other fixes and implementations.
+    
 
 #### Nico (Eposs111)
 
