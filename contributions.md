@@ -176,6 +176,51 @@
         same it's not a problem but it I pull the window a new column left and right and on top and on
         button can appear that also scales with the picture itself. Was really hard to find this fix. 
 
+
+    26.04.2024
+        Links:
+            Issue #17
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/17
+            Issue 12: 
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/12
+            Issue 3:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/3
+            Issue #10:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/10
+            Issue #10:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/10
+            Issue #14:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/14
+            Issue #13:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/13
+            Issue #20 (Mechanic Implemented):
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/20
+            Issue #75:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/75
+            Issue #81:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/81
+            Issue #30:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/30
+            Issue #32:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/32 
+            Issue #49:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/49
+            Issue #57:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/57
+            Issue #58:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/58
+            Issue #59:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/59      
+            Issue #106:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/106 -
+            Issue #107:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/107 -
+            (Probably a few More)
+
+        Description:
+        Yeah I coded a few hours xd
+        This sums up my week: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-            client/commit/2fdf1fed368810ba84ca497cd906b38a07a41098
+
 #### Robin Burkard (roburkUZH):
 
 	08.04.2024
