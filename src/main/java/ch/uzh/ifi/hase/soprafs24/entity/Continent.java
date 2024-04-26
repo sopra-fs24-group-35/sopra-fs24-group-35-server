@@ -25,6 +25,14 @@ public class Continent implements Serializable {
     @Column(nullable = true, unique = false)
     private int additionalTroopBonus;
 
+    public Long getContinentId() {
+        return continentId;
+    }
+
+    public void setContinentId(Long continentId) {
+        this.continentId = continentId;
+    }
+
     // Getters and setters for territories
     public List<Territory> getTerritories() {
         return territories;
