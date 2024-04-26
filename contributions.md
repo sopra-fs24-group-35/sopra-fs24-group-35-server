@@ -72,6 +72,16 @@
             made sure that the Lobby redirects to "/risk/gameId" instead of "/risk". (All of this worked once but somehow now there are errors
             despite me not doing anything before it broke)
 
+    29.04.2024:
+        I canno't provide a detailed Links to issues I was bussy to bugfix whatever didn't work. Some of them:
+
+        https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/49
+        https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/50
+        https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/18
+        https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/34
+
+        Description:
+        Bugfixes after Bugfixes
             
 #### Ralph Kosch (RPKosch)
 
