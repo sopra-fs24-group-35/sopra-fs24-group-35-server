@@ -219,8 +219,8 @@
 
         Description:
         Yeah I coded a few hours xd
-        This sums up my week: 
-https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/commit/2fdf1fed368810ba84ca497cd906b38a07a41098
+        This sums up our week: 
+        https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/commit/2fdf1fed368810ba84ca497cd906b38a07a41098
 
 #### Robin Burkard (roburkUZH):
 
