@@ -22,6 +22,14 @@ public class Territory implements Serializable {
     @Column(nullable = true, unique = false)
     private int troops;
 
+    public Long getTerritoryId() {
+        return territoryId;
+    }
+
+    public void setTerritoryId(Long territoryId) {
+        this.territoryId = territoryId;
+    }
+
      // Getter and setter for name
     public String getName() {
         return name;
