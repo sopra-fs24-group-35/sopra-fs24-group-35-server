@@ -311,6 +311,9 @@ public class GameService {
         Board board = game.getBoard();
         int count = 0;
         for (Territory territory : board.getTerritories()) {
+            if (territory.getName() == "North Africa"){
+                System.out.println(territory.getTerritoryId());
+            }
             if (territory.getOwner() == playerId) {
                 count++;
             }
@@ -510,7 +513,6 @@ public class GameService {
 
     // Helper function to initialize game
     private Game initializeGame(Game game) {
-        // TODO: Insert code to initialize the game here (e.g. distribute troops etc.)
 
         //AFRICA----------------------------------------------------------------------
 
@@ -518,6 +520,7 @@ public class GameService {
         northAfrica.setName("North Africa");
         northAfrica.setOwner(null);
         northAfrica.setTroops(0);
+        System.out.println(northAfrica.getTerritoryId());
 
         Territory egypt = new Territory();
         egypt.setName("Egypt");

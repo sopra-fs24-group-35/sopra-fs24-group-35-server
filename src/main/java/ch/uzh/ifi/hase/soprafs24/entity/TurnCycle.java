@@ -28,6 +28,14 @@ public class TurnCycle implements Serializable {
     @Column(nullable = true, unique = false)
     private int timeLeftForCycle;
 
+    public Long getTurnCycleId() {
+        return turnCycleId;
+    }
+
+    public void setTurnCycleId(Long turnCycleId) {
+        this.turnCycleId = turnCycleId;
+    }
+
     // Getter and setter for currentPlayer
     public Player getCurrentPlayer() {
         return currentPlayer;
