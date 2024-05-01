@@ -406,6 +406,56 @@ public class GameService {
         return game;
     }
 
+    //function for players to leave game
+    public void leaveGame(Long gameId, Long lobbyId, Long userId){
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No game with this id could be found.");
+        }
+
+        // get game from repository
+        Game game = this.gameRepository.getByGameId(gameId);
+
+        boolean removed = false;
+        for (Player player : game.getTurnCycle().getPlayerCycle()) {
+            if (player.getPlayerId() == userId){
+                //check if it's users turn, if yes go to next user
+                if (game.getTurnCycle().getCurrentPlayer() == player){
+                    int nextPosition = game.getTurnCycle().getPlayerCycle().indexOf(player)+1;
+                    if (nextPosition > game.getTurnCycle().getPlayerCycle().size()-1){
+                        nextPosition=0;
+                    }
+                    game.getTurnCycle().setCurrentPlayer(game.getTurnCycle().getPlayerCycle().get(nextPosition));
+                }
+                //remove player from turnCycle
+                game.getTurnCycle().getPlayerCycle().remove(player);
+                removed = true;
+
+                //create a lobby so player can also get removed from lobby
+                Lobby lobby = new Lobby();
+                lobby.addPlayers(userId);
+
+                lobbyService.removePlayer(lobby, lobbyId);
+
+                //if last player has left game, delete game
+                if (game.getTurnCycle().getPlayerCycle().size() == 0) {
+                    deleteGame(gameId);
+                    return;
+                }
+            }
+        }
+
+        //if no player was found, raise error
+        if (removed == false) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No player with this id could be found.");
+        }
+
+        gameRepository.save(game);
+        gameRepository.flush();
+    }
+
 
     // Helper function to check if a game with a certain Id exists in the repository
     private boolean checkIfGameExists(Long gameId, boolean shouldExist) {
