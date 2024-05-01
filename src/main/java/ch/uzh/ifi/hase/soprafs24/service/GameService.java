@@ -427,6 +427,8 @@ public class GameService {
                         nextPosition=0;
                     }
                     game.getTurnCycle().setCurrentPlayer(game.getTurnCycle().getPlayerCycle().get(nextPosition));
+                    game.getTurnCycle().setCurrentPhase(Phase.REINFORCEMENT);
+                    game = distributeTroops(game, game.getTurnCycle().getCurrentPlayer().getPlayerId());
                 }
                 //remove player from turnCycle
                 game.getTurnCycle().getPlayerCycle().remove(player);
