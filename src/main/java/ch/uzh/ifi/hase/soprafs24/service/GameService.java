@@ -20,6 +20,7 @@ import ch.uzh.ifi.hase.soprafs24.service.UserService;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
+import ch.uzh.ifi.hase.soprafs24.entity.RiskCard;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
@@ -403,6 +404,35 @@ public class GameService {
 
         
 
+        return game;
+    }
+
+    public Game pullCard(Long gameId) {
+        Random rand = new Random();
+        Game game = this.gameRepository.getByGameId(gameId);
+        List<Territory> territories = game.getBoard().getTerritories();
+
+        // choose a territory randomly
+        Territory chosenTerritory = territories.get(rand.nextInt(42));
+
+        // choose a troop type
+        int troop = rand.nextInt(10);
+
+        // adjust troop size
+        if (troop == 0) {troop = 0;} //joker
+        else if (troop <= 3) {troop = 1;} //infantery
+        else if (troop <= 6) {troop = 5;} //cavallery
+        else {troop = 10;} //artillery
+
+        // get current player
+        Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+
+        // create and add the new card
+        RiskCard card = new RiskCard();
+        card.setTerritoryName(chosenTerritory.getName());
+        card.setTroops(troop);
+        currentPlayer.getRiskCards().add(card);
+        
         return game;
     }
 

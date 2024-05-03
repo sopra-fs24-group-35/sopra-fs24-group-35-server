@@ -152,5 +152,18 @@ public class GameController {
         Game updatedGame = gameService.transferTroops(attack, gameId);
         // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(updatedGame);
-    } 
+    }
+
+    @GetMapping("/lobbies/{lobbyId}/game/{gameId}/cards")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameGetDTO pullCard(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
+        @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
+        // check if request is authorized
+        gameService.checkAuthorization(lobbyId, token);
+        // pull a card
+        Game updatedGame = gameService.pullCard(gameId);
+        // convert internal representation of user back to API
+        return DTOMapper.INSTANCE.convertEntityToGameGetDTO(updatedGame);
+    }
 }
