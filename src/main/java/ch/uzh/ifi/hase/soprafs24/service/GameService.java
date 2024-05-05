@@ -6,8 +6,10 @@ import java.util.Random;
 import java.util.Collections;
 import java.util.HashMap;
 
+import javax.persistence.Id;
 import javax.transaction.Transactional;
 
+import org.hibernate.mapping.IdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -432,7 +434,37 @@ public class GameService {
                 }
                 //remove player from turnCycle
                 game.getTurnCycle().getPlayerCycle().remove(player);
+
+                boolean alreadyUsedId = false;
+
+                //Check each territory for usable IDs for player
+                for (Territory territory : game.getBoard().getTerritories()) {
+                    for (Player existentPlayers : game.getPlayers()) {
+                        if (existentPlayers.getPlayerId() == territory.getTerritoryId()){
+                            alreadyUsedId = true;
+                        }
+                    }
+
+                    // If ID has not been used for a player, use this ID
+                    if (alreadyUsedId == false){
+                        player.setPlayerId(territory.getTerritoryId());
+                        break;
+                    }
+                }
+
+                if (userId == player.getPlayerId()){
+                    throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED,
+                "For unknown reason no new Player ID could be generated so do not start a new game until old one is finished.");
+                }
+
                 removed = true;
+
+                //Change all territory owner IDs to new one
+                for (Territory territory : game.getBoard().getTerritories()) {
+                    if(territory.getOwner() == userId){
+                        territory.setOwner(player.getPlayerId());
+                    }
+                }
 
                 //create a lobby so player can also get removed from lobby
                 Lobby lobby = new Lobby();
