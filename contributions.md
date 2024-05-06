@@ -55,6 +55,17 @@
             Improve game flow and UI "prettiness".
             Various other fixes and implementations.
     
+    06.05.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/39
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/38
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/41
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/43
+
+        Description:
+            Added the RiskCardModal.tsx for the user to view his cards and trade if possibple.
+            At the moment not connected to the backend.
+            Otherwise everything went smooth.
 
 #### Nico (Eposs111)
 
