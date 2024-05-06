@@ -4,12 +4,16 @@ import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Attack;
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
+import ch.uzh.ifi.hase.soprafs24.entity.TurnCycle;
+import ch.uzh.ifi.hase.soprafs24.entity.RiskCard;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 
 import org.hibernate.action.spi.Executable;
+import org.hibernate.mapping.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -209,6 +213,47 @@ public class GameServiceTest {
         // Since both had 7 troops initially, they should now have 13 troops when added together
         assertEquals(13, afterAttack.getBoard().getTerritories().get(0).getTroops()
         + afterAttack.getBoard().getTerritories().get(1).getTroops());
+
+
+        
+    }
+
+    //@Test
+    public void pullCard_validInput_updatedGame() {
+
+        // set turn cycle with two players
+        Player p1 = new Player();
+        p1.setPlayerId(7L);
+        ArrayList<RiskCard> l = new ArrayList<RiskCard>();
+        p1.setRiskCards(l);
+
+        Player p2 = new Player();
+        p2.setPlayerId(8L);
+        ArrayList<RiskCard> l2 = new ArrayList<RiskCard>();
+        p2.setRiskCards(l2);
+
+        ArrayList<Player> players = new ArrayList<Player>();
+        players.add(p1);
+        players.add(p2);
+
+        TurnCycle tc = new TurnCycle();
+        tc.setCurrentPlayer(p1);
+        tc.setPlayerCycle(players);
+        testGame.setTurnCycle(tc);
+
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+        //Mockito.when(territories.get(Mockito.any()))
+
+        // check that player has no card
+        assertTrue(testGame.getTurnCycle().getCurrentPlayer().getRiskCards().size() == 0);
+
+        // perform the pull card method
+        Game afterCardPull = gameService.pullCard(1L);
+
+        // check that player has a card now
+        assertTrue(afterCardPull.getTurnCycle().getCurrentPlayer().getRiskCards().size() > 0);
+        assertTrue(afterCardPull.getTurnCycle().getCurrentPlayer().getRiskCards().get(0).getTroops() > 0);
 
 
         
