@@ -222,6 +222,27 @@
         This sums up our week: 
         https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/commit/2fdf1fed368810ba84ca497cd906b38a07a41098
 
+
+    6.05.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/111
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/112
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/110
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/9
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/86
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/87
+
+        Description:
+            Redesign the Avatars that only those are visible that are also in the Game 
+            Implement functionality for visability of troop amounts and amount of territories for all players
+            When only one player is left in the lobby the game should display a win screen (Had a bug before)
+            When a player has no more troops it should display a defeat screen (Had also a bug)
+            Changing Layout of Game for better Visibility -> Changed Avatar that only Players getting displayed
+            Changed Avatars to the right side 
+            Added Leave Button and Additional Modal that you cannot accidentally leave the game
+
+
+
 #### Robin Burkard (roburkUZH):
 
 	08.04.2024
