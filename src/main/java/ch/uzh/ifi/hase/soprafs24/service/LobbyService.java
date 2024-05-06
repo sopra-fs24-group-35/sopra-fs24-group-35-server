@@ -108,9 +108,20 @@ public class LobbyService{
         }
         
         Lobby toUpdate = getLobbyByCode(code);
-        //add new player
+
+        boolean playerAlreadyInLobby = false;
+        //check if player is already in lobby
+        for (Long playerId : toUpdate.getPlayers()) {
+            if (playerId == playerInput.getPlayers().get(0)){
+                playerAlreadyInLobby = true;
+            }
+        }
+
+        //add new player if he is not already in Lobby
         try {
-            toUpdate.addPlayers(playerInput.getPlayers().get(0));
+            if (playerAlreadyInLobby == false){
+                toUpdate.addPlayers(playerInput.getPlayers().get(0));
+            }
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,
             "Entering Lobby failed. No player id could be found in the players list of the request DTO, so you can't be added to player list.");

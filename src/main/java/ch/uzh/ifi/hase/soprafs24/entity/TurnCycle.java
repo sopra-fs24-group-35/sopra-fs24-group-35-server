@@ -6,6 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.Phase;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "TURNCYCLE")
@@ -19,8 +20,8 @@ public class TurnCycle implements Serializable {
     @JoinColumn(name = "playerId")
     private Player currentPlayer;
 
-    @OneToMany(targetEntity=Player.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Player> playerCycle;
+    @OneToMany(targetEntity=Player.class, fetch = FetchType.LAZY)
+    private List<Player> playerCycle = new ArrayList<Player>();
 
     @Column(nullable = true, unique = false)
     private Phase currentPhase;
