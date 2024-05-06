@@ -175,6 +175,9 @@ public class GameService {
         } else {
             nextPlayer = turnCycle.getPlayerCycle().get(position+1);
         }
+
+        // set gotACard to false
+        turnCycle.setGotACard(false);
         return nextPlayer;
     }
 
@@ -267,6 +270,12 @@ public class GameService {
             defendingTerritory.setOwner(attackingTerritory.getOwner());
             defendingTerritory.setTroops(troopsFromAtk);
             attackingTerritory.setTroops(attackingTerritory.getTroops() - troopsFromAtk);
+
+            // get pull Risk Card if it is the first time in the round
+            if (game.getTurnCycle().getGotACard() == false) {
+                pullCard(gameId);
+                game.getTurnCycle().setGotACard(true);
+            }
         }
 
         // Now save the adjusted territories to the repository
