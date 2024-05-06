@@ -15,16 +15,28 @@ public class RiskCard implements Serializable {
     @GeneratedValue
     private Long cardId;
 
-    @Column(nullable = true, unique = false)
-    private String type;
+    @Column(nullable = false, unique = false)
+    private String territoryName;
 
-    // Getter and setter for type
-    public String getType() {
-        return type;
+    @Column(nullable = true, unique = false)
+    private int troops;
+
+    // Getter and setter for territoryName
+    public String getTerritoryName() {
+        return territoryName;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setTerritoryName(String territoryName) {
+        this.territoryName = territoryName;
+    }
+
+    // Getter and setter for troops
+    public int getTroops() {
+        return troops;
+    }
+
+    public void setTroops(int troops) {
+        this.troops = troops;
     }
     
 }
