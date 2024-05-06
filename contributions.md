@@ -102,6 +102,11 @@
 
         Description:
         Bugfixes after Bugfixes
+
+    06.05.2024:
+        Unfortunately I had to go to the hospital the last Tuesday and they only let me go this morning. So I wasn't able 
+        to do any Tasks this week. I apologise to my teammtates. I will do more next week. (Doctors Note and Confirmation
+        of Stationary stay has been sent to my TA Nils Grob)
             
 #### Ralph Kosch (RPKosch)
 
