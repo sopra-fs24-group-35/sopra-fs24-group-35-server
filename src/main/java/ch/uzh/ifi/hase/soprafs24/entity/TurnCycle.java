@@ -20,7 +20,7 @@ public class TurnCycle implements Serializable {
     @JoinColumn(name = "playerId")
     private Player currentPlayer;
 
-    @OneToMany(targetEntity=Player.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(targetEntity=Player.class, fetch = FetchType.LAZY)
     private List<Player> playerCycle = new ArrayList<Player>();
 
     @Column(nullable = true, unique = false)
