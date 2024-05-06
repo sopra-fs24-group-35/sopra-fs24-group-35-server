@@ -119,8 +119,6 @@ public class GameService {
         updatedGame = gameRepository.save(updatedGame);
         gameRepository.flush();
 
-        System.out.println(updatedGame.getTurnCycle().getCurrentPlayer().getTroopBonus());
-
         log.debug("Updated a Game");
         return updatedGame;
     }
@@ -151,7 +149,6 @@ public class GameService {
         if (game.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
             Player nextPlayer = nextPlayer(currentPlayer, game.getTurnCycle());
-            System.out.println(nextPlayer);
             game.getTurnCycle().setCurrentPlayer(nextPlayer);
         }
         return game;
@@ -313,9 +310,6 @@ public class GameService {
         Board board = game.getBoard();
         int count = 0;
         for (Territory territory : board.getTerritories()) {
-            if (territory.getName() == "North Africa"){
-                System.out.println(territory.getTerritoryId());
-            }
             if (territory.getOwner() == playerId) {
                 count++;
             }
@@ -339,7 +333,6 @@ public class GameService {
                     }
                     if (territoriesOwned == size){
                         player.setTroopBonus(player.getTroopBonus() + continent.getAdditionalTroopBonus());
-                        System.out.println(player.getTroopBonus());
                     }
                 }
             }
@@ -433,50 +426,28 @@ public class GameService {
                     game = distributeTroops(game, game.getTurnCycle().getCurrentPlayer().getPlayerId());
                 }
                 //remove player from turnCycle
+                System.out.println("here1");
                 game.getTurnCycle().getPlayerCycle().remove(player);
 
-                boolean alreadyUsedId = false;
-
-                //Check each territory for usable IDs for player
-                for (Territory territory : game.getBoard().getTerritories()) {
-                    for (Player existentPlayers : game.getPlayers()) {
-                        if (existentPlayers.getPlayerId() == territory.getTerritoryId()){
-                            alreadyUsedId = true;
-                        }
-                    }
-
-                    // If ID has not been used for a player, use this ID
-                    if (alreadyUsedId == false){
-                        player.setPlayerId(territory.getTerritoryId());
-                        break;
-                    }
-                }
-
-                if (userId == player.getPlayerId()){
-                    throw new ResponseStatusException(HttpStatus.EXPECTATION_FAILED,
-                "For unknown reason no new Player ID could be generated so do not start a new game until old one is finished.");
-                }
-
+                System.out.println("here2");
                 removed = true;
-
-                //Change all territory owner IDs to new one
-                for (Territory territory : game.getBoard().getTerritories()) {
-                    if(territory.getOwner() == userId){
-                        territory.setOwner(player.getPlayerId());
-                    }
-                }
 
                 //create a lobby so player can also get removed from lobby
                 Lobby lobby = new Lobby();
                 lobby.addPlayers(userId);
 
-                lobbyService.removePlayer(lobby, lobbyId);
+                //lobbyService.removePlayer(lobby, lobbyId);
 
+                System.out.println("lol");
+                System.out.println(game.getTurnCycle().getPlayerCycle().size());
+                System.out.println("lol");
                 //if last player has left game, delete game
                 if (game.getTurnCycle().getPlayerCycle().size() == 0) {
                     deleteGame(gameId);
                     return;
                 }
+                
+                break;
             }
         }
 
@@ -604,7 +575,6 @@ public class GameService {
         northAfrica.setName("North Africa");
         northAfrica.setOwner(null);
         northAfrica.setTroops(0);
-        System.out.println(northAfrica.getTerritoryId());
 
         Territory egypt = new Territory();
         egypt.setName("Egypt");
