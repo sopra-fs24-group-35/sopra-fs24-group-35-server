@@ -139,7 +139,7 @@ public class GameController {
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(updatedGame);
     } 
 
-    @PutMapping("lobbies/{lobbyId}/game/{gameId}/transfer")
+    @PutMapping("/lobbies/{lobbyId}/game/{gameId}/transfer")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GameGetDTO transferTroops(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
@@ -154,10 +154,10 @@ public class GameController {
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(updatedGame);
     }
 
-    @PutMapping("lobbies/{lobbyId}/game/{gameId}/user/{userId}")
+    @PutMapping("/lobbies/{lobbyId}/game/{gameId}/user/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public void leaveGame(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId, @PathVariable("userId") Long userId,
-    @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
+    @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token, @RequestBody GamePostDTO gamePostDTO) {
         
         gameService.checkAuthorization(lobbyId, token);
 

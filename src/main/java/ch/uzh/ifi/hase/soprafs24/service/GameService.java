@@ -438,9 +438,7 @@ public class GameService {
 
                 //lobbyService.removePlayer(lobby, lobbyId);
 
-                System.out.println("lol");
                 System.out.println(game.getTurnCycle().getPlayerCycle().size());
-                System.out.println("lol");
                 //if last player has left game, delete game
                 if (game.getTurnCycle().getPlayerCycle().size() == 0) {
                     deleteGame(gameId);
@@ -457,8 +455,12 @@ public class GameService {
             "No player with this id could be found.");
         }
 
+        System.out.println("hello");
+
         gameRepository.save(game);
         gameRepository.flush();
+
+        System.out.println("wieso");
     }
 
 
