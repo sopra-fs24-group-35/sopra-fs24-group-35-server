@@ -369,6 +369,28 @@
 
         I have also spent a lot of time with bugfixing and helping to make the client work properly.
 
+    06.05.2024
+		Links:
+
+            Issue #42:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=57251785
+            Issue #28:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=57112873
+
+        Description:
+
+        I did the following:
+        For Issue #42:
+        - Designed Risk Cards
+        - Created images for the Risk Cards
+        - Created a scrollable React component for the cards
+
+        For Issue #28:
+        - Created pullCard method in the server
+        - Added automatic card pull after a player wins a territory, but only once in a turn
+        - Also added a REST method including a test to manually pull a card by the client
+
+
 
 
 
