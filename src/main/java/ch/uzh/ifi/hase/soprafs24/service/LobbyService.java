@@ -191,10 +191,7 @@ public class LobbyService{
 
         Lobby toUpdate = getLobbyById(lobby_id);
 
-        toUpdate.setGameId(null);
-
-        toUpdate = lobbyRepository.save(toUpdate);
-        lobbyRepository.flush();
+        manager.remove(toUpdate);
 
         return toUpdate;
     }

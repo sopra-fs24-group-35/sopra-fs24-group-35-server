@@ -116,7 +116,11 @@ public class GameService {
             updatedGame = distributeTroops(updatedGame, updatedGame.getTurnCycle().getCurrentPlayer().getPlayerId());
         } else if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.MOVE) {
             int territoriesOwned = 0;
+            List<Player> toRemove = new ArrayList<Player>();
             for (Player player : updatedGame.getTurnCycle().getPlayerCycle()) {
+                toRemove.add(player);
+            }
+            for (Player player : toRemove) {
                 territoriesOwned = 0;
                 for (Territory territory : updatedGame.getBoard().getTerritories()) {
                     if (territory.getOwner() == player.getPlayerId()){
@@ -457,6 +461,7 @@ public class GameService {
                 //if last player has left game, delete game
                 if (game.getTurnCycle().getPlayerCycle().size() == 0) {
                     deleteGame(gameId);
+                    lobbyService.endGame(lobbyId);
                     return;
                 }
                 
