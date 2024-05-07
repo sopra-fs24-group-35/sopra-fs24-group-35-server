@@ -97,7 +97,7 @@ public class GameService {
         return initializedGame;
     }
 
-    public Game updateGame(Game updatedGame, Long gameId) {
+    public Game updateGame(Game updatedGame, Long gameId, Long lobbyId) {
 
         // throww error if game with the given id doesn't exist
         boolean exists = checkIfGameExists(gameId, true);
@@ -114,6 +114,20 @@ public class GameService {
         // If reinforcement phase, then distribute troops to current player
         if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             updatedGame = distributeTroops(updatedGame, updatedGame.getTurnCycle().getCurrentPlayer().getPlayerId());
+        } else if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.MOVE) {
+            int territoriesOwned = 0;
+            for (Player player : updatedGame.getPlayers()) {
+                territoriesOwned = 0;
+                for (Territory territory : updatedGame.getBoard().getTerritories()) {
+                    if (territory.getOwner() == player.getPlayerId()){
+                        territoriesOwned++;
+                    }
+                }
+
+                if (territoriesOwned == 0) {
+                    leaveGame(gameId, lobbyId, player.getPlayerId());
+                }
+            }
         }
 
         // save updated game to repository
