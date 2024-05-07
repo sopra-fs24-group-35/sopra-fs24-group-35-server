@@ -162,6 +162,7 @@ public class GameController {
         gameService.checkAuthorization(lobbyId, token);
 
         gameService.leaveGame(gameId, lobbyId, userId);
+    }
 
 
     @GetMapping("/lobbies/{lobbyId}/game/{gameId}/cards")
