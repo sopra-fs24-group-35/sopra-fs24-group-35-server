@@ -151,7 +151,8 @@ public class LobbyService{
         if (toUpdate.getOwnerId().equals(playerId)){
             //If no more players are in Lobby, delete Lobby
             if (toUpdate.getPlayers().isEmpty()) {
-                manager.remove(toUpdate);
+                lobbyRepository.deleteById(lobby_id);
+                lobbyRepository.flush();
                 return toUpdate;
             } //Else make next Player LobbyOwner
             else {
@@ -183,17 +184,16 @@ public class LobbyService{
         return toUpdate;
     }
 
-    public Lobby endGame(Long lobby_id){
+    public void endGame(Long lobby_id){
         boolean exists = checkIfLobbyExistsId(lobby_id, true);
         if (!exists){
-            return null;
+            return;
         }
 
         Lobby toUpdate = getLobbyById(lobby_id);
 
-        manager.remove(toUpdate);
-
-        return toUpdate;
+        lobbyRepository.deleteById(lobby_id);
+        lobbyRepository.flush();
     }
 
     private boolean checkIfLobbyExistsId(Long lobby_id, boolean shouldExist){

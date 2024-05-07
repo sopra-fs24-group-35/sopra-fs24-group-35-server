@@ -66,8 +66,8 @@ public class GameService {
         return lobbyService.startGame(lobby_id, game_id);
     }
 
-    public Lobby endGame(Long lobby_id){
-        return lobbyService.endGame(lobby_id);
+    public void endGame(Long lobby_id){
+        lobbyService.endGame(lobby_id);
     }
 
     public void checkIfLobbyExists(long lobbyId) {
@@ -114,7 +114,8 @@ public class GameService {
         // If reinforcement phase, then distribute troops to current player
         if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             updatedGame = distributeTroops(updatedGame, updatedGame.getTurnCycle().getCurrentPlayer().getPlayerId());
-        } else if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.MOVE) {
+        } //if player haas no territories remove him
+        else if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.MOVE) {
             int territoriesOwned = 0;
             List<Player> toRemove = new ArrayList<Player>();
             for (Player player : updatedGame.getTurnCycle().getPlayerCycle()) {
