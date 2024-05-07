@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import javax.transaction.Transactional;
 
+import org.hibernate.mapping.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
+import ch.uzh.ifi.hase.soprafs24.entity.CardStack;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.RiskCard;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
@@ -417,30 +419,31 @@ public class GameService {
     }
 
     public Game pullCard(Long gameId) {
-        Random rand = new Random();
+
+        // get game from repository
         Game game = this.gameRepository.getByGameId(gameId);
-        List<Territory> territories = game.getBoard().getTerritories();
 
-        // choose a territory randomly
-        Territory chosenTerritory = territories.get(rand.nextInt(42));
+        // shuffle the list of cards (card stack)
+        Collections.shuffle(game.getCardStack().getRiskCards());
 
-        // choose a troop type
-        int troop = rand.nextInt(10);
+        // choose the first card that's free
+        RiskCard pulledCard = null;
 
-        // adjust troop size
-        if (troop == 0) {troop = 0;} //joker
-        else if (troop <= 3) {troop = 1;} //infantery
-        else if (troop <= 6) {troop = 5;} //cavallery
-        else {troop = 10;} //artillery
+        for (int i = 0; i < 44; i++) {
+            if (game.getCardStack().getRiskCards().get(i).isInStack()) {
+                pulledCard = game.getCardStack().getRiskCards().get(i);
+            }
+        }
 
         // get current player
         Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
 
-        // create and add the new card
-        RiskCard card = new RiskCard();
-        card.setTerritoryName(chosenTerritory.getName());
-        card.setTroops(troop);
-        currentPlayer.getRiskCards().add(card);
+        // add the new card to the player and label it to not be in the stack anymore
+        currentPlayer.getRiskCards().add(pulledCard);
+        pulledCard.setInStack(false);
+
+        this.gameRepository.save(game);
+        gameRepository.flush();
         
         return game;
     }
@@ -552,6 +555,21 @@ public class GameService {
 
     // Helper function to initialize game
     private Game initializeGame(Game game) {
+
+        //Set arrays of territories
+        String[] africaTerritories = {"North Africa", "Egypt", "East Africa", "Central Africa", "South Africa", "Madagascar"};
+        String[] asiaTerritories = {"Middle East", "Afghanistan", "Ural", "Siberia", "Yakutsk", "Kamchatka", "Irkutsk", "Mongolia", "China", "India", "Siam", "Japan"};
+        String[] europeTerritories = {"Western Europe", "Southern Europe", "Northern Europe", "Great Britain", "Iceland", "Scandinavia", "Ukraine"};
+        String[] northAmericaTerritories = {"Alaska", "Northwest Territory", "Greenland", "Alberta", "Ontario", "Quebec", "Western United States", "Eastern United States", "Central America"};
+        String[] southAmericaTerritories = {"Venezuela", "Peru", "Brazil", "Argentina"};
+        String[] australiaTerritories = {"Indonesia", "New Guinea", "Eastern Australia", "Western Australia"};
+
+        int[] africaTerritoriesTroops = {2, 1, 1, 1, 3, 2};
+        int[] asiaTerritoriesTroops = {1, 2, 2, 2, 2, 1, 2, 1, 1, 2, 1, 3};
+        int[] europeTerritoriesTroops = {3, 3, 3, 3, 1, 2, 2};
+        int[] northAmericaTerritoriesTroops = {1, 3, 2, 2, 2, 2, 3, 3, 3};
+        int[] southAmericaTerritoriesTroops = {1, 1, 3, 1};
+        int[] australiaTerritoriesTroops = {3, 2, 3, 3};
 
         //AFRICA----------------------------------------------------------------------
 
@@ -924,6 +942,90 @@ public class GameService {
         board.setTerritories(territories);
 
         game.setBoard(board);
+
+        // set card stack
+
+        CardStack cardStack = new CardStack();
+
+        // Iterate over Africa territories
+        int i = 0;
+        for (String territory : africaTerritories) {
+            RiskCard card = new RiskCard();
+            card.setInStack(true);
+            card.setTerritoryName(territory);
+            card.setTroops(africaTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Iterate over Asia territories
+        i = 0;
+        for (String territory : asiaTerritories) {
+            RiskCard card = new RiskCard();
+            card.setInStack(true);
+            card.setTerritoryName(territory);
+            card.setTroops(asiaTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Iterate over Europe territories
+        i = 0;
+        for (String territory : europeTerritories) {
+            RiskCard card = new RiskCard();
+            card.setInStack(true);
+            card.setTerritoryName(territory);
+            card.setTroops(europeTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Iterate over North America territories
+        i = 0;
+        for (String territory : northAmericaTerritories) {
+            RiskCard card = new RiskCard();
+            card.setInStack(true);
+            card.setTerritoryName(territory);
+            card.setTroops(northAmericaTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Iterate over South America territories
+        i = 0;
+        for (String territory : southAmericaTerritories) {
+            RiskCard card = new RiskCard();
+            card.setInStack(true);
+            card.setTerritoryName(territory);
+            card.setTroops(southAmericaTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Iterate over Australia territories
+        i = 0;
+        for (String territory : australiaTerritories) {
+            RiskCard card = new RiskCard();
+            card.setInStack(true);
+            card.setTerritoryName(territory);
+            card.setTroops(australiaTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Add jokers
+
+        RiskCard joker1 = new RiskCard();
+        joker1.setInStack(true);
+        joker1.setTerritoryName("Joker");
+        joker1.setTroops(0);
+        cardStack.getRiskCards().add(joker1);
+
+        RiskCard joker2 = new RiskCard();
+        joker2.setInStack(true);
+        joker2.setTerritoryName("Joker");
+        joker2.setTroops(0);
+        cardStack.getRiskCards().add(joker2);
 
         return game;
     }

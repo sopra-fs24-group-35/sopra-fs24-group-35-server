@@ -21,6 +21,9 @@ public class RiskCard implements Serializable {
     @Column(nullable = true, unique = false)
     private int troops;
 
+    @Column(nullable = true, unique = false)
+    private boolean inStack;
+
     // Getter and setter for territoryName
     public String getTerritoryName() {
         return territoryName;
@@ -37,6 +40,16 @@ public class RiskCard implements Serializable {
 
     public void setTroops(int troops) {
         this.troops = troops;
+    }
+
+    // Getter method
+    public boolean isInStack() {
+        return inStack;
+    }
+
+    // Setter method
+    public void setInStack(boolean inStack) {
+        this.inStack = inStack;
     }
     
 }

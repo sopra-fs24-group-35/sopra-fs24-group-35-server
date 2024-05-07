@@ -28,6 +28,9 @@ public class TurnCycle implements Serializable {
     @Column(nullable = true, unique = false)
     private int timeLeftForCycle;
 
+    @Column(nullable = true, unique = false)
+    private boolean gotACard; // stores if a player has already got a risk card in the current turn
+
     public Long getTurnCycleId() {
         return turnCycleId;
     }
@@ -70,6 +73,15 @@ public class TurnCycle implements Serializable {
 
     public void setTimeLeftForCycle(int timeLeftForCycle) {
         this.timeLeftForCycle = timeLeftForCycle;
+    }
+
+    // Getter and setter for gotACard
+    public boolean getGotACard() {
+        return gotACard;
+    }
+    
+    public void setGotACard(boolean gotACard) {
+        this.gotACard = gotACard;
     }
     
 }
