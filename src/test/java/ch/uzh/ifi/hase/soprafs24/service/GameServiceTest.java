@@ -110,7 +110,7 @@ public class GameServiceTest {
     public void updateGame_idDoesntExist_noSuccess() {
         // Assert that trying to update a game by an id that doesn't exist throws a HTTP ResponseStatusException
         assertThrows(ResponseStatusException.class, () -> {       
-            gameService.updateGame(testGame, 1L);     
+            gameService.updateGame(testGame, 1L, 10L);     
         } );
     }
 

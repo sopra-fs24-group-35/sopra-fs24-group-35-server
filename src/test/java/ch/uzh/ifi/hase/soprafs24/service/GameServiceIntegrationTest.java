@@ -189,7 +189,7 @@ public class GameServiceIntegrationTest {
         testGame2.setDiceResult("Atk 1 2 Def 3 4");
 
         // when
-        gameService.updateGame(testGame2, 1L);
+        gameService.updateGame(testGame2, 1L, 10L);
         Game fetchedGame = gameService.getGameById(1L);
 
         // then check that the amount of troops is changed to 10
