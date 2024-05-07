@@ -116,7 +116,7 @@ public class GameService {
             updatedGame = distributeTroops(updatedGame, updatedGame.getTurnCycle().getCurrentPlayer().getPlayerId());
         } else if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.MOVE) {
             int territoriesOwned = 0;
-            for (Player player : updatedGame.getPlayers()) {
+            for (Player player : updatedGame.getTurnCycle().getPlayerCycle()) {
                 territoriesOwned = 0;
                 for (Territory territory : updatedGame.getBoard().getTerritories()) {
                     if (territory.getOwner() == player.getPlayerId()){
