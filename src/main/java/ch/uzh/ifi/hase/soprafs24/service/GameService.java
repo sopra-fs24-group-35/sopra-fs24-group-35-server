@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Collections;
 import java.util.HashMap;
-
+import javax.persistence.Id;
 import javax.transaction.Transactional;
+
+import org.hibernate.mapping.IdGenerator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +66,8 @@ public class GameService {
         return lobbyService.startGame(lobby_id, game_id);
     }
 
-    public Lobby endGame(Long lobby_id){
-        return lobbyService.endGame(lobby_id);
-    }
+    public void endGame(Long lobby_id){
+        lobbyService.endGame(lobby_id);
 
     public void checkIfLobbyExists(long lobbyId) {
         lobbyService.checkIfExists(lobbyId);
@@ -95,7 +96,7 @@ public class GameService {
         return initializedGame;
     }
 
-    public Game updateGame(Game updatedGame, Long gameId) {
+    public Game updateGame(Game updatedGame, Long gameId, Long lobbyId) {
 
         // throww error if game with the given id doesn't exist
         boolean exists = checkIfGameExists(gameId, true);
@@ -112,13 +113,30 @@ public class GameService {
         // If reinforcement phase, then distribute troops to current player
         if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             updatedGame = distributeTroops(updatedGame, updatedGame.getTurnCycle().getCurrentPlayer().getPlayerId());
+        } //if player haas no territories remove him
+        else if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.MOVE) {
+            int territoriesOwned = 0;
+            List<Player> toRemove = new ArrayList<Player>();
+            for (Player player : updatedGame.getTurnCycle().getPlayerCycle()) {
+                toRemove.add(player);
+            }
+            for (Player player : toRemove) {
+                territoriesOwned = 0;
+                for (Territory territory : updatedGame.getBoard().getTerritories()) {
+                    if (territory.getOwner() == player.getPlayerId()){
+                        territoriesOwned++;
+                    }
+                }
+
+                if (territoriesOwned == 0) {
+                    leaveGame(gameId, lobbyId, player.getPlayerId());
+                }
+            }
         }
 
         // save updated game to repository
         updatedGame = gameRepository.save(updatedGame);
         gameRepository.flush();
-
-        System.out.println(updatedGame.getTurnCycle().getCurrentPlayer().getTroopBonus());
 
         log.debug("Updated a Game");
         return updatedGame;
@@ -150,7 +168,6 @@ public class GameService {
         if (game.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
             Player nextPlayer = nextPlayer(currentPlayer, game.getTurnCycle());
-            System.out.println(nextPlayer);
             game.getTurnCycle().setCurrentPlayer(nextPlayer);
         }
         return game;
@@ -312,9 +329,6 @@ public class GameService {
         Board board = game.getBoard();
         int count = 0;
         for (Territory territory : board.getTerritories()) {
-            if (territory.getName() == "North Africa"){
-                System.out.println(territory.getTerritoryId());
-            }
             if (territory.getOwner() == playerId) {
                 count++;
             }
@@ -338,7 +352,6 @@ public class GameService {
                     }
                     if (territoriesOwned == size){
                         player.setTroopBonus(player.getTroopBonus() + continent.getAdditionalTroopBonus());
-                        System.out.println(player.getTroopBonus());
                     }
                 }
             }
@@ -407,6 +420,69 @@ public class GameService {
         return game;
     }
 
+    //function for players to leave game
+    public void leaveGame(Long gameId, Long lobbyId, Long userId){
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No game with this id could be found.");
+        }
+
+        // get game from repository
+        Game game = this.gameRepository.getByGameId(gameId);
+
+        boolean removed = false;
+        for (Player player : game.getTurnCycle().getPlayerCycle()) {
+            if (player.getPlayerId() == userId){
+                //check if it's users turn, if yes go to next user
+                if (game.getTurnCycle().getCurrentPlayer() == player){
+                    int nextPosition = game.getTurnCycle().getPlayerCycle().indexOf(player)+1;
+                    if (nextPosition > game.getTurnCycle().getPlayerCycle().size()-1){
+                        nextPosition=0;
+                    }
+                    game.getTurnCycle().setCurrentPlayer(game.getTurnCycle().getPlayerCycle().get(nextPosition));
+                    game.getTurnCycle().setCurrentPhase(Phase.REINFORCEMENT);
+                    game = distributeTroops(game, game.getTurnCycle().getCurrentPlayer().getPlayerId());
+                }
+                //remove player from turnCycle
+                System.out.println("here1");
+                game.getTurnCycle().getPlayerCycle().remove(player);
+
+                System.out.println("here2");
+                removed = true;
+
+                //create a lobby so player can also get removed from lobby
+                Lobby lobby = new Lobby();
+                lobby.addPlayers(userId);
+
+                //lobbyService.removePlayer(lobby, lobbyId);
+
+                System.out.println(game.getTurnCycle().getPlayerCycle().size());
+                //if last player has left game, delete game
+                if (game.getTurnCycle().getPlayerCycle().size() == 0) {
+                    deleteGame(gameId);
+                    lobbyService.endGame(lobbyId);
+                    return;
+                }
+                
+                break;
+            }
+        }
+
+        //if no player was found, raise error
+        if (removed == false) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No player with this id could be found.");
+        }
+
+        System.out.println("hello");
+
+        gameRepository.save(game);
+        gameRepository.flush();
+
+        System.out.println("wieso");
+    }
+      
     public Game pullCard(Long gameId) {
         Random rand = new Random();
         Game game = this.gameRepository.getByGameId(gameId);
@@ -550,7 +626,6 @@ public class GameService {
         northAfrica.setName("North Africa");
         northAfrica.setOwner(null);
         northAfrica.setTroops(0);
-        System.out.println(northAfrica.getTerritoryId());
 
         Territory egypt = new Territory();
         egypt.setName("Egypt");
