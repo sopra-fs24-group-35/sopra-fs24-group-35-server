@@ -1194,13 +1194,13 @@ public class GameService {
 
         RiskCard joker1 = new RiskCard();
         joker1.setHandedOut(false);
-        joker1.setTerritoryName("Joker");
+        joker1.setTerritoryName("Joker1");
         joker1.setTroops(0);
         cardStack.getRiskCards().add(joker1);
 
         RiskCard joker2 = new RiskCard();
         joker2.setHandedOut(false);
-        joker2.setTerritoryName("Joker");
+        joker2.setTerritoryName("Joker2");
         joker2.setTroops(0);
         cardStack.getRiskCards().add(joker2);
 
