@@ -66,8 +66,9 @@ public class GameService {
         return lobbyService.startGame(lobby_id, game_id);
     }
 
-    public void endGame(Long lobby_id){
+    public void endGame(Long lobby_id) {
         lobbyService.endGame(lobby_id);
+    }
 
     public void checkIfLobbyExists(long lobbyId) {
         lobbyService.checkIfExists(lobbyId);
