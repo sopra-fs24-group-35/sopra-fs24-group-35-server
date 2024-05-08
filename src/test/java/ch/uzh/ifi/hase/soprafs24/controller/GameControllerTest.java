@@ -10,6 +10,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.TurnCycle;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AttackPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.CardTradePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
@@ -127,32 +128,6 @@ public class GameControllerTest {
 
         // then
         mockMvc.perform(getRequest).andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void givenGame_whenPullCard_thenReturnGame() throws Exception {
-        // given
-        Game game = new Game();
-        game.setGameId(1L);
-        game.setBoard(null);
-        game.setPlayers(null);
-        game.setTurnCycle(null);
-        game.setDiceResult(null);
-
-        // Mocking
-        given(gameService.pullCard(1L)).willReturn(game);
-
-        // when
-        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/game/1/cards")
-        .contentType(MediaType.APPLICATION_JSON)
-        .header("Authorization", "abc");
-
-        // then
-        mockMvc.perform(getRequest).andExpect(status().isOk())
-            .andExpect(jsonPath("$.gameId", is(game.getGameId().intValue())))
-            .andExpect(jsonPath("$.board", is(game.getBoard())))
-            .andExpect(jsonPath("$.players", is(game.getPlayers())))
-            .andExpect(jsonPath("$.turnCycle", is(game.getTurnCycle())));
     }
 
 
@@ -407,6 +382,36 @@ public class GameControllerTest {
         // then
         mockMvc.perform(putRequest)
             .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void givenGame_whenPullCard_thenReturnGame() throws Exception {
+        // given
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setBoard(null);
+        game.setPlayers(null);
+        game.setTurnCycle(null);
+        game.setDiceResult(null);
+
+        CardTradePostDTO cardTradePostDTO = new CardTradePostDTO(); 
+
+        // Mocking
+        given(gameService.tradeCards(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
+        doNothing().when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
+
+        // when
+        MockHttpServletRequestBuilder postRequest = post("/lobbies/1/game/1/cards")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(asJsonString(cardTradePostDTO))
+        .header("Authorization", "abc");
+
+        // then
+        mockMvc.perform(postRequest).andExpect(status().isOk())
+            .andExpect(jsonPath("$.gameId", is(game.getGameId().intValue())))
+            .andExpect(jsonPath("$.board", is(game.getBoard())))
+            .andExpect(jsonPath("$.players", is(game.getPlayers())))
+            .andExpect(jsonPath("$.turnCycle", is(game.getTurnCycle())));
     }
 
     // DELETE tests ----------------------------------------------------------------------------------------------------

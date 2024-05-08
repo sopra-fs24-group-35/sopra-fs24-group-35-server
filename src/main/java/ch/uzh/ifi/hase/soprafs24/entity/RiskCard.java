@@ -22,7 +22,7 @@ public class RiskCard implements Serializable {
     private int troops;
 
     @Column(nullable = true, unique = false)
-    private boolean inStack;
+    private boolean handedOut;
 
     // Getter and setter for territoryName
     public String getTerritoryName() {
@@ -43,13 +43,13 @@ public class RiskCard implements Serializable {
     }
 
     // Getter method
-    public boolean isInStack() {
-        return inStack;
+    public boolean isHandedOut() {
+        return handedOut;
     }
 
     // Setter method
-    public void setInStack(boolean inStack) {
-        this.inStack = inStack;
+    public void setHandedOut(boolean handedOut) {
+        this.handedOut = handedOut;
     }
     
 }

@@ -21,6 +21,7 @@ import ch.uzh.ifi.hase.soprafs24.service.UserService;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
 import ch.uzh.ifi.hase.soprafs24.entity.CardStack;
+import ch.uzh.ifi.hase.soprafs24.entity.CardTrade;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.RiskCard;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
@@ -323,9 +324,6 @@ public class GameService {
         Board board = game.getBoard();
         int count = 0;
         for (Territory territory : board.getTerritories()) {
-            if (territory.getName() == "North Africa"){
-                System.out.println(territory.getTerritoryId());
-            }
             if (territory.getOwner() == playerId) {
                 count++;
             }
@@ -349,12 +347,110 @@ public class GameService {
                     }
                     if (territoriesOwned == size){
                         player.setTroopBonus(player.getTroopBonus() + continent.getAdditionalTroopBonus());
-                        System.out.println(player.getTroopBonus());
+                        
                     }
                 }
+
+                // Transfer card bonus to troop bonus and reset card bonus to 0
+                player.setTroopBonus(player.getTroopBonus() + player.getCardBonus());
+                player.setCardBonus(0);
             }
         }
         return game;
+    }
+
+    public Game tradeCards(Long gameId, CardTrade cardTrade, int cardStackSize) {
+
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No game with this id could be found.");
+        }
+
+        // get game from repository
+        Game game = this.gameRepository.getByGameId(gameId);
+
+        // get the names of the three cards
+        String card1Name = cardTrade.getCard1Name();
+        String card2Name = cardTrade.getCard2Name();
+        String card3Name = cardTrade.getCard3Name();
+
+        // get first card in the card stack
+        RiskCard card1 = null;
+        for (int i = 0; i < cardStackSize; i++) {
+            if (game.getCardStack().getRiskCards().get(i).getTerritoryName().equals(card1Name)) {
+                card1 = game.getCardStack().getRiskCards().get(i);
+                break;
+            }
+        }
+        if (card1 == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Card trade failed. The name of the first of the three traded-in cards cannot be found in the stack.");
+        }
+
+        // get second card in the card stack
+        RiskCard card2 = null;
+        for (int i = 0; i < cardStackSize; i++) {
+            if (game.getCardStack().getRiskCards().get(i).getTerritoryName().equals(card2Name)) {
+                card2 = game.getCardStack().getRiskCards().get(i);
+                break;
+            }
+        }
+        if (card2 == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Card trade failed. The name of the second of the three traded-in cards cannot be found in the stack.");
+        }
+
+        // get third card in the card stack
+        RiskCard card3 = null;
+        for (int i = 0; i < cardStackSize; i++) {
+            if (game.getCardStack().getRiskCards().get(i).getTerritoryName().equals(card3Name)) {
+                card3 = game.getCardStack().getRiskCards().get(i);
+                break;
+            }
+        }
+        if (card3 == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Card trade failed. The name of the third of the three traded-in cards cannot be found in the stack.");
+        }
+
+        // check if the trade is valid
+        if ((card1.getTroops() == card2.getTroops() && card2.getTroops() == card3.getTroops())
+            || (card1.getTroops() != card2.getTroops() && card2.getTroops() != card3.getTroops())) {
+
+            Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+            
+            // perform trade
+            // increase troop bonus of current player by 2
+            currentPlayer.setCardBonus(4);
+
+            // change labels of the cards to be not handed out anymore
+            card1.setHandedOut(false);
+            card2.setHandedOut(false);
+            card3.setHandedOut(false);
+
+            // remove cards from player
+            for (RiskCard card : currentPlayer.getRiskCards()) {
+                if (card.getTerritoryName().equals(card1.getTerritoryName())) {
+                    currentPlayer.getRiskCards().remove(card);
+                }else if (card.getTerritoryName().equals(card2.getTerritoryName())) {
+                    currentPlayer.getRiskCards().remove(card);
+                }else if (card.getTerritoryName().equals(card3.getTerritoryName())) {
+                    currentPlayer.getRiskCards().remove(card);
+                }
+            }
+
+
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Card trade failed. Two cards have the same troop type but not all three cards. This is not allowed.");
+        }
+
+
+
+        return game;
+
     }
 
     public Game executeAttack(Game game, Attack attack, Territory attackingTerritory, Territory defendingTerritory, Random rand) {
@@ -430,8 +526,9 @@ public class GameService {
         RiskCard pulledCard = null;
 
         for (int i = 0; i < 44; i++) {
-            if (game.getCardStack().getRiskCards().get(i).isInStack()) {
+            if (game.getCardStack().getRiskCards().get(i).isHandedOut() == false) {
                 pulledCard = game.getCardStack().getRiskCards().get(i);
+                break;
             }
         }
 
@@ -440,7 +537,7 @@ public class GameService {
 
         // add the new card to the player and label it to not be in the stack anymore
         currentPlayer.getRiskCards().add(pulledCard);
-        pulledCard.setInStack(false);
+        pulledCard.setHandedOut(true);
 
         this.gameRepository.save(game);
         gameRepository.flush();
@@ -951,7 +1048,7 @@ public class GameService {
         int i = 0;
         for (String territory : africaTerritories) {
             RiskCard card = new RiskCard();
-            card.setInStack(true);
+            card.setHandedOut(false);
             card.setTerritoryName(territory);
             card.setTroops(africaTerritoriesTroops[i]);
             cardStack.getRiskCards().add(card);
@@ -962,7 +1059,7 @@ public class GameService {
         i = 0;
         for (String territory : asiaTerritories) {
             RiskCard card = new RiskCard();
-            card.setInStack(true);
+            card.setHandedOut(false);
             card.setTerritoryName(territory);
             card.setTroops(asiaTerritoriesTroops[i]);
             cardStack.getRiskCards().add(card);
@@ -973,7 +1070,7 @@ public class GameService {
         i = 0;
         for (String territory : europeTerritories) {
             RiskCard card = new RiskCard();
-            card.setInStack(true);
+            card.setHandedOut(false);
             card.setTerritoryName(territory);
             card.setTroops(europeTerritoriesTroops[i]);
             cardStack.getRiskCards().add(card);
@@ -984,7 +1081,7 @@ public class GameService {
         i = 0;
         for (String territory : northAmericaTerritories) {
             RiskCard card = new RiskCard();
-            card.setInStack(true);
+            card.setHandedOut(false);
             card.setTerritoryName(territory);
             card.setTroops(northAmericaTerritoriesTroops[i]);
             cardStack.getRiskCards().add(card);
@@ -995,7 +1092,7 @@ public class GameService {
         i = 0;
         for (String territory : southAmericaTerritories) {
             RiskCard card = new RiskCard();
-            card.setInStack(true);
+            card.setHandedOut(false);
             card.setTerritoryName(territory);
             card.setTroops(southAmericaTerritoriesTroops[i]);
             cardStack.getRiskCards().add(card);
@@ -1006,7 +1103,7 @@ public class GameService {
         i = 0;
         for (String territory : australiaTerritories) {
             RiskCard card = new RiskCard();
-            card.setInStack(true);
+            card.setHandedOut(false);
             card.setTerritoryName(territory);
             card.setTroops(australiaTerritoriesTroops[i]);
             cardStack.getRiskCards().add(card);
@@ -1016,13 +1113,13 @@ public class GameService {
         // Add jokers
 
         RiskCard joker1 = new RiskCard();
-        joker1.setInStack(true);
+        joker1.setHandedOut(false);
         joker1.setTerritoryName("Joker");
         joker1.setTroops(0);
         cardStack.getRiskCards().add(joker1);
 
         RiskCard joker2 = new RiskCard();
-        joker2.setInStack(true);
+        joker2.setHandedOut(false);
         joker2.setTerritoryName("Joker");
         joker2.setTroops(0);
         cardStack.getRiskCards().add(joker2);

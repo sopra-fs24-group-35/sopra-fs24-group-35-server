@@ -22,6 +22,9 @@ public class Player implements Serializable {
     @Column(nullable = true, unique = false)
     private int troopBonus;
 
+    @Column(nullable = true, unique = false)
+    private int cardBonus;
+
     @OneToMany(targetEntity=RiskCard.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<RiskCard> riskCards = new ArrayList<RiskCard>();
 
@@ -69,6 +72,16 @@ public class Player implements Serializable {
     // Setter for troopBonus
     public void setTroopBonus(int troopBonus) {
         this.troopBonus = troopBonus;
+    }
+
+    // Getter method for cardBonus
+    public int getCardBonus() {
+        return cardBonus;
+    }
+
+    // Setter method for cardBonus
+    public void setCardBonus(int cardBonus) {
+        this.cardBonus = cardBonus;
     }
     
 }

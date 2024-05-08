@@ -4,12 +4,14 @@ import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Attack;
+import ch.uzh.ifi.hase.soprafs24.entity.CardTrade;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GameGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.TerritoryGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AttackPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.CardTradePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
@@ -144,7 +146,7 @@ public class GameController {
     @ResponseBody
     public GameGetDTO transferTroops(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
     @RequestBody AttackPostDTO attackPostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
-        // convert API game to internal representation
+        // convert API attack to internal representation
         Attack attack = DTOMapper.INSTANCE.convertAttackPostDTOtoEntity(attackPostDTO);
         // check if request is authorized
         gameService.checkAuthorization(lobbyId, token);
@@ -154,15 +156,17 @@ public class GameController {
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(updatedGame);
     }
 
-    @GetMapping("/lobbies/{lobbyId}/game/{gameId}/cards")
+    @PostMapping("/lobbies/{lobbyId}/game/{gameId}/cards")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GameGetDTO pullCard(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
-        @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
+        @RequestBody CardTradePostDTO cardTradePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
         gameService.checkAuthorization(lobbyId, token);
+        // convert API cardTrade to internal representation
+        CardTrade cardTrade = DTOMapper.INSTANCE.convertCardTradePostDTOtoEntity(cardTradePostDTO);
         // pull a card
-        Game updatedGame = gameService.pullCard(gameId);
+        Game updatedGame = gameService.tradeCards(gameId, cardTrade, 44);
         // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(updatedGame);
     }

@@ -12,8 +12,9 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AttackPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.CardTradePostDTO;
 import ch.uzh.ifi.hase.soprafs24.entity.Attack;
-
+import ch.uzh.ifi.hase.soprafs24.entity.CardTrade;
 import ch.uzh.ifi.hase.soprafs24.entity.UserList;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserListPostDTO;
 
@@ -96,4 +97,10 @@ public interface DTOMapper {
   @Mapping(source = "troopsAmount", target = "troopsAmount")
   @Mapping(source = "repeats", target = "repeats")
   Attack convertAttackPostDTOtoEntity(AttackPostDTO attackPostDTO);
+
+  //CardTrade
+  @Mapping(source = "card1Name", target = "card1Name")
+  @Mapping(source = "card2Name", target = "card2Name")
+  @Mapping(source = "card3Name", target = "card3Name")
+  CardTrade convertCardTradePostDTOtoEntity(CardTradePostDTO cardTradePostDTO);
 }

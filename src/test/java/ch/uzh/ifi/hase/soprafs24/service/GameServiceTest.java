@@ -3,6 +3,8 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Attack;
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
+import ch.uzh.ifi.hase.soprafs24.entity.CardStack;
+import ch.uzh.ifi.hase.soprafs24.entity.CardTrade;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
@@ -46,6 +48,8 @@ public class GameServiceTest {
         // create a board
         Board board = new Board();
         ArrayList<Territory> territories = new ArrayList<>();
+
+        // Add 4 territories to the board
         Territory paradeplatz = new Territory();
         paradeplatz.setName("Paradeplatz");
         paradeplatz.setTroops(7);
@@ -54,14 +58,68 @@ public class GameServiceTest {
         central.setName("Central");
         central.setTroops(7);
         territories.add(central);
+        Territory bellevue = new Territory();
+        bellevue.setName("Bellevue");
+        bellevue.setTroops(7);
+        territories.add(bellevue);
+        Territory milchbuck = new Territory();
+        milchbuck.setName("Milchbuck");
+        milchbuck.setTroops(7);
+        territories.add(milchbuck);
         board.setTerritories(territories);
 
-        // create Game with this board
+        // Create 4 Risk Cards, one for each territory; Bellevue and Milchbuck have the same troop type
+        CardStack cardStack = new CardStack();
+        RiskCard cardParadeplatz = new RiskCard();
+        cardParadeplatz.setHandedOut(false);
+        cardParadeplatz.setTerritoryName("Paradeplatz");
+        cardParadeplatz.setTroops(1);
+        cardStack.getRiskCards().add(cardParadeplatz);
+
+        RiskCard cardCentral = new RiskCard();
+        cardCentral.setHandedOut(false);
+        cardCentral.setTerritoryName("Central");
+        cardCentral.setTroops(2);
+        cardStack.getRiskCards().add(cardCentral);
+
+        RiskCard cardBellevue = new RiskCard();
+        cardBellevue.setHandedOut(false);
+        cardBellevue.setTerritoryName("Bellevue");
+        cardBellevue.setTroops(3);
+        cardStack.getRiskCards().add(cardBellevue);
+
+        RiskCard cardMilchbuck = new RiskCard();
+        cardMilchbuck.setHandedOut(false);
+        cardMilchbuck.setTerritoryName("Milchbuck");
+        cardMilchbuck.setTroops(3);
+        cardStack.getRiskCards().add(cardMilchbuck);
+
+        // set turn cycle with two players and player1 as current player
+        Player p1 = new Player();
+        p1.setPlayerId(7L);
+        ArrayList<RiskCard> l = new ArrayList<RiskCard>();
+        p1.setRiskCards(l);
+
+        Player p2 = new Player();
+        p2.setPlayerId(8L);
+        ArrayList<RiskCard> l2 = new ArrayList<RiskCard>();
+        p2.setRiskCards(l2);
+
+        ArrayList<Player> players = new ArrayList<Player>();
+        players.add(p1);
+        players.add(p2);
+
+        TurnCycle tc = new TurnCycle();
+        tc.setCurrentPlayer(p1);
+        tc.setPlayerCycle(players);
+
+        // create Game with the board
         testGame = new Game();
         testGame.setGameId(1L);
         testGame.setBoard(board);
         testGame.setPlayers(null);
-        testGame.setTurnCycle(null);
+        testGame.setCardStack(cardStack);
+        testGame.setTurnCycle(tc);
         testGame.setDiceResult("Atk 1 2 Def 3 4");
 
         // when -> any object is being save in the userRepository -> return the dummy
@@ -218,34 +276,13 @@ public class GameServiceTest {
         
     }
 
-    //@Test
+    @Test
     public void pullCard_validInput_updatedGame() {
-
-        // set turn cycle with two players
-        Player p1 = new Player();
-        p1.setPlayerId(7L);
-        ArrayList<RiskCard> l = new ArrayList<RiskCard>();
-        p1.setRiskCards(l);
-
-        Player p2 = new Player();
-        p2.setPlayerId(8L);
-        ArrayList<RiskCard> l2 = new ArrayList<RiskCard>();
-        p2.setRiskCards(l2);
-
-        ArrayList<Player> players = new ArrayList<Player>();
-        players.add(p1);
-        players.add(p2);
-
-        TurnCycle tc = new TurnCycle();
-        tc.setCurrentPlayer(p1);
-        tc.setPlayerCycle(players);
-        testGame.setTurnCycle(tc);
 
         // mock the get game from repository
         Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
-        //Mockito.when(territories.get(Mockito.any()))
 
-        // check that player has no card
+        // check that current player has no card
         assertTrue(testGame.getTurnCycle().getCurrentPlayer().getRiskCards().size() == 0);
 
         // perform the pull card method
@@ -254,9 +291,59 @@ public class GameServiceTest {
         // check that player has a card now
         assertTrue(afterCardPull.getTurnCycle().getCurrentPlayer().getRiskCards().size() > 0);
         assertTrue(afterCardPull.getTurnCycle().getCurrentPlayer().getRiskCards().get(0).getTroops() > 0);
-
-
         
+    }
+
+    @Test
+    public void testTradeCards_SuccessfulTrade() {
+        // Arrange
+        CardTrade cardTrade = new CardTrade();
+        cardTrade.setCard1Name("Paradeplatz");
+        cardTrade.setCard2Name("Central");
+        cardTrade.setCard3Name("Bellevue");
+
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // Act
+        Game tradedGame = gameService.tradeCards(1L, cardTrade, 3);
+
+        // Assert
+        // Verify that the currentPlayer's card bonus is increased by 2
+        assert tradedGame.getTurnCycle().getCurrentPlayer().getCardBonus() == 4;
+
+        // Verify that the cards are removed from the currentPlayer's risk cards
+        assert tradedGame.getTurnCycle().getCurrentPlayer().getRiskCards().isEmpty();
+    }
+
+    @Test
+    public void testTradeCards_invalidCardName_InvalidTrade() {
+        // Arrange
+        CardTrade cardTrade = new CardTrade();
+        cardTrade.setCard1Name("Paradeplatz");
+        cardTrade.setCard2Name("Bellevue");
+        cardTrade.setCard3Name("FairyTaleWorld"); // this card name is invalid
+
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.tradeCards(1L, cardTrade, 3));
+    }
+
+    @Test
+    public void testTradeCards_invalidCardCombination_InvalidTrade() {
+        // Arrange
+        CardTrade cardTrade = new CardTrade();
+        cardTrade.setCard1Name("Paradeplatz");
+        cardTrade.setCard2Name("Bellevue");
+        cardTrade.setCard3Name("Milchbuck"); //has the same troop type as Bellevue and thus is an invalid trade
+
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.tradeCards(1L, cardTrade, 3));
     }
 
     @Test
