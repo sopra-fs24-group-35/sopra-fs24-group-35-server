@@ -483,7 +483,6 @@ public class GameControllerTest {
 
         doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
         given(gameService.updateGame(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
-
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/1/game/1")
             .contentType(MediaType.APPLICATION_JSON)

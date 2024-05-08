@@ -103,6 +103,7 @@ public class GameController {
         Game thingsToUpdate = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
         // update game data
         thingsToUpdate = gameService.updateGame(thingsToUpdate, gameId, lobbyId);
+      
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(thingsToUpdate);
     }
 
@@ -138,6 +139,7 @@ public class GameController {
         // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(updatedGame);
     } 
+
 
     @PutMapping("/lobbies/{lobbyId}/game/{gameId}/transfer")
     @ResponseStatus(HttpStatus.OK)

@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Collections;
 import java.util.HashMap;
-
 import javax.persistence.Id;
 import javax.transaction.Transactional;
 
 import org.hibernate.mapping.IdGenerator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +68,6 @@ public class GameService {
 
     public void endGame(Long lobby_id){
         lobbyService.endGame(lobby_id);
-    }
 
     public void checkIfLobbyExists(long lobbyId) {
         lobbyService.checkIfExists(lobbyId);
@@ -483,7 +482,7 @@ public class GameService {
 
         System.out.println("wieso");
     }
-  
+      
     public Game pullCard(Long gameId) {
         Random rand = new Random();
         Game game = this.gameRepository.getByGameId(gameId);

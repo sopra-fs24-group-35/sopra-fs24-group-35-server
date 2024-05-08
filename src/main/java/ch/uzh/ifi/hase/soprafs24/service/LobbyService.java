@@ -191,7 +191,6 @@ public class LobbyService{
         }
 
         Lobby toUpdate = getLobbyById(lobby_id);
-
         lobbyRepository.deleteById(lobby_id);
         lobbyRepository.flush();
     }
