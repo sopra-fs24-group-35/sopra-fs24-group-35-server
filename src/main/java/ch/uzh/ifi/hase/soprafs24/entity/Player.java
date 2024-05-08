@@ -10,7 +10,10 @@ import java.util.ArrayList;
 public class Player implements Serializable {
 
     @Id
-    //@GeneratedValue
+    @GeneratedValue
+    private Long id;
+
+    @Column(nullable = true, unique = false)
     private Long playerId;
 
     @Column(nullable = true, unique = false)
@@ -27,6 +30,15 @@ public class Player implements Serializable {
 
     @OneToMany(targetEntity=RiskCard.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<RiskCard> riskCards = new ArrayList<RiskCard>();
+
+    //getter and setter for id
+    public Long getId(){
+        return id;
+    }
+
+    public void setId(Long id){
+        this.id = id;
+    }
 
     //Getter and setter for playerId
     public Long getPlayerId(){

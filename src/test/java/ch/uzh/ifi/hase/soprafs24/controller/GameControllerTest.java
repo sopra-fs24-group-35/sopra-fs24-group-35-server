@@ -292,7 +292,7 @@ public class GameControllerTest {
         gamePostDTO.setBoard(board);
         gamePostDTO.setTurnCycle(turnCycleBefore);
 
-        given(gameService.updateGame(Mockito.any(), Mockito.any())).willReturn(game);
+        given(gameService.updateGame(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1")
@@ -332,7 +332,7 @@ public class GameControllerTest {
         GamePostDTO gamePostDTO = new GamePostDTO();
         gamePostDTO.setBoard(board);
 
-        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Game update failed, because there is no game with this id.")).when(gameService).updateGame(Mockito.any(), Mockito.any());
+        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Game update failed, because there is no game with this id.")).when(gameService).updateGame(Mockito.any(), Mockito.any(), Mockito.any());
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1")
@@ -370,7 +370,7 @@ public class GameControllerTest {
         gamePostDTO.setBoard(board);
 
         doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
-        given(gameService.updateGame(Mockito.any(), Mockito.any())).willReturn(game);
+        given(gameService.updateGame(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1")
@@ -514,8 +514,7 @@ public class GameControllerTest {
         gamePostDTO.setBoard(board);
 
         doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
-        given(gameService.updateGame(Mockito.any(), Mockito.any())).willReturn(game);
-
+        given(gameService.updateGame(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/1/game/1")
             .contentType(MediaType.APPLICATION_JSON)
