@@ -10,7 +10,10 @@ import ch.uzh.ifi.hase.soprafs24.entity.TurnCycle;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AttackPostDTO;
+<<<<<<< HEAD
 import ch.uzh.ifi.hase.soprafs24.rest.dto.CardTradePostDTO;
+=======
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
@@ -130,6 +133,35 @@ public class GameControllerTest {
         mockMvc.perform(getRequest).andExpect(status().isUnauthorized());
     }
 
+<<<<<<< HEAD
+=======
+    @Test
+    public void givenGame_whenPullCard_thenReturnGame() throws Exception {
+        // given
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setBoard(null);
+        game.setPlayers(null);
+        game.setTurnCycle(null);
+        game.setDiceResult(null);
+
+        // Mocking
+        given(gameService.pullCard(1L)).willReturn(game);
+
+        // when
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/game/1/cards")
+        .contentType(MediaType.APPLICATION_JSON)
+        .header("Authorization", "abc");
+
+        // then
+        mockMvc.perform(getRequest).andExpect(status().isOk())
+            .andExpect(jsonPath("$.gameId", is(game.getGameId().intValue())))
+            .andExpect(jsonPath("$.board", is(game.getBoard())))
+            .andExpect(jsonPath("$.players", is(game.getPlayers())))
+            .andExpect(jsonPath("$.turnCycle", is(game.getTurnCycle())));
+    }
+
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
 
     // POST tests ----------------------------------------------------------------------------------------------------
 
@@ -384,6 +416,7 @@ public class GameControllerTest {
             .andExpect(status().isUnauthorized());
     }
 
+<<<<<<< HEAD
     @Test
     public void givenGame_whenPullCard_thenReturnGame() throws Exception {
         // given
@@ -414,6 +447,8 @@ public class GameControllerTest {
             .andExpect(jsonPath("$.turnCycle", is(game.getTurnCycle())));
     }
 
+=======
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
     // DELETE tests ----------------------------------------------------------------------------------------------------
 
     @Test

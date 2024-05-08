@@ -8,7 +8,10 @@ import java.util.HashMap;
 
 import javax.transaction.Transactional;
 
+<<<<<<< HEAD
 import org.hibernate.mapping.Collection;
+=======
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +23,11 @@ import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
+<<<<<<< HEAD
 import ch.uzh.ifi.hase.soprafs24.entity.CardStack;
 import ch.uzh.ifi.hase.soprafs24.entity.CardTrade;
+=======
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.RiskCard;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
@@ -324,6 +330,12 @@ public class GameService {
         Board board = game.getBoard();
         int count = 0;
         for (Territory territory : board.getTerritories()) {
+<<<<<<< HEAD
+=======
+            if (territory.getName() == "North Africa"){
+                System.out.println(territory.getTerritoryId());
+            }
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
             if (territory.getOwner() == playerId) {
                 count++;
             }
@@ -347,6 +359,7 @@ public class GameService {
                     }
                     if (territoriesOwned == size){
                         player.setTroopBonus(player.getTroopBonus() + continent.getAdditionalTroopBonus());
+<<<<<<< HEAD
                         
                     }
                 }
@@ -354,11 +367,17 @@ public class GameService {
                 // Transfer card bonus to troop bonus and reset card bonus to 0
                 player.setTroopBonus(player.getTroopBonus() + player.getCardBonus());
                 player.setCardBonus(0);
+=======
+                        System.out.println(player.getTroopBonus());
+                    }
+                }
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
             }
         }
         return game;
     }
 
+<<<<<<< HEAD
     public Game tradeCards(Long gameId, CardTrade cardTrade, int cardStackSize) {
 
         boolean exists = checkIfGameExists(gameId, true);
@@ -453,6 +472,8 @@ public class GameService {
 
     }
 
+=======
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
     public Game executeAttack(Game game, Attack attack, Territory attackingTerritory, Territory defendingTerritory, Random rand) {
         
 
@@ -515,6 +536,7 @@ public class GameService {
     }
 
     public Game pullCard(Long gameId) {
+<<<<<<< HEAD
 
         // get game from repository
         Game game = this.gameRepository.getByGameId(gameId);
@@ -531,16 +553,41 @@ public class GameService {
                 break;
             }
         }
+=======
+        Random rand = new Random();
+        Game game = this.gameRepository.getByGameId(gameId);
+        List<Territory> territories = game.getBoard().getTerritories();
+
+        // choose a territory randomly
+        Territory chosenTerritory = territories.get(rand.nextInt(42));
+
+        // choose a troop type
+        int troop = rand.nextInt(10);
+
+        // adjust troop size
+        if (troop == 0) {troop = 0;} //joker
+        else if (troop <= 3) {troop = 1;} //infantery
+        else if (troop <= 6) {troop = 5;} //cavallery
+        else {troop = 10;} //artillery
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
 
         // get current player
         Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
 
+<<<<<<< HEAD
         // add the new card to the player and label it to not be in the stack anymore
         currentPlayer.getRiskCards().add(pulledCard);
         pulledCard.setHandedOut(true);
 
         this.gameRepository.save(game);
         gameRepository.flush();
+=======
+        // create and add the new card
+        RiskCard card = new RiskCard();
+        card.setTerritoryName(chosenTerritory.getName());
+        card.setTroops(troop);
+        currentPlayer.getRiskCards().add(card);
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
         
         return game;
     }
@@ -653,6 +700,7 @@ public class GameService {
     // Helper function to initialize game
     private Game initializeGame(Game game) {
 
+<<<<<<< HEAD
         //Set arrays of territories
         String[] africaTerritories = {"North Africa", "Egypt", "East Africa", "Central Africa", "South Africa", "Madagascar"};
         String[] asiaTerritories = {"Middle East", "Afghanistan", "Ural", "Siberia", "Yakutsk", "Kamchatka", "Irkutsk", "Mongolia", "China", "India", "Siam", "Japan"};
@@ -668,6 +716,8 @@ public class GameService {
         int[] southAmericaTerritoriesTroops = {1, 1, 3, 1};
         int[] australiaTerritoriesTroops = {3, 2, 3, 3};
 
+=======
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
         //AFRICA----------------------------------------------------------------------
 
         Territory northAfrica = new Territory();
@@ -1040,6 +1090,7 @@ public class GameService {
 
         game.setBoard(board);
 
+<<<<<<< HEAD
         // set card stack
 
         CardStack cardStack = new CardStack();
@@ -1124,6 +1175,8 @@ public class GameService {
         joker2.setTroops(0);
         cardStack.getRiskCards().add(joker2);
 
+=======
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
         return game;
     }
 

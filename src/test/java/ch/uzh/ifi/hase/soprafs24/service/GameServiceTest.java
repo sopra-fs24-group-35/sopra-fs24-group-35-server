@@ -3,8 +3,11 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Attack;
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
+<<<<<<< HEAD
 import ch.uzh.ifi.hase.soprafs24.entity.CardStack;
 import ch.uzh.ifi.hase.soprafs24.entity.CardTrade;
+=======
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
@@ -48,8 +51,11 @@ public class GameServiceTest {
         // create a board
         Board board = new Board();
         ArrayList<Territory> territories = new ArrayList<>();
+<<<<<<< HEAD
 
         // Add 4 territories to the board
+=======
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
         Territory paradeplatz = new Territory();
         paradeplatz.setName("Paradeplatz");
         paradeplatz.setTroops(7);
@@ -58,6 +64,7 @@ public class GameServiceTest {
         central.setName("Central");
         central.setTroops(7);
         territories.add(central);
+<<<<<<< HEAD
         Territory bellevue = new Territory();
         bellevue.setName("Bellevue");
         bellevue.setTroops(7);
@@ -114,12 +121,21 @@ public class GameServiceTest {
         tc.setPlayerCycle(players);
 
         // create Game with the board
+=======
+        board.setTerritories(territories);
+
+        // create Game with this board
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
         testGame = new Game();
         testGame.setGameId(1L);
         testGame.setBoard(board);
         testGame.setPlayers(null);
+<<<<<<< HEAD
         testGame.setCardStack(cardStack);
         testGame.setTurnCycle(tc);
+=======
+        testGame.setTurnCycle(null);
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
         testGame.setDiceResult("Atk 1 2 Def 3 4");
 
         // when -> any object is being save in the userRepository -> return the dummy
@@ -276,6 +292,7 @@ public class GameServiceTest {
         
     }
 
+<<<<<<< HEAD
     @Test
     public void pullCard_validInput_updatedGame() {
 
@@ -283,6 +300,36 @@ public class GameServiceTest {
         Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
 
         // check that current player has no card
+=======
+    //@Test
+    public void pullCard_validInput_updatedGame() {
+
+        // set turn cycle with two players
+        Player p1 = new Player();
+        p1.setPlayerId(7L);
+        ArrayList<RiskCard> l = new ArrayList<RiskCard>();
+        p1.setRiskCards(l);
+
+        Player p2 = new Player();
+        p2.setPlayerId(8L);
+        ArrayList<RiskCard> l2 = new ArrayList<RiskCard>();
+        p2.setRiskCards(l2);
+
+        ArrayList<Player> players = new ArrayList<Player>();
+        players.add(p1);
+        players.add(p2);
+
+        TurnCycle tc = new TurnCycle();
+        tc.setCurrentPlayer(p1);
+        tc.setPlayerCycle(players);
+        testGame.setTurnCycle(tc);
+
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+        //Mockito.when(territories.get(Mockito.any()))
+
+        // check that player has no card
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
         assertTrue(testGame.getTurnCycle().getCurrentPlayer().getRiskCards().size() == 0);
 
         // perform the pull card method
@@ -291,10 +338,16 @@ public class GameServiceTest {
         // check that player has a card now
         assertTrue(afterCardPull.getTurnCycle().getCurrentPlayer().getRiskCards().size() > 0);
         assertTrue(afterCardPull.getTurnCycle().getCurrentPlayer().getRiskCards().get(0).getTroops() > 0);
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
         
     }
 
     @Test
+<<<<<<< HEAD
     public void testTradeCards_SuccessfulTrade() {
         // Arrange
         CardTrade cardTrade = new CardTrade();
@@ -347,6 +400,8 @@ public class GameServiceTest {
     }
 
     @Test
+=======
+>>>>>>> 418582e77a04997cb9ebc62088814b54745433e5
     public void executeRepeatedAttacks_validInput_updatedGame() {
 
         // given territories
