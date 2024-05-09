@@ -31,7 +31,7 @@ public class Player implements Serializable {
     @Column(nullable = true, unique = false)
     private Boolean awaitsCard;
 
-    @OneToMany(targetEntity=RiskCard.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(targetEntity=RiskCard.class,fetch = FetchType.LAZY)
     private List<RiskCard> riskCards = new ArrayList<RiskCard>();
 
     //getter and setter for id

@@ -373,9 +373,6 @@ public class GameService {
                         
                     }
                 }
-
-                // Transfer card bonus to troop bonus and reset card bonus to 0
-                player.setCardBonus(0);
             }
         }
         return game;
@@ -444,7 +441,7 @@ public class GameService {
             
             // perform trade
             // increase troop bonus of current player by 2
-            currentPlayer.setCardBonus(4);
+            currentPlayer.setTroopBonus(currentPlayer.getTroopBonus() + 4);
 
             // change labels of the cards to be not handed out anymore
             card1.setHandedOut(false);
@@ -452,16 +449,17 @@ public class GameService {
             card3.setHandedOut(false);
 
             // remove cards from player
-            for (RiskCard card : currentPlayer.getRiskCards()) {
+            int i = 0;
+            while (i < currentPlayer.getRiskCards().size()) {
+                RiskCard card = currentPlayer.getRiskCards().get(i);
                 if (card.getTerritoryName().equals(card1.getTerritoryName())) {
                     currentPlayer.getRiskCards().remove(card);
                 }else if (card.getTerritoryName().equals(card2.getTerritoryName())) {
                     currentPlayer.getRiskCards().remove(card);
                 }else if (card.getTerritoryName().equals(card3.getTerritoryName())) {
                     currentPlayer.getRiskCards().remove(card);
-                }
+                }else {i++;}
             }
-
 
         }
         else {
