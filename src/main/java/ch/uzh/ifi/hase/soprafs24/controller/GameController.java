@@ -168,10 +168,10 @@ public class GameController {
         gameService.leaveGame(gameId, lobbyId, userId);
     }
 
-    @GetMapping("/lobbies/{lobbyId}/game/{gameId}/cards")
+    @PostMapping("/lobbies/{lobbyId}/game/{gameId}/cards")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GameGetDTO pullCard(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
+    public GameGetDTO tradeCards(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
         @RequestBody CardTradePostDTO cardTradePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
         // check if request is authorized
         gameService.checkAuthorization(lobbyId, token);
