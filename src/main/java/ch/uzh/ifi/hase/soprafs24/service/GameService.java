@@ -171,6 +171,14 @@ public class GameService {
         // if it's a new player's turn, update TurnCycle
         if (game.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+
+            // add a Riak card to the old player if he awaits one
+            if (currentPlayer.getAwaitsCard() == true) {
+                pullCard(game.getGameId());
+                currentPlayer.setAwaitsCard(false);
+            }
+
+            // change currentPlayer to the new player
             Player nextPlayer = nextPlayer(currentPlayer, game.getTurnCycle());
             game.getTurnCycle().setCurrentPlayer(nextPlayer);
         }
@@ -231,8 +239,7 @@ public class GameService {
             Player player = new Player();
             player.setPlayerId(id);
             player.setUsername(userService.getUserById(id).getUsername());
-            //System.out.println(player.getPlayerId());
-            //System.out.println(player.getUsername());
+            player.setAwaitsCard(false);
             updatedGame.addPlayers(player);
         }
 
@@ -292,11 +299,9 @@ public class GameService {
             defendingTerritory.setTroops(troopsFromAtk);
             attackingTerritory.setTroops(attackingTerritory.getTroops() - troopsFromAtk);
 
-            // get pull Risk Card if it is the first time in the round
-            if (game.getTurnCycle().getGotACard() == false) {
-                pullCard(gameId);
-                game.getTurnCycle().setGotACard(true);
-            }
+            // now set the player that he awaits a risk card at the end of the turn
+            game.getTurnCycle().getCurrentPlayer().setAwaitsCard(true);
+            
         }
 
         // Now save the adjusted territories to the repository

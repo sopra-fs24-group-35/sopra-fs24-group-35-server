@@ -28,6 +28,9 @@ public class Player implements Serializable {
     @Column(nullable = true, unique = false)
     private int cardBonus;
 
+    @Column(nullable = true, unique = false)
+    private Boolean awaitsCard;
+
     @OneToMany(targetEntity=RiskCard.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<RiskCard> riskCards = new ArrayList<RiskCard>();
 
@@ -94,6 +97,16 @@ public class Player implements Serializable {
     // Setter method for cardBonus
     public void setCardBonus(int cardBonus) {
         this.cardBonus = cardBonus;
+    }
+
+    // Getter for awaitsCard
+    public Boolean getAwaitsCard() {
+        return awaitsCard;
+    }
+
+    // Setter for awaitsCard
+    public void setAwaitsCard(Boolean awaitsCard) {
+        this.awaitsCard = awaitsCard;
     }
     
 }

@@ -24,6 +24,9 @@ public class RiskCard implements Serializable {
     @Column(nullable = true, unique = false)
     private boolean handedOut;
 
+    @Column(nullable = true, unique = false)
+    private boolean isNew;
+
     // Getter and setter for territoryName
     public String getTerritoryName() {
         return territoryName;
@@ -50,6 +53,16 @@ public class RiskCard implements Serializable {
     // Setter method
     public void setHandedOut(boolean handedOut) {
         this.handedOut = handedOut;
+    }
+
+    // Getter for isNew
+    public boolean isNew() {
+        return isNew;
+    }
+
+    // Setter for isNew
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
     
 }
