@@ -446,11 +446,59 @@ public class GameService {
             || (card1.getTroops() != card2.getTroops() && card2.getTroops() != card3.getTroops())) {
 
             Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+
+            // calculte card bonus
+            // set values for calculation (we use a mathematical trick with modulo to determine bonusses)
+            int cSum = 0;
+            if(card1.getTroops() == 1) {cSum += 1;}
+            else if(card1.getTroops() == 2) {cSum += 4;}
+            else if(card1.getTroops() == 3) {cSum += 13;}
+            else {cSum += 0;}
+            if(card2.getTroops() == 1) {cSum += 1;}
+            else if(card2.getTroops() == 2) {cSum += 4;}
+            else if(card2.getTroops() == 3) {cSum += 13;}
+            else {cSum += 0;}
+            if(card3.getTroops() == 1) {cSum += 1;}
+            else if(card3.getTroops() == 2) {cSum += 4;}
+            else if(card3.getTroops() == 3) {cSum += 13;}
+            else {cSum += 0;}
+
+            int cardBonus = 0;
+
+            // if 3 different cards
+            if (cSum == 18 || cSum == 17 || cSum == 14 || cSum == 13 || cSum == 5 || cSum == 4 || cSum < 3) {
+                cardBonus = 10;
+            }
+            else if (cSum % 13 == 0) {cardBonus = 8;} // 3x Artillery
+            else if (cSum % 4 == 0) {cardBonus = 6;} // 3x Cavallery
+            else if (cSum % 1 == 0) {cardBonus = 4;} // 3x Infantery
+
+            // calculate card name bonus
+            /*
+             * 1 territory matching: +2 points
+             * 2 territories matching: +4 points
+             * 3 territories matching: +8 points
+             */
+            int cardNameBonus = 0;
+            for (Territory t : game.getBoard().getTerritories()) {
+                if (t.getName() == card1Name) {
+                    if (cardNameBonus > 0) {cardNameBonus *= 2;} else {cardNameBonus = 2;}
+                }
+                if (t.getName() == card2Name) {
+                    if (cardNameBonus > 0) {cardNameBonus *= 2;} else {cardNameBonus = 2;}
+                }
+                if (t.getName() == card3Name) {
+                    if (cardNameBonus > 0) {cardNameBonus *= 2;} else {cardNameBonus = 2;}
+                }
+            }
+
+            // add card name bonus to card bonus
+            cardBonus += cardNameBonus;
             
             // perform trade
             // increase troop bonus of current player by 2
-            currentPlayer.setTroopBonus(currentPlayer.getTroopBonus() + 4);
-            currentPlayer.setCardBonus(4);
+            currentPlayer.setTroopBonus(currentPlayer.getTroopBonus() + cardBonus);
+            currentPlayer.setCardBonus(cardBonus);
 
             // change labels of the cards to be not handed out anymore
             card1.setHandedOut(false);
