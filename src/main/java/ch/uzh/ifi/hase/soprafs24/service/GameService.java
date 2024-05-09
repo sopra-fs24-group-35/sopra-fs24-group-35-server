@@ -172,7 +172,7 @@ public class GameService {
         if (game.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
 
-            // add a Riak card to the old player if he awaits one
+            // add a Risk card to the old player if he awaits one
             if (currentPlayer.getAwaitsCard() == true) {
                 pullCard(game.getGameId());
                 currentPlayer.setAwaitsCard(false);
@@ -181,6 +181,13 @@ public class GameService {
             // change currentPlayer to the new player
             Player nextPlayer = nextPlayer(currentPlayer, game.getTurnCycle());
             game.getTurnCycle().setCurrentPlayer(nextPlayer);
+        }
+        if (game.getTurnCycle().getCurrentPhase() == Phase.ATTACK) {
+
+            // reset card bonus of player after reinforcement phase has finished
+            Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+            currentPlayer.setCardBonus(0);
+            
         }
         return game;
     }
@@ -239,6 +246,7 @@ public class GameService {
             Player player = new Player();
             player.setPlayerId(id);
             player.setUsername(userService.getUserById(id).getUsername());
+            player.setCardBonus(0);
             player.setAwaitsCard(false);
             updatedGame.addPlayers(player);
         }
@@ -442,6 +450,7 @@ public class GameService {
             // perform trade
             // increase troop bonus of current player by 2
             currentPlayer.setTroopBonus(currentPlayer.getTroopBonus() + 4);
+            currentPlayer.setCardBonus(4);
 
             // change labels of the cards to be not handed out anymore
             card1.setHandedOut(false);
