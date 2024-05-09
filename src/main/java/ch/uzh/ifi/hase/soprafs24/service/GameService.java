@@ -1204,6 +1204,7 @@ public class GameService {
         joker2.setTroops(0);
         cardStack.getRiskCards().add(joker2);
 
+        game.setCardStack(cardStack);
         return game;
     }
 
