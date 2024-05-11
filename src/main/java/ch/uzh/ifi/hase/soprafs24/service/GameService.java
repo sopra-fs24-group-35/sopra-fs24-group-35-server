@@ -481,15 +481,16 @@ public class GameService {
              */
             int cardNameBonus = 0;
             for (Territory t : game.getBoard().getTerritories()) {
-                if (t.getName() == card1Name) {
-                    if (cardNameBonus > 0) {cardNameBonus *= 2;} else {cardNameBonus = 2;}
+                if (t.getName().equals(card1Name) && t.getOwner() == game.getTurnCycle().getCurrentPlayer().getPlayerId()) {
+                    cardNameBonus += 1;
                 }
-                if (t.getName() == card2Name) {
-                    if (cardNameBonus > 0) {cardNameBonus *= 2;} else {cardNameBonus = 2;}
+                else if (t.getName().equals(card2Name) && t.getOwner() == game.getTurnCycle().getCurrentPlayer().getPlayerId()) {
+                    cardNameBonus += 1;
                 }
-                if (t.getName() == card3Name) {
-                    if (cardNameBonus > 0) {cardNameBonus *= 2;} else {cardNameBonus = 2;}
+                else if (t.getName().equals(card3Name) && t.getOwner() == game.getTurnCycle().getCurrentPlayer().getPlayerId()) {
+                    cardNameBonus += 1;
                 }
+                if (cardNameBonus == 3) {cardNameBonus = 6;}
             }
 
             // add card name bonus to card bonus
@@ -524,7 +525,8 @@ public class GameService {
             "Card trade failed. Two cards have the same troop type but not all three cards. This is not allowed.");
         }
 
-
+        gameRepository.save(game);
+        gameRepository.flush();
 
         return game;
 
