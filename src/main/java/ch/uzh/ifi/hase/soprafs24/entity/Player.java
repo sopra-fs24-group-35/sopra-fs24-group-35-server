@@ -31,6 +31,9 @@ public class Player implements Serializable {
     @Column(nullable = true, unique = false)
     private Boolean awaitsCard;
 
+    @Column(nullable = true)
+    private int avatarId;
+
     @OneToMany(targetEntity=RiskCard.class,fetch = FetchType.LAZY)
     private List<RiskCard> riskCards = new ArrayList<RiskCard>();
 
@@ -107,6 +110,14 @@ public class Player implements Serializable {
     // Setter for awaitsCard
     public void setAwaitsCard(Boolean awaitsCard) {
         this.awaitsCard = awaitsCard;
+    }
+
+    public int getAvatarId() {
+        return this.avatarId;
+    }
+    
+    public void setAvatarId(int avatarId) {
+        this.avatarId = avatarId;
     }
     
 }

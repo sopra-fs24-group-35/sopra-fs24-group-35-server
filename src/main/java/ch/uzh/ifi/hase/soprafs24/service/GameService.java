@@ -246,6 +246,7 @@ public class GameService {
             Player player = new Player();
             player.setPlayerId(id);
             player.setUsername(userService.getUserById(id).getUsername());
+            player.setAvatarId(userService.getUserById(id).getAvatarId());
             player.setCardBonus(0);
             player.setAwaitsCard(false);
             updatedGame.addPlayers(player);
