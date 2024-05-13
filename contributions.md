@@ -259,6 +259,23 @@
 
 
 
+    13.06.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/125
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/9
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/118
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/112
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/120
+
+        Description:
+            125 -> Add Symbols and Pictures to Avatars when Players loose or quit / Also added a arrow that points to the current Player 
+            9 -> Full leaving implementation for the frontend
+            118 -> When a Player wins and then leaves the lobby gets terminated and all other players are getting kicked after a 10 second cooldown.
+            112 -> Adding Troop Amount display and amount of territoroes for all Player and updating those.
+            120 -> For all the Players I also added the Username underneath the Avatars to know exactly who you are
+
+
+
 #### Robin Burkard (roburkUZH):
 
 	08.04.2024
