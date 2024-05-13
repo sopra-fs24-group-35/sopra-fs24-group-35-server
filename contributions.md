@@ -63,9 +63,23 @@
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/43
 
         Description:
-            Added the RiskCardModal.tsx for the user to view his cards and trade if possibple.
+            Added the RiskCardModal.tsx for the user to view his cards and trade if possible.
             At the moment not connected to the backend.
             Otherwise everything went smooth.
+    
+    13.05.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/39
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/126
+
+        Description:
+            Merged the risk card functionality into the development branch and connected it to the backend.
+            Added general quality of life changes to the game loop:
+                - Automatically changes the phase after placing all troops
+                - Automatically ends turn after moving troops in the movement phase
+                - Automatically opens the card modal if the player has 5 or more cards at the beginning of their turn
+                - etc.
+            Tried to make the player information in the game modular to improve scalability, but eventually stopped after facing flickering issues and Ralph found a solution. 
 
 #### Nico (Eposs111)
 
