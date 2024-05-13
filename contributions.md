@@ -406,6 +406,33 @@
         - Added automatic card pull after a player wins a territory, but only once in a turn
         - Also added a REST method including a test to manually pull a card by the client
 
+    13.05.2024
+        Links:
+
+            Issue #113:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=61996187
+            Issue #115:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=61999091
+            Issue #123:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=62438121
+
+        Description:
+
+        I did the following:
+        For Issue #113:
+        - Implemented the cards in the server such that there are 44 distinct Risk cards, which are managed by the server. Cards are no longer generated randomly, but are predefined according to the actual Risk game.
+
+        For Issue #115:
+        - Created a new REST endpoint such that the client can trade Risk cards.
+        - Created a method to trade cards for a fixed troop bonus.
+        
+        For Issue #123:
+        - Modified the method to calculate bonusses when trading Risk cards depending on which cards are traded in and which territories the player owns.
+        - The method can also handle joker cards.
+
+        I also created an image for the joker RISK cards.
+
+
 
 
 
