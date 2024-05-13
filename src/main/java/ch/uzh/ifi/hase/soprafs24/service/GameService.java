@@ -292,6 +292,19 @@ public class GameService {
             "No defending territory with the given name exists.");
         }
 
+        //save attacking and defending player in variable
+        Player defendingPlayer = new Player();
+        Player attackingPlayer = new Player();
+        for (Player player : game.getPlayers()) {
+            if (defendingTerritory.getOwner() == player.getPlayerId()){
+                defendingPlayer = player;
+            }
+
+            if (attackingTerritory.getOwner() == player.getPlayerId()){
+                attackingPlayer = player;
+            }
+        }
+
         // repeat attacks as many times as 'repeat' specifies, but only do it as long as there are enough troops on both territories.
         String diceResult = "";
         game.setDiceResult(diceResult);
@@ -310,6 +323,27 @@ public class GameService {
 
             // now set the player that he awaits a risk card at the end of the turn
             game.getTurnCycle().getCurrentPlayer().setAwaitsCard(true);
+
+            //check how many territories defender still owns
+            int ownedTerritories = 0;
+            for (Territory territory : game.getBoard().getTerritories()) {
+                if (territory.getOwner() == defendingPlayer.getPlayerId()){
+                    ownedTerritories++;
+                }
+            }
+
+            //removes all RiskCards from the defending player and adds them to the attacking if the defender has zero territories
+            if (ownedTerritories == 0) {
+                List<RiskCard> cardList = new ArrayList<RiskCard>();
+                for (RiskCard riskCard : defendingPlayer.getRiskCards()) {
+                    cardList.add(riskCard);
+                }
+
+                for (RiskCard card : cardList) {
+                    defendingPlayer.getRiskCards().remove(card);
+                    attackingPlayer.getRiskCards().add(card);
+                }
+            }
             
         }
 
