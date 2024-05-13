@@ -146,6 +146,22 @@ public class GameService {
         return updatedGame;
     }
 
+    public Game updateBoard(Game game, Long gameId, Long lobbyId){
+
+        // throw error if game with given id doesn't exist
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game deletion failed, because there is no game with this id.");
+        }
+
+        Game oldGame = getGameById(gameId);
+
+        //overwrite old game with new state
+        game = doConsequences(game, oldGame);
+
+        return game;
+    }
+
     public void deleteGame(Long gameId) {
 
         // throw error if game with given id doesn't exist
