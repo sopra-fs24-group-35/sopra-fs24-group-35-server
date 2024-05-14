@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.validation.Validator;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,9 @@ import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 public class GameService {
     
     private final Logger log = LoggerFactory.getLogger(GameService.class);
+
+    @Autowired
+    private Validator validator;
 
     private final GameRepository gameRepository;
     private final LobbyService lobbyService;
@@ -350,19 +354,23 @@ public class GameService {
 
             //removes all RiskCards from the defending player and adds them to the attacking if the defender has zero territories
             if (ownedTerritories == 0) {
-                List<RiskCard> cardList = new ArrayList<RiskCard>();
-                for (RiskCard riskCard : defendingPlayer.getRiskCards()) {
-                    cardList.add(riskCard);
-                }
+                if (defendingPlayer.getRiskCards().size() > 0) {
+                    List<RiskCard> cardList = new ArrayList<RiskCard>();
+                    for (RiskCard riskCard : defendingPlayer.getRiskCards()) {
+                        cardList.add(riskCard);
+                    }
 
-                for (RiskCard card : cardList) {
-                    defendingPlayer.getRiskCards().remove(card);
-                    attackingPlayer.getRiskCards().add(card);
+                    for (RiskCard card : cardList) {
+                        defendingPlayer.getRiskCards().remove(card);
+                        attackingPlayer.getRiskCards().add(card);
+                        System.out.println("lol3----------------------");
+                    }
                 }
             }
             
         }
 
+        System.out.println("lol4----------------------");
         // Now save the adjusted territories to the repository
         gameRepository.save(game);
         gameRepository.flush();
