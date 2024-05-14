@@ -355,22 +355,18 @@ public class GameService {
             //removes all RiskCards from the defending player and adds them to the attacking if the defender has zero territories
             if (ownedTerritories == 0) {
                 if (defendingPlayer.getRiskCards().size() > 0) {
-                    List<RiskCard> cardList = new ArrayList<RiskCard>();
-                    for (RiskCard riskCard : defendingPlayer.getRiskCards()) {
-                        cardList.add(riskCard);
+
+                    for (RiskCard card : defendingPlayer.getRiskCards()) {
+                        //defendingPlayer.getRiskCards().remove(card);
+                        attackingPlayer.getRiskCards().add(card);
                     }
 
-                    for (RiskCard card : cardList) {
-                        defendingPlayer.getRiskCards().remove(card);
-                        attackingPlayer.getRiskCards().add(card);
-                        System.out.println("lol3----------------------");
-                    }
+                    defendingPlayer.setRiskCards(null);
                 }
             }
             
         }
 
-        System.out.println("lol4----------------------");
         // Now save the adjusted territories to the repository
         gameRepository.save(game);
         gameRepository.flush();
