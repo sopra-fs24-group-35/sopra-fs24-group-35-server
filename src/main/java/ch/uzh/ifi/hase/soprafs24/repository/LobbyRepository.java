@@ -12,4 +12,6 @@ public interface LobbyRepository extends JpaRepository<Lobby, Long> {
   Lobby findByCode(String code);
 
   Lobby getById(Long id);
+
+  void deleteById(Long id);
 }

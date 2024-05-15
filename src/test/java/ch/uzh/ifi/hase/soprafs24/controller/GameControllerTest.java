@@ -10,6 +10,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.TurnCycle;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AttackPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.CardTradePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
@@ -128,6 +129,7 @@ public class GameControllerTest {
         // then
         mockMvc.perform(getRequest).andExpect(status().isUnauthorized());
     }
+
 
     // POST tests ----------------------------------------------------------------------------------------------------
 
@@ -290,7 +292,7 @@ public class GameControllerTest {
         gamePostDTO.setBoard(board);
         gamePostDTO.setTurnCycle(turnCycleBefore);
 
-        given(gameService.updateGame(Mockito.any(), Mockito.any())).willReturn(game);
+        given(gameService.updateGame(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1")
@@ -330,7 +332,7 @@ public class GameControllerTest {
         GamePostDTO gamePostDTO = new GamePostDTO();
         gamePostDTO.setBoard(board);
 
-        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Game update failed, because there is no game with this id.")).when(gameService).updateGame(Mockito.any(), Mockito.any());
+        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Game update failed, because there is no game with this id.")).when(gameService).updateGame(Mockito.any(), Mockito.any(), Mockito.any());
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1")
@@ -368,7 +370,7 @@ public class GameControllerTest {
         gamePostDTO.setBoard(board);
 
         doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
-        given(gameService.updateGame(Mockito.any(), Mockito.any())).willReturn(game);
+        given(gameService.updateGame(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1")
@@ -380,6 +382,36 @@ public class GameControllerTest {
         // then
         mockMvc.perform(putRequest)
             .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void givenGame_whenPullCard_thenReturnGame() throws Exception {
+        // given
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setBoard(null);
+        game.setPlayers(null);
+        game.setTurnCycle(null);
+        game.setDiceResult(null);
+
+        CardTradePostDTO cardTradePostDTO = new CardTradePostDTO(); 
+
+        // Mocking
+        given(gameService.tradeCards(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
+        doNothing().when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
+
+        // when
+        MockHttpServletRequestBuilder postRequest = post("/lobbies/1/game/1/cards")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(asJsonString(cardTradePostDTO))
+        .header("Authorization", "abc");
+
+        // then
+        mockMvc.perform(postRequest).andExpect(status().isOk())
+            .andExpect(jsonPath("$.gameId", is(game.getGameId().intValue())))
+            .andExpect(jsonPath("$.board", is(game.getBoard())))
+            .andExpect(jsonPath("$.players", is(game.getPlayers())))
+            .andExpect(jsonPath("$.turnCycle", is(game.getTurnCycle())));
     }
 
     // DELETE tests ----------------------------------------------------------------------------------------------------
@@ -482,8 +514,7 @@ public class GameControllerTest {
         gamePostDTO.setBoard(board);
 
         doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
-        given(gameService.updateGame(Mockito.any(), Mockito.any())).willReturn(game);
-
+        given(gameService.updateGame(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder deleteRequest = delete("/lobbies/1/game/1")
             .contentType(MediaType.APPLICATION_JSON)

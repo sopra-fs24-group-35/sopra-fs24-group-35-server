@@ -31,6 +31,10 @@ public class Game implements Serializable {
     @JoinColumn(name = "turnCycleId")
     private TurnCycle turnCycle;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cardStackId")
+    private CardStack cardStack;
+
     @Column(nullable = true, unique = false)
     private String diceResult;
 
@@ -80,6 +84,16 @@ public class Game implements Serializable {
 
     public void setDiceResult(String diceResult) {
         this.diceResult = diceResult;
+    }
+
+    // Getter method for cardStack
+    public CardStack getCardStack() {
+        return cardStack;
+    }
+
+    // Setter method for cardStack
+    public void setCardStack(CardStack cardStack) {
+        this.cardStack = cardStack;
     }
 
     

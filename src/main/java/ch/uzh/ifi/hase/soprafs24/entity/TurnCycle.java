@@ -6,6 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.Phase;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "TURNCYCLE")
@@ -19,14 +20,17 @@ public class TurnCycle implements Serializable {
     @JoinColumn(name = "playerId")
     private Player currentPlayer;
 
-    @OneToMany(targetEntity=Player.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Player> playerCycle;
+    @OneToMany(targetEntity=Player.class, cascade=CascadeType.PERSIST, fetch = FetchType.LAZY)
+    private List<Player> playerCycle = new ArrayList<Player>();
 
     @Column(nullable = true, unique = false)
     private Phase currentPhase;
 
     @Column(nullable = true, unique = false)
     private int timeLeftForCycle;
+
+    @Column(nullable = true, unique = false)
+    private boolean gotACard; // stores if a player has already got a risk card in the current turn
 
     public Long getTurnCycleId() {
         return turnCycleId;
@@ -70,6 +74,15 @@ public class TurnCycle implements Serializable {
 
     public void setTimeLeftForCycle(int timeLeftForCycle) {
         this.timeLeftForCycle = timeLeftForCycle;
+    }
+
+    // Getter and setter for gotACard
+    public boolean getGotACard() {
+        return gotACard;
+    }
+    
+    public void setGotACard(boolean gotACard) {
+        this.gotACard = gotACard;
     }
     
 }

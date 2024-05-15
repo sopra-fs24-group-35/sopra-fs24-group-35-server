@@ -10,7 +10,10 @@ import java.util.ArrayList;
 public class Player implements Serializable {
 
     @Id
-    //@GeneratedValue
+    @GeneratedValue
+    private Long id;
+
+    @Column(nullable = true, unique = false)
     private Long playerId;
 
     @Column(nullable = true, unique = false)
@@ -22,8 +25,26 @@ public class Player implements Serializable {
     @Column(nullable = true, unique = false)
     private int troopBonus;
 
-    @OneToMany(targetEntity=RiskCard.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @Column(nullable = true, unique = false)
+    private int cardBonus;
+
+    @Column(nullable = true, unique = false)
+    private Boolean awaitsCard;
+
+    @Column(nullable = true)
+    private int avatarId;
+
+    @OneToMany(targetEntity=RiskCard.class, cascade=CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<RiskCard> riskCards = new ArrayList<RiskCard>();
+
+    //getter and setter for id
+    public Long getId(){
+        return id;
+    }
+
+    public void setId(Long id){
+        this.id = id;
+    }
 
     //Getter and setter for playerId
     public Long getPlayerId(){
@@ -69,6 +90,34 @@ public class Player implements Serializable {
     // Setter for troopBonus
     public void setTroopBonus(int troopBonus) {
         this.troopBonus = troopBonus;
+    }
+
+    // Getter method for cardBonus
+    public int getCardBonus() {
+        return cardBonus;
+    }
+
+    // Setter method for cardBonus
+    public void setCardBonus(int cardBonus) {
+        this.cardBonus = cardBonus;
+    }
+
+    // Getter for awaitsCard
+    public Boolean getAwaitsCard() {
+        return awaitsCard;
+    }
+
+    // Setter for awaitsCard
+    public void setAwaitsCard(Boolean awaitsCard) {
+        this.awaitsCard = awaitsCard;
+    }
+
+    public int getAvatarId() {
+        return this.avatarId;
+    }
+    
+    public void setAvatarId(int avatarId) {
+        this.avatarId = avatarId;
     }
     
 }

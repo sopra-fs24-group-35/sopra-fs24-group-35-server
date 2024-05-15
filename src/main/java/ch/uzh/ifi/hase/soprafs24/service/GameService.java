@@ -5,13 +5,17 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Collections;
 import java.util.HashMap;
-
+import javax.persistence.Id;
 import javax.transaction.Transactional;
+
+import org.hibernate.mapping.Collection;
+import org.hibernate.mapping.IdGenerator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.validation.Validator;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -19,7 +23,10 @@ import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
+import ch.uzh.ifi.hase.soprafs24.entity.CardStack;
+import ch.uzh.ifi.hase.soprafs24.entity.CardTrade;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
+import ch.uzh.ifi.hase.soprafs24.entity.RiskCard;
 import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
@@ -44,6 +51,9 @@ public class GameService {
     
     private final Logger log = LoggerFactory.getLogger(GameService.class);
 
+    @Autowired
+    private Validator validator;
+
     private final GameRepository gameRepository;
     private final LobbyService lobbyService;
 
@@ -63,10 +73,10 @@ public class GameService {
         return lobbyService.startGame(lobby_id, game_id);
     }
 
-    public Lobby endGame(Long lobby_id){
-        return lobbyService.endGame(lobby_id);
+    public void endGame(Long lobby_id){
+        lobbyService.endGame(lobby_id);
     }
-
+    
     public void checkIfLobbyExists(long lobbyId) {
         lobbyService.checkIfExists(lobbyId);
     }
@@ -94,7 +104,7 @@ public class GameService {
         return initializedGame;
     }
 
-    public Game updateGame(Game updatedGame, Long gameId) {
+    public Game updateGame(Game updatedGame, Long gameId, Long lobbyId) {
 
         // throww error if game with the given id doesn't exist
         boolean exists = checkIfGameExists(gameId, true);
@@ -111,16 +121,49 @@ public class GameService {
         // If reinforcement phase, then distribute troops to current player
         if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             updatedGame = distributeTroops(updatedGame, updatedGame.getTurnCycle().getCurrentPlayer().getPlayerId());
+        } //if player haas no territories remove him
+        else if (updatedGame.getTurnCycle().getCurrentPhase() == Phase.MOVE) {
+            int territoriesOwned = 0;
+            List<Player> toRemove = new ArrayList<Player>();
+            for (Player player : updatedGame.getTurnCycle().getPlayerCycle()) {
+                toRemove.add(player);
+            }
+            for (Player player : toRemove) {
+                territoriesOwned = 0;
+                for (Territory territory : updatedGame.getBoard().getTerritories()) {
+                    if (territory.getOwner() == player.getPlayerId()){
+                        territoriesOwned++;
+                    }
+                }
+
+                if (territoriesOwned == 0) {
+                    leaveGame(gameId, lobbyId, player.getPlayerId());
+                }
+            }
         }
 
         // save updated game to repository
         updatedGame = gameRepository.save(updatedGame);
         gameRepository.flush();
 
-        System.out.println(updatedGame.getTurnCycle().getCurrentPlayer().getTroopBonus());
-
         log.debug("Updated a Game");
         return updatedGame;
+    }
+
+    public Game updateBoard(Game game, Long gameId, Long lobbyId){
+
+        // throw error if game with given id doesn't exist
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game deletion failed, because there is no game with this id.");
+        }
+
+        Game oldGame = getGameById(gameId);
+
+        //overwrite old game with new state
+        game = doConsequences(game, oldGame);
+
+        return game;
     }
 
     public void deleteGame(Long gameId) {
@@ -148,9 +191,26 @@ public class GameService {
         // if it's a new player's turn, update TurnCycle
         if (game.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+
+            // resrt card bonus of current player
+            currentPlayer.setCardBonus(0);
+
+            // add a Risk card to the old player if he awaits one
+            if (currentPlayer.getAwaitsCard() == true) {
+                pullCard(game.getGameId());
+                currentPlayer.setAwaitsCard(false);
+            }
+
+            // change currentPlayer to the new player
             Player nextPlayer = nextPlayer(currentPlayer, game.getTurnCycle());
-            System.out.println(nextPlayer);
             game.getTurnCycle().setCurrentPlayer(nextPlayer);
+        }
+        if (game.getTurnCycle().getCurrentPhase() == Phase.ATTACK) {
+
+            // reset card bonus of player after reinforcement phase has finished
+            Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+            currentPlayer.setCardBonus(0);
+            
         }
         return game;
     }
@@ -174,6 +234,9 @@ public class GameService {
         } else {
             nextPlayer = turnCycle.getPlayerCycle().get(position+1);
         }
+
+        // set gotACard to false
+        turnCycle.setGotACard(false);
         return nextPlayer;
     }
 
@@ -206,8 +269,9 @@ public class GameService {
             Player player = new Player();
             player.setPlayerId(id);
             player.setUsername(userService.getUserById(id).getUsername());
-            //System.out.println(player.getPlayerId());
-            //System.out.println(player.getUsername());
+            player.setAvatarId(userService.getUserById(id).getAvatarId());
+            player.setCardBonus(0);
+            player.setAwaitsCard(false);
             updatedGame.addPlayers(player);
         }
 
@@ -251,6 +315,19 @@ public class GameService {
             "No defending territory with the given name exists.");
         }
 
+        //save attacking and defending player in variable
+        Player defendingPlayer = new Player();
+        Player attackingPlayer = new Player();
+        for (Player player : game.getPlayers()) {
+            if (defendingTerritory.getOwner() == player.getPlayerId()){
+                defendingPlayer = player;
+            }
+
+            if (attackingTerritory.getOwner() == player.getPlayerId()){
+                attackingPlayer = player;
+            }
+        }
+
         // repeat attacks as many times as 'repeat' specifies, but only do it as long as there are enough troops on both territories.
         String diceResult = "";
         game.setDiceResult(diceResult);
@@ -266,6 +343,31 @@ public class GameService {
             defendingTerritory.setOwner(attackingTerritory.getOwner());
             defendingTerritory.setTroops(troopsFromAtk);
             attackingTerritory.setTroops(attackingTerritory.getTroops() - troopsFromAtk);
+
+            // now set the player that he awaits a risk card at the end of the turn
+            game.getTurnCycle().getCurrentPlayer().setAwaitsCard(true);
+
+            //check how many territories defender still owns
+            int ownedTerritories = 0;
+            for (Territory territory : game.getBoard().getTerritories()) {
+                if (territory.getOwner() == defendingPlayer.getPlayerId()){
+                    ownedTerritories++;
+                }
+            }
+
+            //removes all RiskCards from the defending player and adds them to the attacking if the defender has zero territories
+            if (ownedTerritories == 0) {
+                if (defendingPlayer.getRiskCards().size() > 0) {
+
+                    for (RiskCard card : defendingPlayer.getRiskCards()) {
+                        //defendingPlayer.getRiskCards().remove(card);
+                        attackingPlayer.getRiskCards().add(card);
+                    }
+
+                    defendingPlayer.setRiskCards(null);
+                }
+            }
+            
         }
 
         // Now save the adjusted territories to the repository
@@ -311,9 +413,6 @@ public class GameService {
         Board board = game.getBoard();
         int count = 0;
         for (Territory territory : board.getTerritories()) {
-            if (territory.getName() == "North Africa"){
-                System.out.println(territory.getTerritoryId());
-            }
             if (territory.getOwner() == playerId) {
                 count++;
             }
@@ -337,13 +436,160 @@ public class GameService {
                     }
                     if (territoriesOwned == size){
                         player.setTroopBonus(player.getTroopBonus() + continent.getAdditionalTroopBonus());
-                        System.out.println(player.getTroopBonus());
+                        
                     }
                 }
             }
         }
         return game;
     }
+    
+    public Game tradeCards(Long gameId, CardTrade cardTrade, int cardStackSize) {
+
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No game with this id could be found.");
+        }
+
+        // get game from repository
+        Game game = this.gameRepository.getByGameId(gameId);
+
+        // get the names of the three cards
+        String card1Name = cardTrade.getCard1Name();
+        String card2Name = cardTrade.getCard2Name();
+        String card3Name = cardTrade.getCard3Name();
+
+        // get first card in the card stack
+        RiskCard card1 = null;
+        for (int i = 0; i < cardStackSize; i++) {
+            if (game.getCardStack().getRiskCards().get(i).getTerritoryName().equals(card1Name)) {
+                card1 = game.getCardStack().getRiskCards().get(i);
+                break;
+            }
+        }
+        if (card1 == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Card trade failed. The name of the first of the three traded-in cards cannot be found in the stack.");
+        }
+
+        // get second card in the card stack
+        RiskCard card2 = null;
+        for (int i = 0; i < cardStackSize; i++) {
+            if (game.getCardStack().getRiskCards().get(i).getTerritoryName().equals(card2Name)) {
+                card2 = game.getCardStack().getRiskCards().get(i);
+                break;
+            }
+        }
+        if (card2 == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Card trade failed. The name of the second of the three traded-in cards cannot be found in the stack.");
+        }
+
+        // get third card in the card stack
+        RiskCard card3 = null;
+        for (int i = 0; i < cardStackSize; i++) {
+            if (game.getCardStack().getRiskCards().get(i).getTerritoryName().equals(card3Name)) {
+                card3 = game.getCardStack().getRiskCards().get(i);
+                break;
+            }
+        }
+        if (card3 == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Card trade failed. The name of the third of the three traded-in cards cannot be found in the stack.");
+        }
+
+        // check if the trade is valid
+        if ((card1.getTroops() == card2.getTroops() && card2.getTroops() == card3.getTroops())
+            || (card1.getTroops() != card2.getTroops() && card2.getTroops() != card3.getTroops())) {
+
+            Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+
+            // calculte card bonus
+            // set values for calculation (we use a mathematical trick with modulo to determine bonusses)
+            int cSum = 0;
+            if(card1.getTroops() == 1) {cSum += 1;}
+            else if(card1.getTroops() == 2) {cSum += 4;}
+            else if(card1.getTroops() == 3) {cSum += 13;}
+            else {cSum += 0;}
+            if(card2.getTroops() == 1) {cSum += 1;}
+            else if(card2.getTroops() == 2) {cSum += 4;}
+            else if(card2.getTroops() == 3) {cSum += 13;}
+            else {cSum += 0;}
+            if(card3.getTroops() == 1) {cSum += 1;}
+            else if(card3.getTroops() == 2) {cSum += 4;}
+            else if(card3.getTroops() == 3) {cSum += 13;}
+            else {cSum += 0;}
+
+            int cardBonus = 0;
+
+            // if 3 different cards
+            if (cSum == 18 || cSum == 17 || cSum == 14 || cSum == 13 || cSum == 5 || cSum == 4 || cSum < 3) {
+                cardBonus = 10;
+            }
+            else if (cSum % 13 == 0) {cardBonus = 8;} // 3x Artillery
+            else if (cSum % 4 == 0) {cardBonus = 6;} // 3x Cavallery
+            else if (cSum % 1 == 0) {cardBonus = 4;} // 3x Infantery
+
+            // calculate card name bonus
+            /*
+             * 1 territory matching: +2 points
+             * 2 territories matching: +4 points
+             * 3 territories matching: +8 points
+             */
+            int cardNameBonus = 0;
+            for (Territory t : game.getBoard().getTerritories()) {
+                if (t.getName().equals(card1Name) && t.getOwner() == game.getTurnCycle().getCurrentPlayer().getPlayerId()) {
+                    cardNameBonus += 1;
+                }
+                else if (t.getName().equals(card2Name) && t.getOwner() == game.getTurnCycle().getCurrentPlayer().getPlayerId()) {
+                    cardNameBonus += 1;
+                }
+                else if (t.getName().equals(card3Name) && t.getOwner() == game.getTurnCycle().getCurrentPlayer().getPlayerId()) {
+                    cardNameBonus += 1;
+                }
+                if (cardNameBonus == 3) {cardNameBonus = 6;}
+            }
+
+            // add card name bonus to card bonus
+            cardBonus += cardNameBonus;
+            
+            // perform trade
+            // increase troop bonus of current player by 2
+            currentPlayer.setTroopBonus(currentPlayer.getTroopBonus() + cardBonus);
+            currentPlayer.setCardBonus(currentPlayer.getCardBonus() + cardBonus);
+
+            // change labels of the cards to be not handed out anymore
+            card1.setHandedOut(false);
+            card2.setHandedOut(false);
+            card3.setHandedOut(false);
+
+            // remove cards from player
+            int i = 0;
+            while (i < currentPlayer.getRiskCards().size()) {
+                RiskCard card = currentPlayer.getRiskCards().get(i);
+                if (card.getTerritoryName().equals(card1.getTerritoryName())) {
+                    currentPlayer.getRiskCards().remove(card);
+                }else if (card.getTerritoryName().equals(card2.getTerritoryName())) {
+                    currentPlayer.getRiskCards().remove(card);
+                }else if (card.getTerritoryName().equals(card3.getTerritoryName())) {
+                    currentPlayer.getRiskCards().remove(card);
+                }else {i++;}
+            }
+
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Card trade failed. Two cards have the same troop type but not all three cards. This is not allowed.");
+        }
+
+        gameRepository.save(game);
+        gameRepository.flush();
+
+        return game;
+
+    }
+
 
     public Game executeAttack(Game game, Attack attack, Territory attackingTerritory, Territory defendingTerritory, Random rand) {
         
@@ -403,6 +649,100 @@ public class GameService {
 
         
 
+        return game;
+    }
+
+    //function for players to leave game
+    public void leaveGame(Long gameId, Long lobbyId, Long userId){
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No game with this id could be found.");
+        }
+
+        // get game from repository
+        Game game = this.gameRepository.getByGameId(gameId);
+
+        boolean removed = false;
+        for (Player player : game.getTurnCycle().getPlayerCycle()) {
+            if (player.getPlayerId() == userId){
+                //check if it's users turn, if yes go to next user
+                if (game.getTurnCycle().getCurrentPlayer() == player){
+                    int nextPosition = game.getTurnCycle().getPlayerCycle().indexOf(player)+1;
+                    if (nextPosition > game.getTurnCycle().getPlayerCycle().size()-1){
+                        nextPosition=0;
+                    }
+                    game.getTurnCycle().setCurrentPlayer(game.getTurnCycle().getPlayerCycle().get(nextPosition));
+                    game.getTurnCycle().setCurrentPhase(Phase.REINFORCEMENT);
+                    game = distributeTroops(game, game.getTurnCycle().getCurrentPlayer().getPlayerId());
+                }
+                //remove player from turnCycle
+                System.out.println("here1");
+                game.getTurnCycle().getPlayerCycle().remove(player);
+
+                System.out.println("here2");
+                removed = true;
+
+                //create a lobby so player can also get removed from lobby
+                Lobby lobby = new Lobby();
+                lobby.addPlayers(userId);
+
+                //lobbyService.removePlayer(lobby, lobbyId);
+
+                System.out.println(game.getTurnCycle().getPlayerCycle().size());
+                //if last player has left game, delete game
+                if (game.getTurnCycle().getPlayerCycle().size() == 0) {
+                    deleteGame(gameId);
+                    lobbyService.endGame(lobbyId);
+                    return;
+                }
+                
+                break;
+            }
+        }
+
+        //if no player was found, raise error
+        if (removed == false) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "No player with this id could be found.");
+        }
+
+        System.out.println("hello");
+
+        gameRepository.save(game);
+        gameRepository.flush();
+
+        System.out.println("wieso");
+    }
+      
+    public Game pullCard(Long gameId) {
+
+        // get game from repository
+        Game game = this.gameRepository.getByGameId(gameId);
+
+        // shuffle the list of cards (card stack)
+        Collections.shuffle(game.getCardStack().getRiskCards());
+
+        // choose the first card that's free
+        RiskCard pulledCard = null;
+
+        for (int i = 0; i < 44; i++) {
+            if (game.getCardStack().getRiskCards().get(i).isHandedOut() == false) {
+                pulledCard = game.getCardStack().getRiskCards().get(i);
+                break;
+            }
+        }
+
+        // get current player
+        Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+
+        // add the new card to the player and label it to not be in the stack anymore
+        currentPlayer.getRiskCards().add(pulledCard);
+        pulledCard.setHandedOut(true);
+
+        this.gameRepository.save(game);
+        gameRepository.flush();
+        
         return game;
     }
 
@@ -514,13 +854,27 @@ public class GameService {
     // Helper function to initialize game
     private Game initializeGame(Game game) {
 
+        //Set arrays of territories
+        String[] africaTerritories = {"North Africa", "Egypt", "East Africa", "Central Africa", "South Africa", "Madagascar"};
+        String[] asiaTerritories = {"Middle East", "Afghanistan", "Ural", "Siberia", "Yakutsk", "Kamchatka", "Irkutsk", "Mongolia", "China", "India", "Siam", "Japan"};
+        String[] europeTerritories = {"Western Europe", "Southern Europe", "Northern Europe", "Great Britain", "Iceland", "Scandinavia", "Ukraine"};
+        String[] northAmericaTerritories = {"Alaska", "Northwest Territory", "Greenland", "Alberta", "Ontario", "Quebec", "Western United States", "Eastern United States", "Central America"};
+        String[] southAmericaTerritories = {"Venezuela", "Peru", "Brazil", "Argentina"};
+        String[] australiaTerritories = {"Indonesia", "New Guinea", "Eastern Australia", "Western Australia"};
+
+        int[] africaTerritoriesTroops = {2, 1, 1, 1, 3, 2};
+        int[] asiaTerritoriesTroops = {1, 2, 2, 2, 2, 1, 2, 1, 1, 2, 1, 3};
+        int[] europeTerritoriesTroops = {3, 3, 3, 3, 1, 2, 2};
+        int[] northAmericaTerritoriesTroops = {1, 3, 2, 2, 2, 2, 3, 3, 3};
+        int[] southAmericaTerritoriesTroops = {1, 1, 3, 1};
+        int[] australiaTerritoriesTroops = {3, 2, 3, 3};
+
         //AFRICA----------------------------------------------------------------------
 
         Territory northAfrica = new Territory();
         northAfrica.setName("North Africa");
         northAfrica.setOwner(null);
         northAfrica.setTroops(0);
-        System.out.println(northAfrica.getTerritoryId());
 
         Territory egypt = new Territory();
         egypt.setName("Egypt");
@@ -886,6 +1240,91 @@ public class GameService {
 
         game.setBoard(board);
 
+        // set card stack
+
+        CardStack cardStack = new CardStack();
+
+        // Iterate over Africa territories
+        int i = 0;
+        for (String territory : africaTerritories) {
+            RiskCard card = new RiskCard();
+            card.setHandedOut(false);
+            card.setTerritoryName(territory);
+            card.setTroops(africaTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Iterate over Asia territories
+        i = 0;
+        for (String territory : asiaTerritories) {
+            RiskCard card = new RiskCard();
+            card.setHandedOut(false);
+            card.setTerritoryName(territory);
+            card.setTroops(asiaTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Iterate over Europe territories
+        i = 0;
+        for (String territory : europeTerritories) {
+            RiskCard card = new RiskCard();
+            card.setHandedOut(false);
+            card.setTerritoryName(territory);
+            card.setTroops(europeTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Iterate over North America territories
+        i = 0;
+        for (String territory : northAmericaTerritories) {
+            RiskCard card = new RiskCard();
+            card.setHandedOut(false);
+            card.setTerritoryName(territory);
+            card.setTroops(northAmericaTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Iterate over South America territories
+        i = 0;
+        for (String territory : southAmericaTerritories) {
+            RiskCard card = new RiskCard();
+            card.setHandedOut(false);
+            card.setTerritoryName(territory);
+            card.setTroops(southAmericaTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Iterate over Australia territories
+        i = 0;
+        for (String territory : australiaTerritories) {
+            RiskCard card = new RiskCard();
+            card.setHandedOut(false);
+            card.setTerritoryName(territory);
+            card.setTroops(australiaTerritoriesTroops[i]);
+            cardStack.getRiskCards().add(card);
+            i++;
+        }
+
+        // Add jokers
+
+        RiskCard joker1 = new RiskCard();
+        joker1.setHandedOut(false);
+        joker1.setTerritoryName("Joker1");
+        joker1.setTroops(0);
+        cardStack.getRiskCards().add(joker1);
+
+        RiskCard joker2 = new RiskCard();
+        joker2.setHandedOut(false);
+        joker2.setTerritoryName("Joker2");
+        joker2.setTroops(0);
+        cardStack.getRiskCards().add(joker2);
+
+        game.setCardStack(cardStack);
         return game;
     }
 
