@@ -132,7 +132,7 @@ public class GameService {
                 territoriesOwned = 0;
                 System.out.println("Territorry: " + updatedGame.getBoard().getTerritories().get(0));
                 for (Territory territory : updatedGame.getBoard().getTerritories()) {
-                    if (territory.getOwner() == player.getPlayerId()){
+                    if (territory.getOwner().equals(player.getPlayerId())){
                         territoriesOwned++;
                     }
                 }
