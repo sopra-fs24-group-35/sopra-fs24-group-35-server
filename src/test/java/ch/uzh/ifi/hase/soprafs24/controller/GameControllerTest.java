@@ -397,7 +397,7 @@ public class GameControllerTest {
         CardTradePostDTO cardTradePostDTO = new CardTradePostDTO(); 
 
         // Mocking
-        given(gameService.tradeCards(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
+        given(gameService.tradeCards(Mockito.any(), Mockito.any(), Mockito.anyInt())).willReturn(game);
         doNothing().when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
 
         // when
