@@ -130,6 +130,7 @@ public class GameService {
             }
             for (Player player : toRemove) {
                 territoriesOwned = 0;
+                System.out.println("Territorry: " + updatedGame.getBoard().getTerritories().get(0));
                 for (Territory territory : updatedGame.getBoard().getTerritories()) {
                     if (territory.getOwner() == player.getPlayerId()){
                         territoriesOwned++;
@@ -137,6 +138,7 @@ public class GameService {
                 }
 
                 if (territoriesOwned == 0) {
+                    System.out.println(updatedGame);
                     leaveGame(gameId, lobbyId, player.getPlayerId());
                 }
             }
