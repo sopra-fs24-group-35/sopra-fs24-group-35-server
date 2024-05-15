@@ -192,6 +192,9 @@ public class GameService {
         if (game.getTurnCycle().getCurrentPhase() == Phase.REINFORCEMENT) {
             Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
 
+            // resrt card bonus of current player
+            currentPlayer.setCardBonus(0);
+
             // add a Risk card to the old player if he awaits one
             if (currentPlayer.getAwaitsCard() == true) {
                 pullCard(game.getGameId());
@@ -554,7 +557,7 @@ public class GameService {
             // perform trade
             // increase troop bonus of current player by 2
             currentPlayer.setTroopBonus(currentPlayer.getTroopBonus() + cardBonus);
-            currentPlayer.setCardBonus(cardBonus);
+            currentPlayer.setCardBonus(currentPlayer.getCardBonus() + cardBonus);
 
             // change labels of the cards to be not handed out anymore
             card1.setHandedOut(false);
