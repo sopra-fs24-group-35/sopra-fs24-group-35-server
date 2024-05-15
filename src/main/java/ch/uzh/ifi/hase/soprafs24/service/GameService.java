@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.validation.Validator;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,9 @@ import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 public class GameService {
     
     private final Logger log = LoggerFactory.getLogger(GameService.class);
+
+    @Autowired
+    private Validator validator;
 
     private final GameRepository gameRepository;
     private final LobbyService lobbyService;
@@ -144,6 +148,22 @@ public class GameService {
 
         log.debug("Updated a Game");
         return updatedGame;
+    }
+
+    public Game updateBoard(Game game, Long gameId, Long lobbyId){
+
+        // throw error if game with given id doesn't exist
+        boolean exists = checkIfGameExists(gameId, true);
+        if (!exists) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game deletion failed, because there is no game with this id.");
+        }
+
+        Game oldGame = getGameById(gameId);
+
+        //overwrite old game with new state
+        game = doConsequences(game, oldGame);
+
+        return game;
     }
 
     public void deleteGame(Long gameId) {
@@ -292,6 +312,19 @@ public class GameService {
             "No defending territory with the given name exists.");
         }
 
+        //save attacking and defending player in variable
+        Player defendingPlayer = new Player();
+        Player attackingPlayer = new Player();
+        for (Player player : game.getPlayers()) {
+            if (defendingTerritory.getOwner() == player.getPlayerId()){
+                defendingPlayer = player;
+            }
+
+            if (attackingTerritory.getOwner() == player.getPlayerId()){
+                attackingPlayer = player;
+            }
+        }
+
         // repeat attacks as many times as 'repeat' specifies, but only do it as long as there are enough troops on both territories.
         String diceResult = "";
         game.setDiceResult(diceResult);
@@ -310,6 +343,27 @@ public class GameService {
 
             // now set the player that he awaits a risk card at the end of the turn
             game.getTurnCycle().getCurrentPlayer().setAwaitsCard(true);
+
+            //check how many territories defender still owns
+            int ownedTerritories = 0;
+            for (Territory territory : game.getBoard().getTerritories()) {
+                if (territory.getOwner() == defendingPlayer.getPlayerId()){
+                    ownedTerritories++;
+                }
+            }
+
+            //removes all RiskCards from the defending player and adds them to the attacking if the defender has zero territories
+            if (ownedTerritories == 0) {
+                if (defendingPlayer.getRiskCards().size() > 0) {
+
+                    for (RiskCard card : defendingPlayer.getRiskCards()) {
+                        //defendingPlayer.getRiskCards().remove(card);
+                        attackingPlayer.getRiskCards().add(card);
+                    }
+
+                    defendingPlayer.setRiskCards(null);
+                }
+            }
             
         }
 

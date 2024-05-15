@@ -34,7 +34,7 @@ public class Player implements Serializable {
     @Column(nullable = true)
     private int avatarId;
 
-    @OneToMany(targetEntity=RiskCard.class,fetch = FetchType.LAZY)
+    @OneToMany(targetEntity=RiskCard.class, cascade=CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<RiskCard> riskCards = new ArrayList<RiskCard>();
 
     //getter and setter for id

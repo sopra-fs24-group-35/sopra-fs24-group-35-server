@@ -109,6 +109,20 @@ public class GameController {
         return DTOMapper.INSTANCE.convertEntityToGameGetDTO(thingsToUpdate);
     }
 
+    @PutMapping("/lobbies/{lobbyId}/game/{gameId}/Board")
+    @ResponseStatus(HttpStatus.OK)
+    public GameGetDTO updateBoard(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
+        @RequestBody GamePostDTO gamePostDTO, @RequestHeader(name = "Authorization", required = true, defaultValue = "") String token) {
+        // check if request is authorized
+        gameService.checkAuthorization(lobbyId, token);
+        // convert API user to internal representation
+        Game thingsToUpdate = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
+        // update game data
+        thingsToUpdate = gameService.updateBoard(thingsToUpdate, gameId, lobbyId);
+      
+        return DTOMapper.INSTANCE.convertEntityToGameGetDTO(thingsToUpdate);
+    }
+
     @DeleteMapping("/lobbies/{lobbyId}/game/{gameId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity deleteGame(@PathVariable("lobbyId") Long lobbyId, @PathVariable("gameId") Long gameId,
