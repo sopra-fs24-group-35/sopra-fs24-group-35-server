@@ -63,10 +63,23 @@
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/43
 
         Description:
-            Added the RiskCardModal.tsx for the user to view his cards and trade if possibple.
+            Added the RiskCardModal.tsx for the user to view his cards and trade if possible.
             At the moment not connected to the backend.
             Otherwise everything went smooth.
     
+    13.05.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/39
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/126
+
+        Description:
+            Merged the risk card functionality into the development branch and connected it to the backend.
+            Added general quality of life changes to the game loop:
+                - Automatically changes the phase after placing all troops
+                - Automatically ends turn after moving troops in the movement phase
+                - Automatically opens the card modal if the player has 5 or more cards at the beginning of their turn
+                - etc.
+            Tried to make the player information in the game modular to improve scalability, but eventually stopped after facing flickering issues and Ralph found a solution. 
 
 #### Nico (Eposs111)
 
@@ -114,6 +127,11 @@
 
         Description:
         Bugfixes after Bugfixes
+
+    06.05.2024:
+        Unfortunately I had to go to the hospital the last Tuesday and they only let me go this morning. So I wasn't able 
+        to do any Tasks this week. I apologise to my teammtates. I will do more next week. (Doctors Note and Confirmation
+        of Stationary stay has been sent to my TA Nils Grob)
             
 #### Ralph Kosch (RPKosch)
 
@@ -233,6 +251,44 @@
         Yeah I coded a few hours xd
         This sums up our week: 
         https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/commit/2fdf1fed368810ba84ca497cd906b38a07a41098
+
+
+    6.05.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/111
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/112
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/110
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/9
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/86
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/87
+
+        Description:
+            Redesign the Avatars that only those are visible that are also in the Game 
+            Implement functionality for visability of troop amounts and amount of territories for all players
+            When only one player is left in the lobby the game should display a win screen (Had a bug before)
+            When a player has no more troops it should display a defeat screen (Had also a bug)
+            Changing Layout of Game for better Visibility -> Changed Avatar that only Players getting displayed
+            Changed Avatars to the right side 
+            Added Leave Button and Additional Modal that you cannot accidentally leave the game
+
+
+
+    13.06.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/125
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/9
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/118
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/112
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/120
+
+        Description:
+            125 -> Add Symbols and Pictures to Avatars when Players loose or quit / Also added a arrow that points to the current Player 
+            9 -> Full leaving implementation for the frontend
+            118 -> When a Player wins and then leaves the lobby gets terminated and all other players are getting kicked after a 10 second cooldown.
+            112 -> Adding Troop Amount display and amount of territoroes for all Player and updating those.
+            120 -> For all the Players I also added the Username underneath the Avatars to know exactly who you are
+
+
 
 #### Robin Burkard (roburkUZH):
 
@@ -360,6 +416,55 @@
 
         I have also spent a lot of time with bugfixing and helping to make the client work properly.
 
+    06.05.2024
+		Links:
+
+            Issue #42:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=57251785
+            Issue #28:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=57112873
+
+        Description:
+
+        I did the following:
+        For Issue #42:
+        - Designed Risk Cards
+        - Created images for the Risk Cards
+        - Created a scrollable React component for the cards
+
+        For Issue #28:
+        - Created pullCard method in the server
+        - Added automatic card pull after a player wins a territory, but only once in a turn
+        - Also added a REST method including a test to manually pull a card by the client
+
+    13.05.2024
+        Links:
+
+            Issue #113:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=61996187
+            Issue #115:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=61999091
+            Issue #123:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=62438121
+
+        Description:
+
+        I did the following:
+        For Issue #113:
+        - Implemented the cards in the server such that there are 44 distinct Risk cards, which are managed by the server. Cards are no longer generated randomly, but are predefined according to the actual Risk game.
+
+        For Issue #115:
+        - Created a new REST endpoint such that the client can trade Risk cards.
+        - Created a method to trade cards for a fixed troop bonus.
+        
+        For Issue #123:
+        - Modified the method to calculate bonusses when trading Risk cards depending on which cards are traded in and which territories the player owns.
+        - The method can also handle joker cards.
+
+        I also created an image for the joker RISK cards.
+
+
+
 
 
 
@@ -430,4 +535,24 @@
 
         I have implemented the continent bonus and fixed various bug that appeared when testing our servers. I have also done all the merging into the two main branches.
         I also aided the client at various tasks, like fixing the flickering and getting the screens of non current players to update.
+
+    06.05.2024
+        Links:
+            Issue #90:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/90
+
+            Issue #89:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/89
+
+            Issue #92:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/92
+
+            Issue #91:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/91
+
+            Issue #109:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/109
+
+        I tried to implement to leaveGame function but at the moment not everything is working. I also needed to change the primary Key of the entity palyer.
+        I also fixed some bugs that we discovered after the presentation like a person being in the lobby twice.
 
