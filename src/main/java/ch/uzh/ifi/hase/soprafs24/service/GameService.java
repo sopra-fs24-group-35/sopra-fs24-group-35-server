@@ -131,7 +131,7 @@ public class GameService {
             for (Player player : toRemove) {
                 territoriesOwned = 0;
                 for (Territory territory : updatedGame.getBoard().getTerritories()) {
-                    if (territory.getOwner() == player.getPlayerId()){
+                    if (territory.getOwner().equals(player.getPlayerId())){
                         territoriesOwned++;
                     }
                 }
@@ -220,7 +220,7 @@ public class GameService {
 
         // find current player in player cycle array
         for (Player player : turnCycle.getPlayerCycle()) {
-            if (player.getPlayerId() == currentPlayer.getPlayerId()){
+            if (player.getPlayerId().equals(currentPlayer.getPlayerId())){
                 break;
             } else {
                 position += 1;
@@ -319,11 +319,11 @@ public class GameService {
         Player defendingPlayer = new Player();
         Player attackingPlayer = new Player();
         for (Player player : game.getPlayers()) {
-            if (defendingTerritory.getOwner() == player.getPlayerId()){
+            if (defendingTerritory.getOwner().equals(player.getPlayerId())){
                 defendingPlayer = player;
             }
 
-            if (attackingTerritory.getOwner() == player.getPlayerId()){
+            if (attackingTerritory.getOwner().equals(player.getPlayerId())){
                 attackingPlayer = player;
             }
         }
@@ -350,7 +350,7 @@ public class GameService {
             //check how many territories defender still owns
             int ownedTerritories = 0;
             for (Territory territory : game.getBoard().getTerritories()) {
-                if (territory.getOwner() == defendingPlayer.getPlayerId()){
+                if (territory.getOwner().equals(defendingPlayer.getPlayerId())){
                     ownedTerritories++;
                 }
             }
@@ -413,12 +413,12 @@ public class GameService {
         Board board = game.getBoard();
         int count = 0;
         for (Territory territory : board.getTerritories()) {
-            if (territory.getOwner() == playerId) {
+            if (territory.getOwner().equals(playerId)) {
                 count++;
             }
         }
         for (Player player : game.getPlayers()) {
-            if (player.getPlayerId() ==  playerId) {
+            if (player.getPlayerId().equals(playerId)) {
                 player.setTroopBonus(Math.max(count/3, 3)); // set bonus to number of owned territories/3 and minimum 3
                 
                 int territoriesOwned;
@@ -430,7 +430,7 @@ public class GameService {
                     
                     //Check ownership of each territory
                     for (Territory territory : continent.getTerritories()) {
-                        if (territory.getOwner() == playerId){
+                        if (territory.getOwner().equals(playerId)){
                             territoriesOwned ++;
                         }
                     }
@@ -541,13 +541,13 @@ public class GameService {
              */
             int cardNameBonus = 0;
             for (Territory t : game.getBoard().getTerritories()) {
-                if (t.getName().equals(card1Name) && t.getOwner() == game.getTurnCycle().getCurrentPlayer().getPlayerId()) {
+                if (t.getName().equals(card1Name) && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
                     cardNameBonus += 1;
                 }
-                else if (t.getName().equals(card2Name) && t.getOwner() == game.getTurnCycle().getCurrentPlayer().getPlayerId()) {
+                else if (t.getName().equals(card2Name) && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
                     cardNameBonus += 1;
                 }
-                else if (t.getName().equals(card3Name) && t.getOwner() == game.getTurnCycle().getCurrentPlayer().getPlayerId()) {
+                else if (t.getName().equals(card3Name) && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
                     cardNameBonus += 1;
                 }
                 if (cardNameBonus == 3) {cardNameBonus = 6;}
@@ -667,9 +667,9 @@ public class GameService {
 
         boolean removed = false;
         for (Player player : game.getTurnCycle().getPlayerCycle()) {
-            if (player.getPlayerId() == userId){
+            if (player.getPlayerId().equals(userId)){
                 //check if it's users turn, if yes go to next user
-                if (game.getTurnCycle().getCurrentPlayer() == player){
+                if (game.getTurnCycle().getCurrentPlayer().equals(player)){
                     int nextPosition = game.getTurnCycle().getPlayerCycle().indexOf(player)+1;
                     if (nextPosition > game.getTurnCycle().getPlayerCycle().size()-1){
                         nextPosition=0;
