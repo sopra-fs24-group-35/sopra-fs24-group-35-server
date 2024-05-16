@@ -184,7 +184,7 @@ public class GameService {
         return;
     }
 
-    private Game nextPhase(Game game) {
+    public Game nextPhase(Game game) {
         Phase phase = game.getTurnCycle().getCurrentPhase();
 
         // update phase

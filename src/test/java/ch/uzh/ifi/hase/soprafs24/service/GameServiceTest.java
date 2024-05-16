@@ -1,5 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.service.UserService;
+
+import ch.uzh.ifi.hase.soprafs24.constant.Phase;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Attack;
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
@@ -132,6 +135,8 @@ public class GameServiceTest {
 
     }
 
+    // CREATE GAME ------------------------------------------------------------------------------------------------------
+
     @Test
     public void createGame_validInputs_success() {
         // when -> any object is being save in the gameRepository -> return the dummy
@@ -145,6 +150,8 @@ public class GameServiceTest {
         assertEquals(testGame.getGameId(), createdGame.getGameId());
         assertNotEquals(testGame.getBoard(), null);
     }
+
+    // GET GAME ------------------------------------------------------------------------------------------------------
 
     @Test
     public void getGame_validInputs_success() {
@@ -170,6 +177,8 @@ public class GameServiceTest {
         } );
     }
 
+    // UPDATE GAME ------------------------------------------------------------------------------------------------------
+
     @Test
     public void updateGame_idDoesntExist_noSuccess() {
         // Assert that trying to update a game by an id that doesn't exist throws a HTTP ResponseStatusException
@@ -178,6 +187,8 @@ public class GameServiceTest {
         } );
     }
 
+    // DELETE GAME ------------------------------------------------------------------------------------------------------
+
     @Test
     public void deleteGame_idDoesntExist_noSuccess() {
         // Assert that trying to update a game by an id that doesn't exist throws a HTTP ResponseStatusException
@@ -185,6 +196,142 @@ public class GameServiceTest {
             gameService.deleteGame(1L);     
         } );
     }
+
+    // UPDATE BOARD ------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void testUpdateBoard_SuccessfulUpdate() {
+        // Arrange
+        Game newGameState = new Game();
+        newGameState.setGameId(1L);
+        newGameState.setBoard(testGame.getBoard()); // Assuming similar setup as testGame for simplicity
+
+        // mock the check if game exists
+        Mockito.when(gameRepository.existsById(Mockito.anyLong())).thenReturn(true);
+        Mockito.when(gameRepository.getByGameId(Mockito.anyLong())).thenReturn(testGame);
+        Mockito.when(gameRepository.save(Mockito.any())).thenReturn(newGameState);
+
+        // Act
+        Game updatedGame = gameService.updateBoard(newGameState, 1L, 1L);
+
+        // Assert
+        assertNotNull(updatedGame);
+        assertEquals(1L, updatedGame.getGameId());
+        assertEquals(testGame.getBoard(), updatedGame.getBoard());
+    }
+
+    @Test
+    public void testUpdateBoard_GameDoesNotExist() {
+        // Arrange
+        Game newGameState = new Game();
+        newGameState.setGameId(1L);
+        newGameState.setBoard(testGame.getBoard()); 
+    
+        // mock the check if game exists
+        Mockito.when(gameRepository.existsById(Mockito.anyLong())).thenReturn(false);
+    
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.updateBoard(newGameState, 1L, 1L);
+        });
+    
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+        assertEquals("Game deletion failed, because there is no game with this id.", exception.getReason());
+    }
+
+    // NEXT PHASE ------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void testNextPhase_ReinforcementToAttack() {
+        // Arrange
+        testGame.getTurnCycle().setCurrentPhase(Phase.REINFORCEMENT);
+    
+        // Act
+        Game updatedGame = gameService.nextPhase(testGame);
+    
+        // Assert
+        assertEquals(Phase.ATTACK, updatedGame.getTurnCycle().getCurrentPhase());
+        assertEquals(0, updatedGame.getTurnCycle().getCurrentPlayer().getCardBonus());
+    }
+        
+    @Test
+    public void testNextPhase_AttackToMove() {
+        // Arrange
+        testGame.getTurnCycle().setCurrentPhase(Phase.ATTACK);
+    
+        // Act
+        Game updatedGame = gameService.nextPhase(testGame);
+    
+        // Assert
+        assertEquals(Phase.MOVE, updatedGame.getTurnCycle().getCurrentPhase());
+    }
+
+
+    // GET TERRITORY ---------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void testGetTerritory_Success() {
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // Act
+        Territory territory = gameService.getTerritory(1L, "Paradeplatz");
+
+        // Assert
+        assertNotNull(territory);
+        assertEquals("Paradeplatz", territory.getName());
+        assertEquals(7, territory.getTroops());
+    }
+
+    @Test
+    public void testGetTerritory_GameNotFound() {
+        // Arrange
+        Mockito.when(gameRepository.getByGameId(2L)).thenReturn(null);
+
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.getTerritory(2L, "Paradeplatz");
+        });
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+        assertEquals("Game deletion failed, because there is no game with this id.", exception.getReason());
+    }
+
+    @Test
+    public void testGetTerritory_TerritoryNotFound() {
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.getTerritory(1L, "NonExistentTerritory");
+        });
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        assertEquals("Territory with name NonExistentTerritory not found.", exception.getReason());
+    }
+
+    // ADD PLAYERS ---------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void testAddPlayers_GameNotFound() {
+        // Arrange
+        ArrayList<Long> playerIds = new ArrayList<>();
+        playerIds.add(9L);
+        playerIds.add(10L);
+
+        Mockito.when(gameRepository.getByGameId(2L)).thenReturn(null);
+
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.addPlayers(playerIds, 2L);
+        });
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+        assertEquals("Game deletion failed, because there is no game with this id.", exception.getReason());
+    }
+    
+    // EXECUTE REPEATED ATTACKS ------------------------------------------------------------------------------------------------------
 
     @Test
     public void executeRepeatedAttacks_validInput_success() {
@@ -227,6 +374,7 @@ public class GameServiceTest {
         } );
     }
 
+    // EXECUTE ATTACK ------------------------------------------------------------------------------------------------------
 
     @Test
     public void executeAttack_validInputTwoAttacks_updatedGame() {
@@ -278,6 +426,8 @@ public class GameServiceTest {
         
     }
 
+    // PULL CARD ------------------------------------------------------------------------------------------------------
+
     @Test
     public void pullCard_validInput_updatedGame() {
 
@@ -295,6 +445,8 @@ public class GameServiceTest {
         assertTrue(afterCardPull.getTurnCycle().getCurrentPlayer().getRiskCards().get(0).getTroops() > 0);
         
     }
+
+    // TRADE CARDS ------------------------------------------------------------------------------------------------------
 
     @Test
     public void testTradeCards_SuccessfulTrade() {
@@ -401,6 +553,7 @@ public class GameServiceTest {
         assertTrue(tradedGame.getTurnCycle().getCurrentPlayer().getRiskCards().isEmpty());
     }
 
+    // EXECUTE REPEATED ATTACKS (more tests) ------------------------------------------------------------------------------------------------------
 
     @Test
     public void executeRepeatedAttacks_validInput_updatedGame() {
@@ -550,7 +703,7 @@ public class GameServiceTest {
         assertTrue(paradeplatz.getTroops() >= 1); // Attacking territory should have at least 1 troop left
     }
     
-    
+    // GET TERRITORY ------------------------------------------------------------------------------------------------------
 
     @Test
     public void getTerritory_validInput_success() {
