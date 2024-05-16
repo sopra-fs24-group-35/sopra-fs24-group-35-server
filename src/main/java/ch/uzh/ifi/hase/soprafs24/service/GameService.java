@@ -503,7 +503,7 @@ public class GameService {
         if (((card1.getTroops() == card2.getTroops() || card1.getTroops() == 0 || card2.getTroops() == 0) 
             && (card2.getTroops() == card3.getTroops() || card2.getTroops() == 0 || card3.getTroops() == 0))
             || ((card1.getTroops() != card2.getTroops() || card1.getTroops() == 0 || card2.getTroops() == 0)
-            && (card2.getTroops() != card3.getTroops() || card1.getTroops() == 0 || card2.getTroops() == 0))) {
+            && (card2.getTroops() != card3.getTroops() || card2.getTroops() == 0 || card3.getTroops() == 0))) {
 
             Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
 
