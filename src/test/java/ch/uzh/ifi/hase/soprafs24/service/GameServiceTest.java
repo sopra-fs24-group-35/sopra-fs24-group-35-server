@@ -97,11 +97,13 @@ public class GameServiceTest {
         // set turn cycle with two players and player1 as current player
         Player p1 = new Player();
         p1.setPlayerId(7L);
+        p1.setCardBonus(0);
         ArrayList<RiskCard> l = new ArrayList<RiskCard>();
         p1.setRiskCards(l);
 
         Player p2 = new Player();
         p2.setPlayerId(8L);
+        p2.setCardBonus(0);
         ArrayList<RiskCard> l2 = new ArrayList<RiskCard>();
         p2.setRiskCards(l2);
 
@@ -348,6 +350,59 @@ public class GameServiceTest {
     }
 
     @Test
+    public void testTradeCards_GameDoesNotExist() {
+        // Arrange
+        CardTrade cardTrade = new CardTrade();
+        cardTrade.setCard1Name("Paradeplatz");
+        cardTrade.setCard2Name("Central");
+        cardTrade.setCard3Name("Bellevue");
+
+        // mock game does not exist
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(null);
+
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.tradeCards(1L, cardTrade, 3));
+    }
+
+    @Test
+    public void testTradeCards_EmptyCardStack() {
+        // Arrange
+        CardTrade cardTrade = new CardTrade();
+        cardTrade.setCard1Name("Paradeplatz");
+        cardTrade.setCard2Name("Central");
+        cardTrade.setCard3Name("Bellevue");
+
+        // Empty the card stack
+        testGame.getCardStack().getRiskCards().clear();
+
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.tradeCards(1L, cardTrade, 0));
+    }
+
+    @Test
+    public void testTradeCards_AllDifferentCards() {
+        // Arrange
+        CardTrade cardTrade = new CardTrade();
+        cardTrade.setCard1Name("Paradeplatz");
+        cardTrade.setCard2Name("Central");
+        cardTrade.setCard3Name("Bellevue");
+
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // Act
+        Game tradedGame = gameService.tradeCards(1L, cardTrade, 3);
+
+        // Assert
+        assertEquals(10, tradedGame.getTurnCycle().getCurrentPlayer().getCardBonus());
+        assertTrue(tradedGame.getTurnCycle().getCurrentPlayer().getRiskCards().isEmpty());
+    }
+
+
+    @Test
     public void executeRepeatedAttacks_validInput_updatedGame() {
 
         // given territories
@@ -373,6 +428,129 @@ public class GameServiceTest {
         + afterAttack.getBoard().getTerritories().get(1).getTroops());
 
     }
+
+    @Test
+    public void testExecuteRepeatedAttacks_SuccessfulAttack() {
+        // Arrange
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("Central");
+        attack.setRepeats(3);
+        attack.setTroopsAmount(3);
+
+        // Set initial ownership and troops
+        Territory paradeplatz = testGame.getBoard().getTerritories().stream()
+            .filter(t -> t.getName().equals("Paradeplatz"))
+            .findFirst()
+            .get();
+        paradeplatz.setOwner(7L);
+        paradeplatz.setTroops(10);
+
+        Territory central = testGame.getBoard().getTerritories().stream()
+            .filter(t -> t.getName().equals("Central"))
+            .findFirst()
+            .get();
+        central.setOwner(8L);
+        central.setTroops(5);
+
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // Act
+        Game resultGame = gameService.executeRepeatedAttacks(attack, 1L);
+
+        // Assert
+        assertNotNull(resultGame);
+        assertTrue(central.getTroops() > 0);  // Troops should be transferred
+        assertTrue(paradeplatz.getTroops() >= 1); // Attacking territory should have at least 1 troop left
+    }
+
+    @Test
+    public void testExecuteRepeatedAttacks_GameDoesNotExist() {
+        // Arrange
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("Central");
+        attack.setRepeats(3);
+        attack.setTroopsAmount(3);
+    
+        // mock game does not exist
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(null);
+    
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.executeRepeatedAttacks(attack, 1L));
+    }
+
+    @Test
+    public void testExecuteRepeatedAttacks_AttackingTerritoryNotFound() {
+        // Arrange
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("UnknownTerritory");
+        attack.setDefendingTerritory("Central");
+        attack.setRepeats(3);
+        attack.setTroopsAmount(3);
+    
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+    
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.executeRepeatedAttacks(attack, 1L));
+    }
+
+    @Test
+    public void testExecuteRepeatedAttacks_DefendingTerritoryNotFound() {
+        // Arrange
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("UnknownTerritory");
+        attack.setRepeats(3);
+        attack.setTroopsAmount(3);
+    
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+    
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.executeRepeatedAttacks(attack, 1L));
+    }
+
+    @Test
+    public void testExecuteRepeatedAttacks_AttackWithNotEnoughTroops() {
+        // Arrange
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("Central");
+        attack.setRepeats(3);
+        attack.setTroopsAmount(3);
+    
+        // Set initial ownership and troops
+        Territory paradeplatz = testGame.getBoard().getTerritories().stream()
+            .filter(t -> t.getName().equals("Paradeplatz"))
+            .findFirst()
+            .get();
+        paradeplatz.setOwner(7L);
+        paradeplatz.setTroops(2);
+    
+        Territory central = testGame.getBoard().getTerritories().stream()
+            .filter(t -> t.getName().equals("Central"))
+            .findFirst()
+            .get();
+        central.setOwner(8L);
+        central.setTroops(5);
+    
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+    
+        // Act
+        Game resultGame = gameService.executeRepeatedAttacks(attack, 1L);
+    
+        // Assert
+        assertNotNull(resultGame);
+        assertEquals(8L, central.getOwner()); // Ownership should not be transferred
+        assertTrue(central.getTroops() > 0);  // Defending territory should still have troops
+        assertTrue(paradeplatz.getTroops() >= 1); // Attacking territory should have at least 1 troop left
+    }
+    
+    
 
     @Test
     public void getTerritory_validInput_success() {
