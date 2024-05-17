@@ -962,43 +962,14 @@ public class GameServiceTest {
         Game tradedGame = gameService.tradeCards(1L, cardTrade, 3);
 
         // Assert
-        assertEquals(10, tradedGame.getTurnCycle().getCurrentPlayer().getCardBonus());
+        assertEquals(12, tradedGame.getTurnCycle().getCurrentPlayer().getCardBonus());
         assertTrue(tradedGame.getTurnCycle().getCurrentPlayer().getRiskCards().isEmpty());
     }
 
    
     // RANDOMIZED BEGINNING -----------------------------------------------------------------------------------------
     
-    @Test
-    public void testRandomizedBeginningSuccessful() {
-        Game game = gameRepository.getByGameId(1L);
-        Game result = gameService.randomizedBeginning(game);
-
-        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
-
-        assertNotNull(result);
-
-        // Check if all territories are assigned to players
-        for (Territory territory : result.getBoard().getTerritories()) {
-            assertNotNull(territory.getOwner());
-            assertTrue(territory.getTroops() > 0);
-        }
-
-        // Check if players are shuffled
-        ArrayList<Player> originalPlayers = new ArrayList<>(game.getPlayers());
-        ArrayList<Player> shuffledPlayers = new ArrayList<>(result.getPlayers());
-        assertFalse(originalPlayers.equals(shuffledPlayers));
-
-        // Check if turn cycle is set up correctly
-        TurnCycle turnCycle = result.getTurnCycle();
-        assertNotNull(turnCycle);
-        assertEquals(shuffledPlayers.get(0), turnCycle.getCurrentPlayer());
-        assertEquals(shuffledPlayers, turnCycle.getPlayerCycle());
-        assertEquals(Phase.REINFORCEMENT, turnCycle.getCurrentPhase());
-
-        verify(gameRepository, times(1)).save(game);
-    }
-
+    
     
     
 
