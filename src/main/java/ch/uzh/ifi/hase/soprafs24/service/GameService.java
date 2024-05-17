@@ -423,7 +423,7 @@ public class GameService {
         Board board = game.getBoard();
         int count = 0;
         for (Territory territory : board.getTerritories()) {
-            if (territory.getOwner().equals(playerId)) {
+            if (territory.getOwner() != null && territory.getOwner().equals(playerId)) {
                 count++;
             }
         }

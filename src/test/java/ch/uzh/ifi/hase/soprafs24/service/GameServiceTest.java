@@ -8,6 +8,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Attack;
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
 import ch.uzh.ifi.hase.soprafs24.entity.CardStack;
 import ch.uzh.ifi.hase.soprafs24.entity.CardTrade;
+import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
@@ -29,9 +30,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class GameServiceTest {
@@ -57,20 +61,41 @@ public class GameServiceTest {
         Territory paradeplatz = new Territory();
         paradeplatz.setName("Paradeplatz");
         paradeplatz.setTroops(7);
+        paradeplatz.setOwner(7L);
         territories.add(paradeplatz);
         Territory central = new Territory();
         central.setName("Central");
         central.setTroops(7);
+        central.setOwner(8L);
         territories.add(central);
         Territory bellevue = new Territory();
         bellevue.setName("Bellevue");
         bellevue.setTroops(7);
+        bellevue.setOwner(7L);
         territories.add(bellevue);
         Territory milchbuck = new Territory();
         milchbuck.setName("Milchbuck");
         milchbuck.setTroops(7);
+        milchbuck.setOwner(8L);
         territories.add(milchbuck);
         board.setTerritories(territories);
+
+        Continent zurich = new Continent();
+        ArrayList<Territory> cont_zurich = new ArrayList<>();
+        cont_zurich.add(paradeplatz);
+        cont_zurich.add(bellevue);
+        zurich.setTerritories(cont_zurich);
+
+        Continent zurich2 = new Continent();
+        ArrayList<Territory> cont_zurich2 = new ArrayList<>();
+        cont_zurich2.add(central);
+        cont_zurich2.add(milchbuck);
+        zurich2.setTerritories(cont_zurich2);
+
+        ArrayList<Continent> continents = new ArrayList<>();
+        continents.add(zurich);
+        continents.add(zurich2);
+        board.setContinents(continents);
 
         // Create 4 Risk Cards, one for each territory; Bellevue and Milchbuck have the same troop type
         CardStack cardStack = new CardStack();
@@ -738,6 +763,82 @@ public class GameServiceTest {
         
     }
 
+    // LEAVE GAME -----------------------------------------------------------------------------------------------------
+
+        @Test
+    public void testLeaveGameSuccessful() {
+        Long gameId = 1L;
+        Long lobbyId = 1L;
+        Long userId = 7L;
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        gameService.leaveGame(gameId, lobbyId, userId);
+
+        Game game = gameRepository.getByGameId(gameId);
+        assertNotNull(game);
+
+        boolean playerExists = game.getTurnCycle().getPlayerCycle().stream()
+            .anyMatch(player -> player.getPlayerId().equals(userId));
+
+        assertFalse(playerExists);
+        verify(gameRepository, times(1)).save(game);
+    }
+
+    @Test
+    public void testLeaveGame_GameNotFound() {
+        Long gameId = 2L;
+        Long lobbyId = 1L;
+        Long userId = 7L;
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(null);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.leaveGame(gameId, lobbyId, userId);
+        });
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals("No game with this id could be found.", exception.getReason());
+    }
+
+    @Test
+    public void testPlayerNotFound() {
+        Long gameId = 1L;
+        Long lobbyId = 1L;
+        Long userId = 10L; // Non-existing player ID
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        Game game = gameRepository.getByGameId(gameId);
+        assertNotNull(game);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.leaveGame(gameId, lobbyId, userId);
+        });
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals("No player with this id could be found.", exception.getReason());
+    }
+
+    @Test
+    public void testCurrentPlayerLeavesGame() {
+        Long gameId = 1L;
+        Long lobbyId = 1L;
+        Long userId = 7L;
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        gameService.leaveGame(gameId, lobbyId, userId);
+
+        Game game = gameRepository.getByGameId(gameId);
+        assertNotNull(game);
+
+        Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+        assertNotEquals(userId, currentPlayer.getPlayerId());
+        assertEquals(Phase.REINFORCEMENT, game.getTurnCycle().getCurrentPhase());
+        verify(gameRepository, times(1)).save(game);
+    }
+
     // PULL CARD ------------------------------------------------------------------------------------------------------
 
     @Test
@@ -866,8 +967,38 @@ public class GameServiceTest {
     }
 
    
+    // RANDOMIZED BEGINNING -----------------------------------------------------------------------------------------
     
-    
+    @Test
+    public void testRandomizedBeginningSuccessful() {
+        Game game = gameRepository.getByGameId(1L);
+        Game result = gameService.randomizedBeginning(game);
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        assertNotNull(result);
+
+        // Check if all territories are assigned to players
+        for (Territory territory : result.getBoard().getTerritories()) {
+            assertNotNull(territory.getOwner());
+            assertTrue(territory.getTroops() > 0);
+        }
+
+        // Check if players are shuffled
+        ArrayList<Player> originalPlayers = new ArrayList<>(game.getPlayers());
+        ArrayList<Player> shuffledPlayers = new ArrayList<>(result.getPlayers());
+        assertFalse(originalPlayers.equals(shuffledPlayers));
+
+        // Check if turn cycle is set up correctly
+        TurnCycle turnCycle = result.getTurnCycle();
+        assertNotNull(turnCycle);
+        assertEquals(shuffledPlayers.get(0), turnCycle.getCurrentPlayer());
+        assertEquals(shuffledPlayers, turnCycle.getPlayerCycle());
+        assertEquals(Phase.REINFORCEMENT, turnCycle.getCurrentPhase());
+
+        verify(gameRepository, times(1)).save(game);
+    }
+
     
     
 
