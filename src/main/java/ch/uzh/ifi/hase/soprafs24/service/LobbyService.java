@@ -171,7 +171,8 @@ public class LobbyService{
     public Lobby startGame(Long lobby_id, Long game_id){
         boolean exists = checkIfLobbyExistsId(lobby_id, true);
         if (!exists){
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            String.format("The Lobby with the ID %s doesn't exist.", lobby_id));
         }
 
         Lobby toUpdate = getLobbyById(lobby_id);
@@ -187,7 +188,8 @@ public class LobbyService{
     public void endGame(Long lobby_id){
         boolean exists = checkIfLobbyExistsId(lobby_id, true);
         if (!exists){
-            return;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            String.format("The Lobby with the ID %s doesn't exist.", lobby_id));
         }
 
         Lobby toUpdate = getLobbyById(lobby_id);
