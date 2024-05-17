@@ -712,7 +712,7 @@ public class GameControllerTest {
             .content(asJsonString(gamePostDTO))
             .header("Authorization", "abc");
 
-        mockMvc.perform(putRequest).andExpect(status().isOk());
+        mockMvc.perform(putRequest).andExpect(status().isUnauthorized());
     }
 
     @Test
