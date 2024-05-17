@@ -68,6 +68,16 @@ public class LobbyServiceTest {
     }
 
     @Test
+    public void createLobby_invalidInput_noPlayer() {
+        //create an empty lobby as input
+        Lobby lobby = new Lobby();
+
+        assertThrows(ResponseStatusException.class, () -> {
+            lobbyService.createLobby(lobby);
+        });
+    }
+
+    @Test
     public void getLobby_validInputs() {
         // when -> any object is being save in the gameRepository -> return the dummy
         // testLobby
@@ -81,6 +91,35 @@ public class LobbyServiceTest {
         assertEquals(testLobby.getPlayers(), fetchedLobby.getPlayers());
         assertEquals(testLobby.getOwnerId(), fetchedLobby.getOwnerId());
         assertEquals(testLobby.getGameId(), fetchedLobby.getGameId());
+    }
+
+    @Test
+    public void getLobbyByCode_validInput() {
+        //given
+        //create lobbyCode
+        String code = testLobby.getCode();
+
+        //mock Repository
+        Mockito.when(lobbyRepository.findByCode(testLobby.getCode())).thenReturn(testLobby);
+
+        Lobby lobby = lobbyService.getLobbyByCode(code);
+
+        assertEquals(testLobby.getId(), lobby.getId());
+        assertEquals(testLobby.getToken(), lobby.getToken());
+        assertEquals(testLobby.getPlayers(), lobby.getPlayers());
+        assertEquals(testLobby.getOwnerId(), lobby.getOwnerId());
+        assertEquals(testLobby.getGameId(), lobby.getGameId());
+    }
+
+    @Test
+    public void getLobbyByCode_invalidInput_wrongCode() {
+        //given
+        //create code
+        String code = "1";
+
+        assertThrows(ResponseStatusException.class, () -> {
+            Lobby lobby = lobbyService.getLobbyByCode(code);
+        });
     }
 
     @Test
