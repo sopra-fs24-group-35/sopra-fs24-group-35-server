@@ -137,7 +137,7 @@ public class UserService {
    */
 
    // Check if user exists by username
-  private boolean checkIfUserExistsUsername(User userToBeCreated, boolean shouldExist) {
+  public boolean checkIfUserExistsUsername(User userToBeCreated, boolean shouldExist) {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
     // shouldExist: if true, an error is thrown if the user doesn't exist (and vice versa)
     if (shouldExist && userByUsername == null) {
@@ -148,7 +148,7 @@ public class UserService {
     return true;
   }
   // Check if user exists by ID
-  private boolean checkIfUserExistsId(Long user_id, boolean shouldExist) {
+  public boolean checkIfUserExistsId(Long user_id, boolean shouldExist) {
     User userById = this.userRepository.getById(user_id);
     // shouldExist: if true, an error is thrown if the user doesn't exist (and vice versa)
     if (shouldExist && userById == null) {

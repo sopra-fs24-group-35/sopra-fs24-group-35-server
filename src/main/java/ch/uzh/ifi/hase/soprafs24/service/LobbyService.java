@@ -112,7 +112,7 @@ public class LobbyService{
         boolean playerAlreadyInLobby = false;
         //check if player is already in lobby
         for (Long playerId : toUpdate.getPlayers()) {
-            if (playerId == playerInput.getPlayers().get(0)){
+            if (playerId.equals(playerInput.getPlayers().get(0))){
                 playerAlreadyInLobby = true;
             }
         }

@@ -1,10 +1,14 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.service.UserService;
+
+import ch.uzh.ifi.hase.soprafs24.constant.Phase;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Attack;
 import ch.uzh.ifi.hase.soprafs24.entity.Board;
 import ch.uzh.ifi.hase.soprafs24.entity.CardStack;
 import ch.uzh.ifi.hase.soprafs24.entity.CardTrade;
+import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Player;
 import ch.uzh.ifi.hase.soprafs24.entity.Territory;
@@ -27,8 +31,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class GameServiceTest {
@@ -54,20 +62,41 @@ public class GameServiceTest {
         Territory paradeplatz = new Territory();
         paradeplatz.setName("Paradeplatz");
         paradeplatz.setTroops(7);
+        paradeplatz.setOwner(7L);
         territories.add(paradeplatz);
         Territory central = new Territory();
         central.setName("Central");
         central.setTroops(7);
+        central.setOwner(8L);
         territories.add(central);
         Territory bellevue = new Territory();
         bellevue.setName("Bellevue");
         bellevue.setTroops(7);
+        bellevue.setOwner(7L);
         territories.add(bellevue);
         Territory milchbuck = new Territory();
         milchbuck.setName("Milchbuck");
         milchbuck.setTroops(7);
+        milchbuck.setOwner(8L);
         territories.add(milchbuck);
         board.setTerritories(territories);
+
+        Continent zurich = new Continent();
+        ArrayList<Territory> cont_zurich = new ArrayList<>();
+        cont_zurich.add(paradeplatz);
+        cont_zurich.add(bellevue);
+        zurich.setTerritories(cont_zurich);
+
+        Continent zurich2 = new Continent();
+        ArrayList<Territory> cont_zurich2 = new ArrayList<>();
+        cont_zurich2.add(central);
+        cont_zurich2.add(milchbuck);
+        zurich2.setTerritories(cont_zurich2);
+
+        ArrayList<Continent> continents = new ArrayList<>();
+        continents.add(zurich);
+        continents.add(zurich2);
+        board.setContinents(continents);
 
         // Create 4 Risk Cards, one for each territory; Bellevue and Milchbuck have the same troop type
         CardStack cardStack = new CardStack();
@@ -98,11 +127,13 @@ public class GameServiceTest {
         // set turn cycle with two players and player1 as current player
         Player p1 = new Player();
         p1.setPlayerId(7L);
+        p1.setCardBonus(0);
         ArrayList<RiskCard> l = new ArrayList<RiskCard>();
         p1.setRiskCards(l);
 
         Player p2 = new Player();
         p2.setPlayerId(8L);
+        p2.setCardBonus(0);
         ArrayList<RiskCard> l2 = new ArrayList<RiskCard>();
         p2.setRiskCards(l2);
 
@@ -131,6 +162,8 @@ public class GameServiceTest {
 
     }
 
+    // CREATE GAME ------------------------------------------------------------------------------------------------------
+
     @Test
     public void createGame_validInputs_success() {
         // when -> any object is being save in the gameRepository -> return the dummy
@@ -144,6 +177,8 @@ public class GameServiceTest {
         assertEquals(testGame.getGameId(), createdGame.getGameId());
         assertNotEquals(testGame.getBoard(), null);
     }
+
+    // GET GAME ------------------------------------------------------------------------------------------------------
 
     @Test
     public void getGame_validInputs_success() {
@@ -169,6 +204,8 @@ public class GameServiceTest {
         } );
     }
 
+    // UPDATE GAME ------------------------------------------------------------------------------------------------------
+
     @Test
     public void updateGame_idDoesntExist_noSuccess() {
         // Assert that trying to update a game by an id that doesn't exist throws a HTTP ResponseStatusException
@@ -177,6 +214,8 @@ public class GameServiceTest {
         } );
     }
 
+    // DELETE GAME ------------------------------------------------------------------------------------------------------
+
     @Test
     public void deleteGame_idDoesntExist_noSuccess() {
         // Assert that trying to update a game by an id that doesn't exist throws a HTTP ResponseStatusException
@@ -184,6 +223,168 @@ public class GameServiceTest {
             gameService.deleteGame(1L);     
         } );
     }
+
+    // UPDATE BOARD ------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void testUpdateBoard_SuccessfulUpdate() {
+        // Arrange
+        Game newGameState = new Game();
+        newGameState.setGameId(1L);
+        newGameState.setBoard(testGame.getBoard()); // Assuming similar setup as testGame for simplicity
+
+        // mock the check if game exists
+        Mockito.when(gameRepository.existsById(Mockito.anyLong())).thenReturn(true);
+        Mockito.when(gameRepository.getByGameId(Mockito.anyLong())).thenReturn(testGame);
+        Mockito.when(gameRepository.save(Mockito.any())).thenReturn(newGameState);
+
+        // Act
+        Game updatedGame = gameService.updateBoard(newGameState, 1L, 1L);
+
+        // Assert
+        assertNotNull(updatedGame);
+        assertEquals(1L, updatedGame.getGameId());
+        assertEquals(testGame.getBoard(), updatedGame.getBoard());
+    }
+
+    @Test
+    public void testUpdateBoard_GameDoesNotExist() {
+        // Arrange
+        Game newGameState = new Game();
+        newGameState.setGameId(1L);
+        newGameState.setBoard(testGame.getBoard()); 
+    
+        // mock the check if game exists
+        Mockito.when(gameRepository.existsById(Mockito.anyLong())).thenReturn(false);
+    
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.updateBoard(newGameState, 1L, 1L);
+        });
+    
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+        assertEquals("Game deletion failed, because there is no game with this id.", exception.getReason());
+    }
+
+    // NEXT PHASE ------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void testNextPhase_ReinforcementToAttack() {
+        // Arrange
+        testGame.getTurnCycle().setCurrentPhase(Phase.REINFORCEMENT);
+    
+        // Act
+        Game updatedGame = gameService.nextPhase(testGame);
+    
+        // Assert
+        assertEquals(Phase.ATTACK, updatedGame.getTurnCycle().getCurrentPhase());
+        assertEquals(0, updatedGame.getTurnCycle().getCurrentPlayer().getCardBonus());
+    }
+        
+    @Test
+    public void testNextPhase_AttackToMove() {
+        // Arrange
+        testGame.getTurnCycle().setCurrentPhase(Phase.ATTACK);
+    
+        // Act
+        Game updatedGame = gameService.nextPhase(testGame);
+    
+        // Assert
+        assertEquals(Phase.MOVE, updatedGame.getTurnCycle().getCurrentPhase());
+    }
+
+
+    // GET TERRITORY ---------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void testGetTerritory_Success() {
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // Act
+        Territory territory = gameService.getTerritory(1L, "Paradeplatz");
+
+        // Assert
+        assertNotNull(territory);
+        assertEquals("Paradeplatz", territory.getName());
+        assertEquals(7, territory.getTroops());
+    }
+
+    @Test
+    public void testGetTerritory_GameNotFound() {
+        // Arrange
+        Mockito.when(gameRepository.getByGameId(2L)).thenReturn(null);
+
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.getTerritory(2L, "Paradeplatz");
+        });
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+        assertEquals("Game deletion failed, because there is no game with this id.", exception.getReason());
+    }
+
+    @Test
+    public void testGetTerritory_TerritoryNotFound() {
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.getTerritory(1L, "NonExistentTerritory");
+        });
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        assertEquals("Territory with name NonExistentTerritory not found.", exception.getReason());
+    }
+
+    @Test
+    public void getTerritory_validInput_success() {
+
+        //when
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        Territory territory = gameService.getTerritory(1L,"Paradeplatz");
+
+        //then
+        assertEquals(territory.getName(), "Paradeplatz");
+
+    }
+
+    @Test
+    public void getTerritory_invalidInput_error() {
+
+        //when
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        //then
+        assertThrows(ResponseStatusException.class, () -> {       
+            gameService.getTerritory(1L, "Bellvue");     
+        } );
+
+    }
+
+    // ADD PLAYERS ---------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void testAddPlayers_GameNotFound() {
+        // Arrange
+        ArrayList<Long> playerIds = new ArrayList<>();
+        playerIds.add(9L);
+        playerIds.add(10L);
+
+        Mockito.when(gameRepository.getByGameId(2L)).thenReturn(null);
+
+        // Act & Assert
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.addPlayers(playerIds, 2L);
+        });
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+        assertEquals("Game deletion failed, because there is no game with this id.", exception.getReason());
+    }
+    
+    // EXECUTE REPEATED ATTACKS ------------------------------------------------------------------------------------------------------
 
     @Test
     public void executeRepeatedAttacks_validInput_success() {
@@ -226,6 +427,292 @@ public class GameServiceTest {
         } );
     }
 
+    @Test
+    public void executeRepeatedAttacks_validInput_updatedGame() {
+
+        // given territories
+        Territory attacking = testGame.getBoard().getTerritories().get(0); //Territory called 'Paradeplatz'
+        Territory defending = testGame.getBoard().getTerritories().get(1); //Territory called 'Central'
+
+        // given attack entity whist states to execute only one attack
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("Central");
+        attack.setRepeats(3);
+        attack.setTroopsAmount(2);
+
+        // mock repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // perform the attack method
+        Game afterAttack = gameService.executeRepeatedAttacks(attack, 1L);
+
+        // Check if defender (Central) and attacker (Central) have lost 6 troops in total (3 attacks with 2 troops each)
+        // Since both had 7 troops initially, they should now have 8 troops when added together
+        assertEquals(8, afterAttack.getBoard().getTerritories().get(0).getTroops()
+        + afterAttack.getBoard().getTerritories().get(1).getTroops());
+
+    }
+
+    @Test
+    public void testExecuteRepeatedAttacks_SuccessfulAttack() {
+        // Arrange
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("Central");
+        attack.setRepeats(3);
+        attack.setTroopsAmount(3);
+
+        // Set initial ownership and troops
+        Territory paradeplatz = testGame.getBoard().getTerritories().stream()
+            .filter(t -> t.getName().equals("Paradeplatz"))
+            .findFirst()
+            .get();
+        paradeplatz.setOwner(7L);
+        paradeplatz.setTroops(10);
+
+        Territory central = testGame.getBoard().getTerritories().stream()
+            .filter(t -> t.getName().equals("Central"))
+            .findFirst()
+            .get();
+        central.setOwner(8L);
+        central.setTroops(5);
+
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        // Act
+        Game resultGame = gameService.executeRepeatedAttacks(attack, 1L);
+
+        // Assert
+        assertNotNull(resultGame);
+        assertTrue(central.getTroops() > 0);  // Troops should be transferred
+        assertTrue(paradeplatz.getTroops() >= 1); // Attacking territory should have at least 1 troop left
+    }
+
+    @Test
+    public void testExecuteRepeatedAttacks_GameDoesNotExist() {
+        // Arrange
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("Central");
+        attack.setRepeats(3);
+        attack.setTroopsAmount(3);
+    
+        // mock game does not exist
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(null);
+    
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.executeRepeatedAttacks(attack, 1L));
+    }
+
+    @Test
+    public void testExecuteRepeatedAttacks_AttackingTerritoryNotFound() {
+        // Arrange
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("UnknownTerritory");
+        attack.setDefendingTerritory("Central");
+        attack.setRepeats(3);
+        attack.setTroopsAmount(3);
+    
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+    
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.executeRepeatedAttacks(attack, 1L));
+    }
+
+    @Test
+    public void testExecuteRepeatedAttacks_DefendingTerritoryNotFound() {
+        // Arrange
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("UnknownTerritory");
+        attack.setRepeats(3);
+        attack.setTroopsAmount(3);
+    
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+    
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.executeRepeatedAttacks(attack, 1L));
+    }
+
+    @Test
+    public void testExecuteRepeatedAttacks_AttackWithNotEnoughTroops() {
+        // Arrange
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("Central");
+        attack.setRepeats(3);
+        attack.setTroopsAmount(3);
+    
+        // Set initial ownership and troops
+        Territory paradeplatz = testGame.getBoard().getTerritories().stream()
+            .filter(t -> t.getName().equals("Paradeplatz"))
+            .findFirst()
+            .get();
+        paradeplatz.setOwner(7L);
+        paradeplatz.setTroops(2);
+    
+        Territory central = testGame.getBoard().getTerritories().stream()
+            .filter(t -> t.getName().equals("Central"))
+            .findFirst()
+            .get();
+        central.setOwner(8L);
+        central.setTroops(5);
+    
+        // mock the get game from repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+    
+        // Act
+        Game resultGame = gameService.executeRepeatedAttacks(attack, 1L);
+    
+        // Assert
+        assertNotNull(resultGame);
+        assertEquals(8L, central.getOwner()); // Ownership should not be transferred
+        assertTrue(central.getTroops() > 0);  // Defending territory should still have troops
+        assertTrue(paradeplatz.getTroops() >= 1); // Attacking territory should have at least 1 troop left
+    }
+
+    // TRANSFER TROOPS ------------------------------------------------------------------------------------------------------
+
+        @Test
+    public void testTransferTroopsSuccessful() {
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("Central");
+        attack.setTroopsAmount(3);
+        attack.setRepeats(1);
+        Long gameId = 1L;
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        Game result = gameService.transferTroops(attack, gameId);
+
+        assertNotNull(result);
+        Territory attackingTerritory = result.getBoard().getTerritories().stream()
+                .filter(t -> t.getName().equals("Paradeplatz"))
+                .findFirst()
+                .orElse(null);
+        Territory defendingTerritory = result.getBoard().getTerritories().stream()
+                .filter(t -> t.getName().equals("Central"))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(attackingTerritory);
+        assertNotNull(defendingTerritory);
+        assertEquals(4, attackingTerritory.getTroops());
+        assertEquals(10, defendingTerritory.getTroops());
+    }
+
+    @Test
+    public void testGameNotFound() {
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("Central");
+        attack.setTroopsAmount(3);
+        attack.setRepeats(1);
+        Long gameId = 2L;
+
+        when(gameRepository.getByGameId(gameId)).thenReturn(null);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.transferTroops(attack, gameId);
+        });
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals("No game with this id could be found.", exception.getReason());
+    }
+
+    @Test
+    public void testAttackingTerritoryNotFound() {
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("NonExistent1");
+        attack.setDefendingTerritory("Central");
+        attack.setTroopsAmount(3);
+        attack.setRepeats(1);
+        Long gameId = 1L;
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        Game result = gameService.transferTroops(attack, gameId);
+
+        assertNotNull(result);
+        Territory attackingTerritory = result.getBoard().getTerritories().stream()
+                .filter(t -> t.getName().equals("Paradeplatz"))
+                .findFirst()
+                .orElse(null);
+        Territory defendingTerritory = result.getBoard().getTerritories().stream()
+                .filter(t -> t.getName().equals("Central"))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(attackingTerritory);
+        assertNotNull(defendingTerritory);
+        assertEquals(7, attackingTerritory.getTroops());
+        assertEquals(7, defendingTerritory.getTroops());
+    }
+
+    @Test
+    public void testDefendingTerritoryNotFound() {
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("NonExistent2");
+        attack.setTroopsAmount(3);
+        attack.setRepeats(1);
+        Long gameId = 1L;
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        Game result = gameService.transferTroops(attack, gameId);
+
+        assertNotNull(result);
+        Territory attackingTerritory = result.getBoard().getTerritories().stream()
+                .filter(t -> t.getName().equals("Paradeplatz"))
+                .findFirst()
+                .orElse(null);
+        Territory defendingTerritory = result.getBoard().getTerritories().stream()
+                .filter(t -> t.getName().equals("Central"))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(attackingTerritory);
+        assertNotNull(defendingTerritory);
+        assertEquals(7, attackingTerritory.getTroops());
+        assertEquals(7, defendingTerritory.getTroops());
+    }
+
+    @Test
+    public void testBothTerritoriesNotFound() {
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("NonExistent1");
+        attack.setDefendingTerritory("NonExistent2");
+        attack.setTroopsAmount(3);
+        attack.setRepeats(1);
+        Long gameId = 1L;
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        Game result = gameService.transferTroops(attack, gameId);
+
+        assertNotNull(result);
+        Territory attackingTerritory = result.getBoard().getTerritories().stream()
+                .filter(t -> t.getName().equals("Paradeplatz"))
+                .findFirst()
+                .orElse(null);
+        Territory defendingTerritory = result.getBoard().getTerritories().stream()
+                .filter(t -> t.getName().equals("Central"))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(attackingTerritory);
+        assertNotNull(defendingTerritory);
+        assertEquals(7, attackingTerritory.getTroops());
+        assertEquals(7, defendingTerritory.getTroops());
+    }
+
+    // EXECUTE ATTACK ------------------------------------------------------------------------------------------------------
 
     @Test
     public void executeAttack_validInputTwoAttacks_updatedGame() {
@@ -277,6 +764,84 @@ public class GameServiceTest {
         
     }
 
+    // LEAVE GAME -----------------------------------------------------------------------------------------------------
+
+        @Test
+    public void testLeaveGameSuccessful() {
+        Long gameId = 1L;
+        Long lobbyId = 1L;
+        Long userId = 7L;
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        gameService.leaveGame(gameId, lobbyId, userId);
+
+        Game game = gameRepository.getByGameId(gameId);
+        assertNotNull(game);
+
+        boolean playerExists = game.getTurnCycle().getPlayerCycle().stream()
+            .anyMatch(player -> player.getPlayerId().equals(userId));
+
+        assertFalse(playerExists);
+        verify(gameRepository, times(1)).save(game);
+    }
+
+    @Test
+    public void testLeaveGame_GameNotFound() {
+        Long gameId = 2L;
+        Long lobbyId = 1L;
+        Long userId = 7L;
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(null);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.leaveGame(gameId, lobbyId, userId);
+        });
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals("No game with this id could be found.", exception.getReason());
+    }
+
+    @Test
+    public void testPlayerNotFound() {
+        Long gameId = 1L;
+        Long lobbyId = 1L;
+        Long userId = 10L; // Non-existing player ID
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        Game game = gameRepository.getByGameId(gameId);
+        assertNotNull(game);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            gameService.leaveGame(gameId, lobbyId, userId);
+        });
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals("No player with this id could be found.", exception.getReason());
+    }
+
+    @Test
+    public void testCurrentPlayerLeavesGame() {
+        Long gameId = 1L;
+        Long lobbyId = 1L;
+        Long userId = 7L;
+
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        gameService.leaveGame(gameId, lobbyId, userId);
+
+        Game game = gameRepository.getByGameId(gameId);
+        assertNotNull(game);
+
+        Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+        assertNotEquals(userId, currentPlayer.getPlayerId());
+        assertEquals(Phase.REINFORCEMENT, game.getTurnCycle().getCurrentPhase());
+        verify(gameRepository, times(1)).save(game);
+    }
+
+    // PULL CARD ------------------------------------------------------------------------------------------------------
+
     @Test
     public void pullCard_validInput_updatedGame() {
 
@@ -294,6 +859,8 @@ public class GameServiceTest {
         assertTrue(afterCardPull.getTurnCycle().getCurrentPlayer().getRiskCards().get(0).getTroops() > 0);
         
     }
+
+    // TRADE CARDS ------------------------------------------------------------------------------------------------------
 
     @Test
     public void testTradeCards_SuccessfulTrade() {
@@ -349,55 +916,55 @@ public class GameServiceTest {
     }
 
     @Test
-    public void executeRepeatedAttacks_validInput_updatedGame() {
+    public void testTradeCards_GameDoesNotExist() {
+        // Arrange
+        CardTrade cardTrade = new CardTrade();
+        cardTrade.setCard1Name("Paradeplatz");
+        cardTrade.setCard2Name("Central");
+        cardTrade.setCard3Name("Bellevue");
 
-        // given territories
-        Territory attacking = testGame.getBoard().getTerritories().get(0); //Territory called 'Paradeplatz'
-        Territory defending = testGame.getBoard().getTerritories().get(1); //Territory called 'Central'
+        // mock game does not exist
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(null);
 
-        // given attack entity whist states to execute only one attack
-        Attack attack = new Attack();
-        attack.setAttackingTerritory("Paradeplatz");
-        attack.setDefendingTerritory("Central");
-        attack.setRepeats(3);
-        attack.setTroopsAmount(2);
-
-        // mock repository
-        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
-
-        // perform the attack method
-        Game afterAttack = gameService.executeRepeatedAttacks(attack, 1L);
-
-        // Check if defender (Central) and attacker (Central) have lost 6 troops in total (3 attacks with 2 troops each)
-        // Since both had 7 troops initially, they should now have 8 troops when added together
-        assertEquals(8, afterAttack.getBoard().getTerritories().get(0).getTroops()
-        + afterAttack.getBoard().getTerritories().get(1).getTroops());
-
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.tradeCards(1L, cardTrade, 3));
     }
 
     @Test
-    public void getTerritory_validInput_success() {
+    public void testTradeCards_EmptyCardStack() {
+        // Arrange
+        CardTrade cardTrade = new CardTrade();
+        cardTrade.setCard1Name("Paradeplatz");
+        cardTrade.setCard2Name("Central");
+        cardTrade.setCard3Name("Bellevue");
 
-        //when
+        // Empty the card stack
+        testGame.getCardStack().getRiskCards().clear();
+
+        // mock the get game from repository
         Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
 
-        Territory territory = gameService.getTerritory(1L,"Paradeplatz");
-
-        //then
-        assertEquals(territory.getName(), "Paradeplatz");
+        // Act and Assert
+        assertThrows(ResponseStatusException.class, () -> gameService.tradeCards(1L, cardTrade, 0));
     }
 
     @Test
-    public void getTerritory_invalidInput_error() {
+    public void testTradeCards_AllDifferentCards() {
+        // Arrange
+        CardTrade cardTrade = new CardTrade();
+        cardTrade.setCard1Name("Paradeplatz");
+        cardTrade.setCard2Name("Central");
+        cardTrade.setCard3Name("Bellevue");
 
-        //when
+        // mock the get game from repository
         Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
 
-        //then
-        assertThrows(ResponseStatusException.class, () -> {       
-            gameService.getTerritory(1L, "Bellvue");     
-        } );
+        // Act
+        Game tradedGame = gameService.tradeCards(1L, cardTrade, 3);
 
+        // Assert
+        assertEquals(12, tradedGame.getTurnCycle().getCurrentPlayer().getCardBonus());
+        assertTrue(tradedGame.getTurnCycle().getCurrentPlayer().getRiskCards().isEmpty());
     }
 
     @Test

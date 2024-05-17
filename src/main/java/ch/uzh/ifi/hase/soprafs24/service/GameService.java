@@ -59,6 +59,8 @@ public class GameService {
 
     private UserService userService;
 
+    Random random = new Random(); 
+
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UserService userService) {
         this.gameRepository = gameRepository;
         this.userService = userService;
@@ -130,6 +132,7 @@ public class GameService {
             }
             for (Player player : toRemove) {
                 territoriesOwned = 0;
+                System.out.println("Territorry: " + updatedGame.getBoard().getTerritories().get(0));
                 for (Territory territory : updatedGame.getBoard().getTerritories()) {
                     if (territory.getOwner().equals(player.getPlayerId())){
                         territoriesOwned++;
@@ -137,6 +140,7 @@ public class GameService {
                 }
 
                 if (territoriesOwned == 0) {
+                    System.out.println(updatedGame);
                     leaveGame(gameId, lobbyId, player.getPlayerId());
                 }
             }
@@ -182,7 +186,7 @@ public class GameService {
         return;
     }
 
-    private Game nextPhase(Game game) {
+    public Game nextPhase(Game game) {
         Phase phase = game.getTurnCycle().getCurrentPhase();
 
         // update phase
@@ -319,11 +323,11 @@ public class GameService {
         Player defendingPlayer = new Player();
         Player attackingPlayer = new Player();
         for (Player player : game.getPlayers()) {
-            if (defendingTerritory.getOwner().equals(player.getPlayerId())){
+            if (defendingTerritory.getOwner() != null && defendingTerritory.getOwner().equals(player.getPlayerId())){
                 defendingPlayer = player;
             }
 
-            if (attackingTerritory.getOwner().equals(player.getPlayerId())){
+            if (attackingTerritory.getOwner() != null && attackingTerritory.getOwner().equals(player.getPlayerId())){
                 attackingPlayer = player;
             }
         }
@@ -333,7 +337,7 @@ public class GameService {
         game.setDiceResult(diceResult);
         for (int i = 0; i < attack.getRepeats(); i++) {
             if (defendingTerritory.getTroops() > 0 && attackingTerritory.getTroops() > 1) {
-                game = executeAttack(game, attack, attackingTerritory, defendingTerritory, new Random());
+                game = executeAttack(game, attack, attackingTerritory, defendingTerritory, this.random);
             }
         }
 
@@ -398,10 +402,16 @@ public class GameService {
             }
         }
 
-        int transferingTroops = Math.min(attackingTerritory.getTroops()-1, attack.getTroopsAmount());
-
-        attackingTerritory.setTroops(attackingTerritory.getTroops() - transferingTroops);
-        defendingTerritory.setTroops(defendingTerritory.getTroops() + transferingTroops);
+        int transferingTroops = 0;
+        if (attackingTerritory != null) {
+            transferingTroops = Math.min(attackingTerritory.getTroops()-1, attack.getTroopsAmount());
+        }
+        
+        if (attackingTerritory != null && defendingTerritory != null) {
+            attackingTerritory.setTroops(attackingTerritory.getTroops() - transferingTroops);
+            defendingTerritory.setTroops(defendingTerritory.getTroops() + transferingTroops);
+        }
+        
 
         gameRepository.save(game);
         gameRepository.flush();
@@ -413,7 +423,7 @@ public class GameService {
         Board board = game.getBoard();
         int count = 0;
         for (Territory territory : board.getTerritories()) {
-            if (territory.getOwner().equals(playerId)) {
+            if (territory.getOwner() != null && territory.getOwner().equals(playerId)) {
                 count++;
             }
         }
@@ -541,13 +551,13 @@ public class GameService {
              */
             int cardNameBonus = 0;
             for (Territory t : game.getBoard().getTerritories()) {
-                if (t.getName().equals(card1Name) && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
+                if (t.getName().equals(card1Name) && t.getOwner() != null && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
                     cardNameBonus += 1;
                 }
-                else if (t.getName().equals(card2Name) && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
+                else if (t.getName().equals(card2Name) && t.getOwner() != null && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
                     cardNameBonus += 1;
                 }
-                else if (t.getName().equals(card3Name) && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
+                else if (t.getName().equals(card3Name) && t.getOwner() != null && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
                     cardNameBonus += 1;
                 }
                 if (cardNameBonus == 3) {cardNameBonus = 6;}
@@ -731,8 +741,10 @@ public class GameService {
         Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
 
         // add the new card to the player and label it to not be in the stack anymore
-        currentPlayer.getRiskCards().add(pulledCard);
-        pulledCard.setHandedOut(true);
+        if (pulledCard != null) {
+            currentPlayer.getRiskCards().add(pulledCard);
+            pulledCard.setHandedOut(true);
+        }
 
         this.gameRepository.save(game);
         gameRepository.flush();
@@ -758,8 +770,6 @@ public class GameService {
         int TerritoryPerPlayer = (game.getBoard().getTerritories().size() / AmountOfPlayers);
 
         List<Player> playerList = game.getPlayers();
-
-        Random rand = new Random();
 
         //Shuffle territory list so destribution is random
         Collections.shuffle(game.getBoard().getTerritories());
@@ -788,7 +798,7 @@ public class GameService {
             i=i+1;
             //Assign random amount of Troops from (0 to 4) + 1 to country if maxTroops is bigger than 1
             if (maxTroopsVar > 4) {
-                troopPerTerritory = rand.nextInt(5);
+                troopPerTerritory = this.random.nextInt(5);
                 territory.setTroops(troopPerTerritory+1);
                 maxTroopsVar -= troopPerTerritory;
             } else if (maxTroopsVar > 1) {
