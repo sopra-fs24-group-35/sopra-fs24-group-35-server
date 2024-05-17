@@ -112,8 +112,8 @@
             https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/48
 
         Description:
-            I was busy displaying the Avatars on the bottom right part of the screen. I took about 10 to accomplish this because a set function 
-            did not worl. I managed to fix it in the end but have no idea how. Further I fixed some other bugs and refined int issue 48. I also
+            I was busy displaying the Avatars on the bottom right part of the screen. I took about 10 hours to accomplish this because a set function 
+            did not work. I managed to fix it in the end but have no idea how. Further I fixed some other bugs and refined in issue 48. I also
             made sure that the Lobby redirects to "/risk/gameId" instead of "/risk". (All of this worked once but somehow now there are errors
             despite me not doing anything before it broke)
 
@@ -126,12 +126,33 @@
         https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/34
 
         Description:
-        Bugfixes after Bugfixes
+        Bugfixes after Bugfixes to get the minimal working program to work for the submission. The bugfixes were limited to 
+        the frontend. It included the display of the Avatars, adding and fixing a Win/Loose screen and fixing some error 
+        would not let you start the lobby.
 
     06.05.2024:
         Unfortunately I had to go to the hospital the last Tuesday and they only let me go this morning. So I wasn't able 
         to do any Tasks this week. I apologise to my teammtates. I will do more next week. (Doctors Note and Confirmation
         of Stationary stay has been sent to my TA Nils Grob)
+        
+    13.05.2024:
+        After a quick break at home I was readmitted to the hospitl due to shortness of breath. So I only managed to do:
+        
+        https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/124
+
+        Here I coded a loading screen that shows up if the game is not fully loaded to not disturb the game feel.
+
+    20.05.2024:
+
+        So far I did:
+
+        https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/86
+        https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/87
+        https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/145
+
+        These include mostly the correct display of a Win-/Loosescreen and soe "cosmetic" and convenience updates like not
+        showing the announcements to a player that has already lost or won.
+        
             
 #### Ralph Kosch (RPKosch)
 
