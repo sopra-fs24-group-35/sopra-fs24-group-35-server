@@ -679,17 +679,9 @@ public class GameService {
                     game = distributeTroops(game, game.getTurnCycle().getCurrentPlayer().getPlayerId());
                 }
                 //remove player from turnCycle
-                System.out.println("here1");
                 game.getTurnCycle().getPlayerCycle().remove(player);
 
-                System.out.println("here2");
                 removed = true;
-
-                //create a lobby so player can also get removed from lobby
-                Lobby lobby = new Lobby();
-                lobby.addPlayers(userId);
-
-                //lobbyService.removePlayer(lobby, lobbyId);
 
                 System.out.println(game.getTurnCycle().getPlayerCycle().size());
                 //if last player has left game, delete game

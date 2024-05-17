@@ -5,6 +5,7 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 
 @Entity
@@ -16,10 +17,10 @@ public class Board implements Serializable {
     private Long boardId;
 
     @OneToMany(targetEntity=Continent.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Continent> continents;
+    private List<Continent> continents = new ArrayList<Continent>();
 
     @OneToMany(targetEntity=Territory.class,cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Territory> territories;
+    private List<Territory> territories = new ArrayList<Territory>();
 
     public Long getBoardId() {
         return boardId;

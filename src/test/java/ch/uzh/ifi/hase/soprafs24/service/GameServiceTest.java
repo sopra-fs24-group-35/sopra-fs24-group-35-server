@@ -11,6 +11,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Territory;
 import ch.uzh.ifi.hase.soprafs24.entity.TurnCycle;
 import ch.uzh.ifi.hase.soprafs24.entity.RiskCard;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.Continent;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 
@@ -384,7 +385,6 @@ public class GameServiceTest {
 
         //then
         assertEquals(territory.getName(), "Paradeplatz");
-
     }
 
     @Test
@@ -400,6 +400,103 @@ public class GameServiceTest {
 
     }
 
+    @Test
+    public void transferTroops_validInput() {
+        //given
+        Territory attacking = testGame.getBoard().getTerritories().get(0); //Territory called 'Paradeplatz'
+        Territory defending = testGame.getBoard().getTerritories().get(1); //Territory called 'Central'
+
+        //attack
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("Central");
+        attack.setTroopsAmount(2);
+
+        // mock repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        //perform transfer
+        Game afterTransfer = gameService.transferTroops(attack, testGame.getGameId());
+
+        assertEquals(5, afterTransfer.getBoard().getTerritories().get(0).getTroops());
+        assertEquals(9, afterTransfer.getBoard().getTerritories().get(1).getTroops());
+    }
+
+    @Test
+    public void transferTroops_validInput_tooManyTroops() {
+        //given
+        //affected territories
+        Territory attacking = testGame.getBoard().getTerritories().get(0); //Territory called 'Paradeplatz'
+        Territory defending = testGame.getBoard().getTerritories().get(1); //Territory called 'Central'
+
+        //attack
+        Attack attack = new Attack();
+        attack.setAttackingTerritory("Paradeplatz");
+        attack.setDefendingTerritory("Central");
+        attack.setTroopsAmount(10);
+
+        // mock repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        //perform transfer
+        Game afterTransfer = gameService.transferTroops(attack, testGame.getGameId());
+
+        assertEquals(1, afterTransfer.getBoard().getTerritories().get(0).getTroops());
+        assertEquals(13, afterTransfer.getBoard().getTerritories().get(1).getTroops());
+    }
+
+    @Test
+    public void leaveGame_validInput_notCurrentPlayer() {
+        //given
+        //playerToLeave
+        Player player2 = testGame.getPlayers().get(1);
+
+        //lobby Id
+        Long lobbyId = 20L;
+
+        //mock repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        //perform leave
+        gameService.leaveGame(testGame.getGameId(), lobbyId, player2.getPlayerId());
+
+        assertEquals(1, testGame.getTurnCycle().getPlayerCycle().size());
+    }
+
+    @Test
+    public void leaveGame_validInput_CurrentPlayer() {
+        //given
+        //playerToLeave
+        Player player1 = testGame.getPlayers().get(0);
+
+        //new current player after
+        Player player2 = testGame.getPlayers().get(1);
+
+        //lobby Id
+        Long lobbyId = 20L;
+
+        //distribute territories so no error happens
+        testGame.getBoard().getTerritories().get(0).setOwner(player1.getPlayerId());
+        testGame.getBoard().getTerritories().get(1).setOwner(player1.getPlayerId());
+        testGame.getBoard().getTerritories().get(2).setOwner(player2.getPlayerId());
+        testGame.getBoard().getTerritories().get(3).setOwner(player2.getPlayerId());
+
+        //create a continent with all territories
+        Continent continent = new Continent();
+        continent.getTerritories().add(testGame.getBoard().getTerritories().get(0));
+        continent.getTerritories().add(testGame.getBoard().getTerritories().get(1));
+        continent.getTerritories().add(testGame.getBoard().getTerritories().get(2));
+        continent.getTerritories().add(testGame.getBoard().getTerritories().get(3));
+        testGame.getBoard().getContinents().add(continent);
+
+        //mock repository
+        Mockito.when(gameRepository.getByGameId(Mockito.any())).thenReturn(testGame);
+
+        //perform leave
+        gameService.leaveGame(testGame.getGameId(), lobbyId, player1.getPlayerId());
+
+        assertEquals(1, testGame.getTurnCycle().getPlayerCycle().size());
+        assertEquals(player2, testGame.getTurnCycle().getCurrentPlayer());
+    }
+
 }
-
-
