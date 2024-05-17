@@ -112,4 +112,56 @@ public class LobbyServiceTest {
             lobbyService.removePlayer(lobby, 3L);     
         } );
     }
+
+    @Test
+    public void removePlayer_validInput() {
+        //given
+        //add player to lobby
+        testLobby.addPlayers(3L);
+
+        //create removePlayer request
+        Lobby lobby = new Lobby();
+        lobby.addPlayers(3L);
+
+        Mockito.when(lobbyRepository.getById(Mockito.any())).thenReturn(testLobby);
+
+        lobbyService.removePlayer(lobby, testLobby.getId());
+
+        assertEquals(1, testLobby.getPlayers().size());
+    }
+
+    @Test
+    public void removePlayer_doesntExist() {
+        Lobby lobby = new Lobby();
+        lobby.addPlayers(10L);
+
+        assertThrows(ResponseStatusException.class, () -> {
+            lobbyService.removePlayer(lobby, testLobby.getId());
+        });
+    }
+
+    @Test
+    public void startGame_validInput() {
+
+        Mockito.when(lobbyRepository.getById(Mockito.any())).thenReturn(testLobby);
+
+        Lobby lobby = lobbyService.startGame(testLobby.getId(), 10L);
+
+        assertEquals(10L, lobby.getGameId());
+    }
+
+    @Test
+    public void startGame_invalidInput_lobbyDoesntExist() {
+
+        assertThrows(ResponseStatusException.class, () -> {
+            lobbyService.startGame(10L, 11L);
+        });
+    }
+
+    @Test
+    public void endGame_invalidInput_lobbyDoesntExist() {
+        assertThrows(ResponseStatusException.class, () -> {
+            lobbyService.endGame(testLobby.getId());
+        });
+    }
 }

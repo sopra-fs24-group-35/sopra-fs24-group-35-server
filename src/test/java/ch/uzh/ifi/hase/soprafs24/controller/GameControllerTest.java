@@ -36,6 +36,8 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.contains;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.doNothing;
@@ -581,6 +583,177 @@ public class GameControllerTest {
             .header("Authorization", "abc");
         
         mockMvc.perform(postRequest)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isUnauthorized());
+    }
+
+    //@Test
+    public void transfer_validInput() throws Exception{
+        //given
+        // create board with a territory called 'Paradeplatz' and 'Marktplatz'
+        Board board = new Board();
+        ArrayList<Territory> territories = new ArrayList<>();
+        Territory paradeplatz = new Territory();
+        paradeplatz.setName("Paradeplatz");
+        paradeplatz.setTroops(7);
+        territories.add(paradeplatz);
+        Territory marktplatz = new Territory();
+        marktplatz.setName("Marktplatz");
+        marktplatz.setTroops(5);
+        territories.add(marktplatz);
+        board.setTerritories(territories);
+
+        //create 2 players
+        Player player1 = new Player();
+        player1.setPlayerId(2L);
+
+        Player player2 = new Player();
+        player2.setPlayerId(3L);
+
+        List<Player> players = new ArrayList<Player>();
+        players.add(player1);
+        players.add(player2);
+
+        //create TurnCycleBefore and TurnCycleAfter
+        TurnCycle turnCycle = new TurnCycle();
+        turnCycle.setCurrentPlayer(player1);
+        turnCycle.setPlayerCycle(players);
+        turnCycle.setCurrentPhase(Phase.MOVE);
+
+        // create Game with this board
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setBoard(board);
+        game.setPlayers(players);
+        game.setTurnCycle(turnCycle);
+
+
+        AttackPostDTO attackPostDTO = new AttackPostDTO();
+        attackPostDTO.setAttackingTerritory("Marktplatz");
+        attackPostDTO.setDefendingTerritory("Paradeplatz");
+        attackPostDTO.setTroopsAmount(2);
+
+        given(gameService.transferTroops(Mockito.any(), Mockito.any())).willReturn(game);
+
+        // when/then -> do the request + validate the result
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1/transfer")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(attackPostDTO))
+            .header("Authorization", "abc");
+        
+
+        // then
+        mockMvc.perform(putRequest)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.board.territories", contains(game.getBoard().getTerritories().get(0).getTroops())));
+    }
+
+    @Test
+    public void transfer_invalidInput_unauthorized() throws Exception {
+        //given
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setBoard(null);
+        game.setPlayers(null);
+        game.setTurnCycle(null);
+
+        AttackPostDTO attackPostDTO = new AttackPostDTO();
+
+        given(gameService.transferTroops(Mockito.any(), Mockito.any())).willReturn(game);
+        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
+
+        // when/then -> do the request + validate the result
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1/transfer")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(attackPostDTO))
+            .header("Authorization", "abc");
+        
+        mockMvc.perform(putRequest)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void leaveGame_validInput() throws Exception {
+        //given
+        //create 3 players
+        Player player1 = new Player();
+        player1.setPlayerId(2L);
+
+        Player player2 = new Player();
+        player2.setPlayerId(3L);
+
+        Player player3 = new Player();
+        player3.setPlayerId(4L);
+
+        List<Player> players = new ArrayList<Player>();
+        players.add(player1);
+        players.add(player2);
+        players.add(player3);
+
+        //create new turnCycle
+        TurnCycle turnCycle = new TurnCycle();
+        turnCycle.setPlayerCycle(players);
+
+        //create new game
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setPlayers(players);
+        game.setTurnCycle(turnCycle);
+
+        GamePostDTO gamePostDTO = new GamePostDTO();
+
+        doNothing().when(gameService).leaveGame(Mockito.any(), Mockito.any(), Mockito.any());
+        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
+
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1/user/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(gamePostDTO))
+            .header("Authorization", "abc");
+
+        mockMvc.perform(putRequest).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void leaveGame_invalidInput_unauthorized() throws Exception {
+        //given
+        //create 3 players
+        Player player1 = new Player();
+        player1.setPlayerId(2L);
+
+        Player player2 = new Player();
+        player2.setPlayerId(3L);
+
+        Player player3 = new Player();
+        player3.setPlayerId(4L);
+
+        List<Player> players = new ArrayList<Player>();
+        players.add(player1);
+        players.add(player2);
+        players.add(player3);
+
+        //create new turnCycle
+        TurnCycle turnCycle = new TurnCycle();
+        turnCycle.setPlayerCycle(players);
+
+        //create new game
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setPlayers(players);
+        game.setTurnCycle(turnCycle);
+
+        GamePostDTO gamePostDTO = new GamePostDTO();
+
+        doNothing().when(gameService).leaveGame(Mockito.any(), Mockito.any(), Mockito.any());
+        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
+
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1/user/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(gamePostDTO))
+            .header("Authorization", "abc");
+
+        mockMvc.perform(putRequest)
             .andDo(MockMvcResultHandlers.print())
             .andExpect(status().isUnauthorized());
     }
