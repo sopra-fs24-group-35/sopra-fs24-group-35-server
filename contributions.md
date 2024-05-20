@@ -79,7 +79,19 @@
                 - Automatically ends turn after moving troops in the movement phase
                 - Automatically opens the card modal if the player has 5 or more cards at the beginning of their turn
                 - etc.
-            Tried to make the player information in the game modular to improve scalability, but eventually stopped after facing flickering issues and Ralph found a solution. 
+            Tried to make the player information in the game modular to improve scalability, but eventually stopped after facing flickering issues and Ralph found a solution.
+    
+    20.05.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/144
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/151
+
+        Description:
+           Fixed all bugs concerning the mid turn trade functionality.
+           Added ability for players to see if they own a selected RiskCard or not.
+           Added ability for players to see how many troops they will recieve with the selected cards (if it is a valid combination).
+           Added a selection to place 1, 5 or 10 troops while placing troops.
+           Removed an annoying 0, no one knew where it came from.
 
 #### Nico (Eposs111)
 
