@@ -551,7 +551,10 @@ public class GameService {
              */
             int cardNameBonus = 0;
             for (Territory t : game.getBoard().getTerritories()) {
-                if (t.getName().equals(card1Name) && t.getOwner() != null && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
+                if (t.getTroops() == 0) {
+                    cardNameBonus += 1;
+                }
+                else if (t.getName().equals(card1Name) && t.getOwner() != null && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
                     cardNameBonus += 1;
                 }
                 else if (t.getName().equals(card2Name) && t.getOwner() != null && t.getOwner().equals(game.getTurnCycle().getCurrentPlayer().getPlayerId())) {
