@@ -484,6 +484,33 @@
 
         I also created an image for the joker RISK cards.
 
+    20.05.2024
+
+        Links:
+            Issue #133:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=62763755
+            Issue #95:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=61158149
+            Issue #96:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=61158102
+            Issue #138:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=63049184
+
+        Description:
+
+        For Issue #133:
+        - Designed new icons for player stats display
+
+        For Issues #95 and #96:
+        - Created Countdown
+        - Implemented automatic state change if time is over
+        - Created a bar to display the countdown
+        - Created announcement banners to be displayed at the beginning of a phase that appear automatically
+        - The countdown does also automatically close opened windows (attack etc.)
+
+        For Issue #138:
+        - Created more Game Service tests to lift code coverage to above 75%
+
 
 
 
