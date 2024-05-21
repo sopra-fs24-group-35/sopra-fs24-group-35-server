@@ -1,28 +1,11 @@
 # SoPra Risk Game FS24
 
-## Introduction
 With this project we wanted to make it possible for people to play the board game Risk with each other even if they can't meet in person. We all like strategy games but luck also having a deciding factor makes the game more random and fun which is why we chose to implement risk. In the end we want to have a functioning version of risk which is simple to play and can be extended on. We also want the ui to be simple but understandable.
 
 ## Technologies
 We used two main technologies in the server:
--   Restful JPA
 -   Spring Boot
 -   Gradle
-
-## Launch and Deployment
-
-## Roadmap
-Features which still need to be implemented:
--   At the moment it is not possible for the user to change their avatars after they have chosen one at registration. You could implement one in the userService and userController.
--   At the moment there is only one map to play on. The board game Risk has more. You could implement them in server.
--   Refactoring. Lots of things are hard coded in the gameServer file which is why it is our biggest file. You could try to refactor it into smaller packages or even into a different file.
-
-## Authors and Acknowledgement
-
-
-## License
-
-
 
 ## Getting started with Spring Boot
 -   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
@@ -30,7 +13,7 @@ Features which still need to be implemented:
     -   Building a RESTful Web Service: http://spring.io/guides/gs/rest-service/
     -   Building REST services with Spring: https://spring.io/guides/tutorials/rest/
 
-## Setup this Template with your IDE of choice
+## Setup this Project with your IDE of choice
 Download your IDE of choice (e.g., [IntelliJ](https://www.jetbrains.com/idea/download/), [Visual Studio Code](https://code.visualstudio.com/), or [Eclipse](http://www.eclipse.org/downloads/)). Make sure Java 17 is installed on your system (for Windows, please make sure your `JAVA_HOME` environment variable is set to the correct version of Java).
 
 ### IntelliJ
@@ -109,3 +92,21 @@ To configure a debugger for SpringBoot's Tomcat servlet (i.e. the process you st
 
 ## Testing
 Have a look here: https://www.baeldung.com/spring-boot-testing
+
+## Roadmap
+Features which still need to be implemented:
+-   At the moment it is not possible for the user to change their avatars after they have chosen one at registration. You could implement one in the userService and userController.
+-   At the moment there is only one map to play on. The board game Risk has more. You could implement them in server.
+-   Refactoring. Lots of things are hard coded in the gameServer file which is why it is our biggest file. You could try to refactor it into smaller packages or even into a different file.
+
+## Authors and Acknowledgement
+-   SylverSezari - Founder
+-   roburkUZH - Founder
+-   Cross55 - Founder
+-   Eposs111 - Founder
+-   RPKosch - Founder
+
+-   We thank mirovv, royru, marion-an, isicu, clennys for sharing their template which we used
+
+## License
+This project is licensed under the GNU License - see the LICENSE.md file for details
