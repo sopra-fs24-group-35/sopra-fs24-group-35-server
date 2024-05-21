@@ -102,13 +102,13 @@ They each are interlinked. The userIds of users who joined a lobby are saved in 
 
 
 ## Contributing
-Please read CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md] for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Roadmap
 Features which still need to be implemented:
 -   At the moment it is not possible for the user to change their avatars after they have chosen one at registration. You could implement one in the [userService] and [userController].
 -   At the moment there is only one map to play on. The board game Risk has more. You could implement them in server.
--   Refactoring. Lots of things are hard coded in the gameServer file which is why it is our biggest file. You could try to refactor it into smaller packages or even into a different file.
+-   Refactoring. Lots of things are hard coded in the [gameService] file which is why it is our biggest file. You could try to refactor it into smaller packages or even into a different file.
 
 ## Authors and Acknowledgement
 -   SylverSezari - Founder
@@ -120,7 +120,13 @@ Features which still need to be implemented:
 -   We thank mirovv, royru, marion-an, isicu, clennys for sharing their template which we used
 
 ## License
-This project is licensed under the GNU License - see the LICENSE.md file for details
+This project is licensed under the GNU License - see the [LICENSE.md] file for details
+
+[LICENSE.md]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/LICENSE.md
+
+[CONTRIBUTING.md]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/CONTRIBUTING.md
+
+[gameService]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/service/GameService.java
 
 [userService]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/service/UserService.java
 
