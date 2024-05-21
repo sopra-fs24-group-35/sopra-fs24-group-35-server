@@ -637,3 +637,16 @@
         I tried to implement to leaveGame function but at the moment not everything is working. I also needed to change the primary Key of the entity palyer.
         I also fixed some bugs that we discovered after the presentation like a person being in the lobby twice.
 
+    13.05.2024:
+        Used a joker
+
+    21.05.2024:
+        Links:
+            Issue #139:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/139
+
+            Issue #138:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/138
+
+        I mainly wrote tests for gameController. gameService, lobbyController and lobbyService
+
