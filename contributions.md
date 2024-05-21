@@ -322,6 +322,27 @@
             120 -> For all the Players I also added the Username underneath the Avatars to know exactly who you are
 
 
+    22.05.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/127
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/128
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/129
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/130
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/134
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/135
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/155 - dynamically adjust stats pictures
+
+
+    Description:
+        127 -> Implement game to play with up to 6 Players (Currently only 4)
+        128 -> Refactoring of current Avatars html so adjustments are quicker
+        129 -> Implement game functionality to add up to 6 Avatars
+        130 -> Adjust Css and HTML Files that the text left of avatars are central and the height as well as the font is according to space
+        134 -> Implement all the pictures drawn by Robin for the stats and the cards into the game and adjust it for 2-6 Players that it looks good.
+        135 -> When a player clicks on the leave button the user gets an additional screen where he has to choose again if he really wants to quit the game. This is just a good safety measurement
+        155 -> Automatically update all stats icon sizes with window size and window ratio
+
+
 
 #### Robin Burkard (roburkUZH):
 
