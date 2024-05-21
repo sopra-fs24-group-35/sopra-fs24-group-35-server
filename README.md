@@ -95,9 +95,9 @@ We used two main technologies in the server:
 
 ## High-level Components
 We have three main Components in our project:
--   [User] [user]: It saves the data after registration and is the personifaction of the user
--   [Lobby] [lobby]: It is created before entering the game so many different users can join one Lobby and then start the game
--   [Game] [game]: It is where the game Risk takes place. All territories, players, cards, etc. are saved in it.
+-   [User]: It saves the data after registration and is the personifaction of the user
+-   [Lobby]: It is created before entering the game so many different users can join one Lobby and then start the game
+-   [Game]: It is where the game Risk takes place. All territories, players, cards, etc. are saved in it.
 They each are interlinked. The userIds of users who joined a lobby are saved in said lobby. The id of a game is saved in its respective lobby. 
 
 
@@ -106,7 +106,7 @@ Please read CONTRIBUTING.md for details on our code of conduct, and the process 
 
 ## Roadmap
 Features which still need to be implemented:
--   At the moment it is not possible for the user to change their avatars after they have chosen one at registration. You could implement one in the userService and userController.
+-   At the moment it is not possible for the user to change their avatars after they have chosen one at registration. You could implement one in the [userService] and [userController].
 -   At the moment there is only one map to play on. The board game Risk has more. You could implement them in server.
 -   Refactoring. Lots of things are hard coded in the gameServer file which is why it is our biggest file. You could try to refactor it into smaller packages or even into a different file.
 
@@ -121,6 +121,10 @@ Features which still need to be implemented:
 
 ## License
 This project is licensed under the GNU License - see the LICENSE.md file for details
+
+[userService]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/service/UserService.java
+
+[userController]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller/UserController.java
 
 [user]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/entity/User.java
 
