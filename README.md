@@ -93,6 +93,14 @@ We used two main technologies in the server:
 -   Spring Boot
 -   Gradle
 
+## High-level Components
+We have three main Components in our project:
+-   [User] [user]: It saves the data after registration and is the personifaction of the user
+-   [Lobby] [lobby]: It is created before entering the game so many different users can join one Lobby and then start the game
+-   [Game] [game]: It is where the game Risk takes place. All territories, players, cards, etc. are saved in it.
+They each are interlinked. The userIds of users who joined a lobby are saved in said lobby. The id of a game is saved in its respective lobby. 
+
+
 ## Contributing
 Please read CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests to us.
 
@@ -113,3 +121,9 @@ Features which still need to be implemented:
 
 ## License
 This project is licensed under the GNU License - see the LICENSE.md file for details
+
+[user]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/entity/User.java
+
+[lobby]:https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/entity/Lobby.java
+
+[game]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/entity/Game.java
