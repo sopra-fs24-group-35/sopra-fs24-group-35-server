@@ -1,4 +1,6 @@
-# SoPra RESTful Service Template FS24
+# SoPra Risk Game FS24
+
+With this project we wanted to make it possible for people to play the board game Risk with each other even if they can't meet in person. We all like strategy games but luck also having a deciding factor makes the game more random and fun which is why we chose to implement risk. In the end we want to have a functioning version of risk which is simple to play and can be extended on. We also want the ui to be simple but understandable.
 
 ## Getting started with Spring Boot
 -   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
@@ -6,7 +8,7 @@
     -   Building a RESTful Web Service: http://spring.io/guides/gs/rest-service/
     -   Building REST services with Spring: https://spring.io/guides/tutorials/rest/
 
-## Setup this Template with your IDE of choice
+## Setup this Project with your IDE of choice
 Download your IDE of choice (e.g., [IntelliJ](https://www.jetbrains.com/idea/download/), [Visual Studio Code](https://code.visualstudio.com/), or [Eclipse](http://www.eclipse.org/downloads/)). Make sure Java 17 is installed on your system (for Windows, please make sure your `JAVA_HOME` environment variable is set to the correct version of Java).
 
 ### IntelliJ
@@ -85,3 +87,53 @@ To configure a debugger for SpringBoot's Tomcat servlet (i.e. the process you st
 
 ## Testing
 Have a look here: https://www.baeldung.com/spring-boot-testing
+
+## Technologies
+We used two main technologies in the server:
+-   Spring Boot
+-   Gradle
+
+## High-level Components
+We have three main Components in our project:
+-   [User]: It saves the data after registration and is the personifaction of the user
+-   [Lobby]: It is created before entering the game so many different users can join one Lobby and then start the game
+-   [Game]: It is where the game Risk takes place. All territories, players, cards, etc. are saved in it.
+They each are interlinked. The userIds of users who joined a lobby are saved in said lobby. The id of a game is saved in its respective lobby. 
+
+
+## Contributing
+Please read [CONTRIBUTING.md] for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Roadmap
+Features which still need to be implemented:
+-   At the moment it is not possible for the user to change their avatars after they have chosen one at registration. You could implement one in the [userService] and [userController].
+-   At the moment there is only one map to play on. The board game Risk has more. You could implement them in server.
+-   Refactoring. Lots of things are hard coded in the [gameService] file which is why it is our biggest file. You could try to refactor it into smaller packages or even into a different file.
+
+## Authors and Acknowledgement
+-   SylverSezari - Founder
+-   roburkUZH - Founder
+-   Cross55 - Founder
+-   Eposs111 - Founder
+-   RPKosch - Founder
+
+-   We thank mirovv, royru, marion-an, isicu, clennys for sharing their template which we used
+
+## License
+This project is licensed under the GNU License - see the [LICENSE.md] file for details
+
+[LICENSE.md]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/LICENSE.md
+
+[CONTRIBUTING.md]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/CONTRIBUTING.md
+
+[gameService]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/service/GameService.java
+
+[userService]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/service/UserService.java
+
+[userController]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller/UserController.java
+
+[user]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/entity/User.java
+
+[lobby]:https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/entity/Lobby.java
+
+[game]: https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/entity/Game.java
