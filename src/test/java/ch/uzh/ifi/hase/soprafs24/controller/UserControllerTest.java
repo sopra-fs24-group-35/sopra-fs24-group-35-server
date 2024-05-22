@@ -2,6 +2,8 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.UserList;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserListPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,14 +17,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -301,6 +306,85 @@ public class UserControllerTest {
     mockMvc.perform(postRequest)
         .andExpect(status().isConflict());
   }
+
+  @Test
+  public void getLobbyUsers_validRequest_returnsUserList() throws Exception {
+    //given
+    //create listWithId
+    ArrayList<Long> users = new ArrayList<Long>();
+    users.add(1L);
+    users.add(2L);
+    users.add(3L);
+
+    //create new UserList
+    UserList userList = new UserList();
+    userList.setUserIdList(users);
+
+    //put it in userListPostDTO
+    UserListPostDTO userListPostDTO = new UserListPostDTO();
+    userListPostDTO.setUserIdList(users);
+
+    MockHttpServletRequestBuilder postRequest = post("/users/lobbies")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(asJsonString(userListPostDTO));
+
+    mockMvc.perform(postRequest)
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$", hasSize(3)));
+  }
+  
+  @Test
+  public void getLobbyUsers_emptyList_returnsEmptyList() throws Exception {
+    //given
+    //create listWithId
+    ArrayList<Long> users = new ArrayList<Long>();
+
+    //create new UserList
+    UserList userList = new UserList();
+    userList.setUserIdList(users);
+
+    //put it in userListPostDTO
+    UserListPostDTO userListPostDTO = new UserListPostDTO();
+    userListPostDTO.setUserIdList(users);
+
+    MockHttpServletRequestBuilder postRequest = post("/users/lobbies")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(asJsonString(userListPostDTO));
+
+    mockMvc.perform(postRequest)
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$", hasSize(0)));
+  }
+
+  @Test
+  public void getLobbyUsers_invalidUserId_returnsNotFound() throws Exception {
+    //given
+    //create listWithId
+    ArrayList<Long> users = new ArrayList<Long>();
+    users.add(1L);
+    users.add(2L);
+    users.add(3L);
+
+    //create new UserList
+    UserList userList = new UserList();
+    userList.setUserIdList(users);
+
+    //put it in userListPostDTO
+    UserListPostDTO userListPostDTO = new UserListPostDTO();
+    userListPostDTO.setUserIdList(users);
+
+    given(userService.getUserById(Mockito.any())).willReturn(null);
+    doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")).when(userService).getUserById(Mockito.any());
+
+    MockHttpServletRequestBuilder postRequest = post("/users/lobbies")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(asJsonString(userListPostDTO));
+
+    mockMvc.perform(postRequest)
+      .andDo(MockMvcResultHandlers.print())
+      .andExpect(status().isNotFound());
+  }
+  
   /**
    * Helper Method to convert userPostDTO into a JSON string such that the input
    * can be processed
