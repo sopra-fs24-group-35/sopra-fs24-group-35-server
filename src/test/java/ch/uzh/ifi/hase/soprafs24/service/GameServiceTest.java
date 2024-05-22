@@ -38,6 +38,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.security.SecureRandom;
 
 public class GameServiceTest {
 
@@ -726,7 +727,7 @@ public class GameServiceTest {
         attack.setTroopsAmount(3);
 
         
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
 
         // perform the attack method
         Game afterAttack = gameService.executeAttack(testGame, attack, attacking, defending, random);
@@ -750,7 +751,7 @@ public class GameServiceTest {
         attack.setTroopsAmount(1);
 
         
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
 
         // perform the attack method
         Game afterAttack = gameService.executeAttack(testGame, attack, attacking, defending, random);
