@@ -799,7 +799,7 @@ public class GameService {
             territory.setOwner(playerList.get(y).getPlayerId());
             i=i+1;
             //Assign random amount of Troops from (0 to 4) + 1 to country if maxTroops is bigger than 1
-            if (maxTroopsVar > 4) {
+            if (maxTroopsVar > 5) {
                 troopPerTerritory = this.random.nextInt(5);
                 territory.setTroops(troopPerTerritory+1);
                 maxTroopsVar -= troopPerTerritory;
