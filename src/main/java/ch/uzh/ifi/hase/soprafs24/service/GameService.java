@@ -2,7 +2,6 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Collections;
 import java.util.HashMap;
 import javax.persistence.Id;
@@ -39,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.Random;
+import java.security.SecureRandom;
 
 import ch.uzh.ifi.hase.soprafs24.constant.Phase;
 import ch.uzh.ifi.hase.soprafs24.entity.Attack;
@@ -59,7 +59,7 @@ public class GameService {
 
     private UserService userService;
 
-    Random random = new Random(); 
+    SecureRandom random = new SecureRandom(); 
 
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UserService userService) {
         this.gameRepository = gameRepository;
@@ -606,9 +606,7 @@ public class GameService {
     }
 
 
-    public Game executeAttack(Game game, Attack attack, Territory attackingTerritory, Territory defendingTerritory, Random rand) {
-        
-
+    public Game executeAttack(Game game, Attack attack, Territory attackingTerritory, Territory defendingTerritory, SecureRandom rand) {
         // specify how many troops the attacker and the defender use each
         int troopsFromAtk = Math.min(attackingTerritory.getTroops() - 1, Math.min(attack.getTroopsAmount(), 3));
         int troopsFromDef = Math.min(defendingTerritory.getTroops(), 2);
@@ -626,7 +624,7 @@ public class GameService {
 
         // attacker rolls dice between 1 and 3 times depending on situation. Results are added to an array.
         for (int i = 0; i < troopsFromAtk; i++) {
-            atkRolls.add(rand.nextInt(6)+1);
+            atkRolls.add((rand.nextInt(1000000)+1)%6);
             diceResult += atkRolls.get(i).toString() + " ";
         }
         
