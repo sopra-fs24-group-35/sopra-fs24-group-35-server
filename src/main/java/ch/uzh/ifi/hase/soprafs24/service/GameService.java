@@ -744,7 +744,7 @@ public class GameService {
         Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
 
         // add the new card to the player and label it to not be in the stack anymore
-        if (pulledCard != null) {
+        if (pulledCard != null && currentPlayer.getRiskCards().size() < 5) {
             currentPlayer.getRiskCards().add(pulledCard);
             pulledCard.setHandedOut(true);
         }
