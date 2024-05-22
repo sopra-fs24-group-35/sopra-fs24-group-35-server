@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Arrays;
 import java.util.Random;
 import java.security.SecureRandom;
+import java.util.concurrent.ThreadLocalRandom;
 
 import ch.uzh.ifi.hase.soprafs24.constant.Phase;
 import ch.uzh.ifi.hase.soprafs24.entity.Attack;
@@ -59,7 +60,7 @@ public class GameService {
 
     private UserService userService;
 
-    SecureRandom random = new SecureRandom(); 
+    SecureRandom random = new SecureRandom();
 
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UserService userService) {
         this.gameRepository = gameRepository;
@@ -624,14 +625,14 @@ public class GameService {
 
         // attacker rolls dice between 1 and 3 times depending on situation. Results are added to an array.
         for (int i = 0; i < troopsFromAtk; i++) {
-            atkRolls.add((rand.nextInt(1000000)+1)%6);
+            atkRolls.add(ThreadLocalRandom.current().nextInt(1, 6+1));
             diceResult += atkRolls.get(i).toString() + " ";
         }
         
         // defender rolls dice between 1 and 2 times depending on situation. Results are added to an array.
         diceResult += "Def: ";
         for (int i = 0; i < troopsFromDef; i++) {
-            defRolls.add(rand.nextInt(6)+1);
+            defRolls.add(ThreadLocalRandom.current().nextInt(1, 6+1));
             diceResult += defRolls.get(i).toString() + " ";
         }
         // sort dice results of both arrays in descending order to figure out the dice pairs
