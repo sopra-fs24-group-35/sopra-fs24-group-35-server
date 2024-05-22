@@ -12,6 +12,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AttackPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.CardTradePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.TerritoryGetDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 
@@ -130,6 +131,64 @@ public class GameControllerTest {
 
         // then
         mockMvc.perform(getRequest).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void getTerritory_validInput() throws Exception {
+        // given
+        Territory territory = new Territory();
+        territory.setTerritoryId(1L);
+        territory.setName("TestTerritory");
+
+        // Mocking
+        given(gameService.getTerritory(Mockito.any(),Mockito.any())).willReturn(territory);
+
+        // when
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/game/1/territory/TestTerritory")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "abc");
+
+        // then
+        mockMvc.perform(getRequest)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name", is(territory.getName())))
+            .andExpect(jsonPath("$.owner", is(territory.getOwner())))
+            .andExpect(jsonPath("$.troops", is(territory.getTroops())));
+    }
+
+    @Test
+    public void getTerritory_invalidInput_notFound() throws Exception {
+        // given
+        given(gameService.getTerritory(Mockito.any(), Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Territory not found"));
+
+        // when
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/game/1/territory/InvalidTerritory")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "abc");
+
+        // then
+        mockMvc.perform(getRequest)
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getTerritory_invalidInput_unauthorized() throws Exception {
+        // given
+        Territory territory = new Territory();
+        territory.setTerritoryId(1L);
+        territory.setName("TestTerritory");
+
+        given(gameService.getTerritory(Mockito.any(), Mockito.any())).willReturn(territory);
+        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
+
+        // when
+        MockHttpServletRequestBuilder getRequest = get("/lobbies/1/game/1/territory/Test Territory")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "wrong_token");
+
+        // then
+        mockMvc.perform(getRequest)
+            .andExpect(status().isUnauthorized());
     }
 
 
@@ -384,6 +443,112 @@ public class GameControllerTest {
         // then
         mockMvc.perform(putRequest)
             .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void updateBoard_validRequest() throws Exception {
+        //given
+        // create board with a territory called 'Paradeplatz'
+        Board board = new Board();
+        ArrayList<Territory> territories = new ArrayList<>();
+        Territory paradeplatz = new Territory();
+        paradeplatz.setName("Paradeplatz");
+        paradeplatz.setTroops(7);
+        paradeplatz.setOwner(2L);
+        territories.add(paradeplatz);
+        board.setTerritories(territories);
+
+        // create Game with this board
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setBoard(board);
+        game.setPlayers(null);
+        game.setTurnCycle(null);
+
+
+        GamePostDTO gamePostDTO = new GamePostDTO();
+        gamePostDTO.setBoard(board);
+        
+        given(gameService.updateBoard(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
+
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1/Board")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(gamePostDTO))
+            .header("Authorization", "abc");
+
+            mockMvc.perform(putRequest)
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void updateBoard_invalidRequest_unauthorized() throws Exception {
+        //given
+        // create board with a territory called 'Paradeplatz'
+        Board board = new Board();
+        ArrayList<Territory> territories = new ArrayList<>();
+        Territory paradeplatz = new Territory();
+        paradeplatz.setName("Paradeplatz");
+        paradeplatz.setTroops(7);
+        paradeplatz.setOwner(2L);
+        territories.add(paradeplatz);
+        board.setTerritories(territories);
+
+        // create Game with this board
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setBoard(board);
+        game.setPlayers(null);
+        game.setTurnCycle(null);
+
+
+        GamePostDTO gamePostDTO = new GamePostDTO();
+        gamePostDTO.setBoard(board);
+        
+        given(gameService.updateBoard(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(game);
+        doThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authorization failed. The user is not allowed to access this Lobby.")).when(gameService).checkAuthorization(Mockito.any(), Mockito.any());
+
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1/Board")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(gamePostDTO))
+            .header("Authorization", "abc");
+
+            mockMvc.perform(putRequest)
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void updateBoard_invalidInput_notFound() throws Exception{
+        //given
+        // create board with a territory called 'Paradeplatz'
+        Board board = new Board();
+        ArrayList<Territory> territories = new ArrayList<>();
+        Territory paradeplatz = new Territory();
+        paradeplatz.setName("Paradeplatz");
+        paradeplatz.setTroops(7);
+        paradeplatz.setOwner(2L);
+        territories.add(paradeplatz);
+        board.setTerritories(territories);
+
+        // create Game with this board
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setBoard(board);
+        game.setPlayers(null);
+        game.setTurnCycle(null);
+
+
+        GamePostDTO gamePostDTO = new GamePostDTO();
+        gamePostDTO.setBoard(board);
+
+        given(gameService.updateBoard(Mockito.any(), Mockito.any(), Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Game wasn't found"));
+
+        MockHttpServletRequestBuilder putRequest = put("/lobbies/1/game/1/Board")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(gamePostDTO))
+            .header("Authorization", "abc");
+
+            mockMvc.perform(putRequest)
+            .andExpect(status().isNotFound());
     }
 
     @Test
