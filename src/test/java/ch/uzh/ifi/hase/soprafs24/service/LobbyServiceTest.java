@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,6 +43,7 @@ public class LobbyServiceTest {
         testLobby.setOwnerId(2L);
         testLobby.addPlayers(2L);
         testLobby.setGameId(null);
+        testLobby.setToken("abc");
 
         // when -> any object is being save in the userRepository -> return the dummy
         // testUser
@@ -131,6 +133,39 @@ public class LobbyServiceTest {
     }
 
     @Test
+    public void checkAuthorization_invalidInput_unauthorized() {
+        //given
+        //get wrong token and id
+        String token = "invalidToken";
+        Long lobbyId = testLobby.getId();
+        //mock Repository
+        Mockito.when(lobbyRepository.getById(Mockito.any())).thenReturn(testLobby);
+
+        assertThrows(ResponseStatusException.class, () -> {
+            lobbyService.checkAuthorization(lobbyId, token);
+        });
+    }
+
+    @Test
+    public void checkAuthorization_invalidInput_notFound() {
+        //given
+        //get token and wrong id
+        String token = testLobby.getToken();
+        Long lobbyId = 0L;
+
+        assertThrows(ResponseStatusException.class, () -> {
+            lobbyService.checkAuthorization(lobbyId, token);
+        });
+    }
+
+    @Test
+    public void checkIfExists_invalidInput_notFound() {
+        assertThrows(ResponseStatusException.class, () -> {
+            lobbyService.checkIfExists(0L);
+        });
+    }
+
+    @Test
     public void updateLobby_wrongCode() {
         // Assert that trying to update a game by an id that doesn't exist throws a HTTP ResponseStatusException
         Lobby lobby = new Lobby();
@@ -139,6 +174,22 @@ public class LobbyServiceTest {
         assertThrows(ResponseStatusException.class, () -> {       
             lobbyService.updateLobby(lobby);     
         } );
+    }
+
+    @Test
+    public void updateLobby_validInput_playerAlreadyInLobby() {
+        //given
+        //create new Lobby for input
+        Lobby lobby = new Lobby();
+        lobby.addPlayers(2L); //same id as already in lobby
+        lobby.setCode(testLobby.getCode());
+
+        //mock Repository
+        Mockito.when(lobbyRepository.findByCode(testLobby.getCode())).thenReturn(testLobby);
+
+        Lobby result = lobbyService.updateLobby(lobby);
+
+        assertEquals(testLobby.getPlayers().size(), result.getPlayers().size());
     }
 
     @Test
