@@ -58,7 +58,7 @@ sonarqube {
     property "sonar.projectKey", "sopra-fs24-group-35_sopra-fs24-group-35-server"
     property "sonar.organization", "sopra-fs24-group-35"
     property "sonar.host.url", "https://sonarcloud.io"
-    property "sonar.exclusions", "build/classes/java/main/ch/uzh/ifi/hase/soprafs24/rest/dto/AttackPostDTO.java, build/classes/java/main/ch/uzh/ifi/hase/soprafs24/rest/dto/CardTradePostDTO.java, build/classes/java/main/ch/uzh/ifi/hase/soprafs24/rest/dto/GameGetDTO.java, build/classes/java/main/ch/uzh/ifi/hase/soprafs24/rest/dto/GamePostDTO.java"
+    property "sonar.exclusions", "**/*DTO.java"
   }
 }
 
