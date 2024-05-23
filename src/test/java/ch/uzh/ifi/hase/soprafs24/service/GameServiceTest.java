@@ -215,6 +215,43 @@ public class GameServiceTest {
         } );
     }
 
+    @Test
+    public void updateGame_validInput_MoveToReinforcement() {
+        //given
+        //set current phase
+        testGame.getTurnCycle().setCurrentPhase(Phase.MOVE);
+
+        //setPlayerAwaitsCard
+        testGame.getTurnCycle().getCurrentPlayer().setAwaitsCard(false);
+        //mock repository
+        Mockito.when(gameRepository.existsById(Mockito.anyLong())).thenReturn(true);
+        Mockito.when(gameRepository.getByGameId(Mockito.anyLong())).thenReturn(testGame);
+
+        Game game = gameService.updateGame(testGame, testGame.getGameId(), 10L);
+
+        assertEquals(Phase.REINFORCEMENT, game.getTurnCycle().getCurrentPhase());
+        assertEquals(testGame.getTurnCycle().getPlayerCycle().get(1), game.getTurnCycle().getCurrentPlayer());
+        assertEquals(3, game.getTurnCycle().getCurrentPlayer().getTroopBonus());
+    }
+
+    @Test
+    public void updateGame_validInput_AttackToMove() {
+        //given
+        //set current phase
+        testGame.getTurnCycle().setCurrentPhase(Phase.ATTACK);
+
+        //setPlayerAwaitsCard
+        testGame.getTurnCycle().getCurrentPlayer().setAwaitsCard(false);
+        //mock repository
+        Mockito.when(gameRepository.existsById(Mockito.anyLong())).thenReturn(true);
+        Mockito.when(gameRepository.getByGameId(Mockito.anyLong())).thenReturn(testGame);
+
+        Game game = gameService.updateGame(testGame, testGame.getGameId(), 10L);
+
+        assertEquals(Phase.MOVE, game.getTurnCycle().getCurrentPhase());
+        assertEquals(testGame.getTurnCycle().getPlayerCycle().get(0), game.getTurnCycle().getCurrentPlayer());
+    }
+
     // DELETE GAME ------------------------------------------------------------------------------------------------------
 
     @Test
