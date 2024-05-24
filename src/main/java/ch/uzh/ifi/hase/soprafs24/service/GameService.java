@@ -619,6 +619,10 @@ public class GameService {
         ArrayList<Integer> atkRolls = new ArrayList<>();
         ArrayList<Integer> defRolls = new ArrayList<>();
 
+        // create randomizer array:
+        int rand_i = (troopsFromAtk*3 + troopsFromDef) % 29;
+        int[] randomizer = {0, 7, 20, 25, 16, 15, 9, 2, 4, 3, 12, 13, 8, 6, 24, 1, 23, 21, 18, 5, 14, 17, 22, 10, 11, 19, 26, 28, 27};
+
         //Reset string because of length limit upon executing attack multiple times
         game.setDiceResult("");
 
@@ -628,15 +632,17 @@ public class GameService {
 
         // attacker rolls dice between 1 and 3 times depending on situation. Results are added to an array.
         for (int i = 0; i < troopsFromAtk; i++) {
-            atkRolls.add(ThreadLocalRandom.current().nextInt(1, 6+1));
+            atkRolls.add((ThreadLocalRandom.current().nextInt(1, 6+1) + randomizer[rand_i]) % 6);
             diceResult += atkRolls.get(i).toString() + " ";
+            rand_i = (rand_i+1) % 29;
         }
         
         // defender rolls dice between 1 and 2 times depending on situation. Results are added to an array.
         diceResult += "Def: ";
         for (int i = 0; i < troopsFromDef; i++) {
-            defRolls.add(ThreadLocalRandom.current().nextInt(1, 6+1));
+            defRolls.add((ThreadLocalRandom.current().nextInt(1, 6+1) + randomizer[rand_i]) % 6);
             diceResult += defRolls.get(i).toString() + " ";
+            rand_i = (rand_i+1) % 29;
         }
         // sort dice results of both arrays in descending order to figure out the dice pairs
         Collections.sort(atkRolls);
