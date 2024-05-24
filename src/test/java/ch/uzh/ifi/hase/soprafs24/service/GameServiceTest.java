@@ -269,7 +269,11 @@ public class GameServiceTest {
         // Arrange
         Game newGameState = new Game();
         newGameState.setGameId(1L);
-        newGameState.setBoard(testGame.getBoard()); // Assuming similar setup as testGame for simplicity
+        newGameState.setBoard(testGame.getBoard()); // Assuming similar setup as testGame for simplicit
+
+        //ChangeTroopBonus of testGame
+        testGame.getTurnCycle().getCurrentPlayer().setTroopBonus(1);
+        testGame.getTurnCycle().getCurrentPlayer().setCardBonus(1);
 
         // mock the check if game exists
         Mockito.when(gameRepository.existsById(Mockito.anyLong())).thenReturn(true);
@@ -300,8 +304,8 @@ public class GameServiceTest {
             gameService.updateBoard(newGameState, 1L, 1L);
         });
     
-        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
-        assertEquals("Game deletion failed, because there is no game with this id.", exception.getReason());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        assertEquals("Game not found, because there is no game with this id.", exception.getReason());
     }
 
     // NEXT PHASE ------------------------------------------------------------------------------------------------------
