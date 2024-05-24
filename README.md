@@ -2,6 +2,18 @@
 
 With this project we wanted to make it possible for people to play the board game Risk with each other even if they can't meet in person. We all like strategy games but luck also having a deciding factor makes the game more random and fun which is why we chose to implement risk. In the end we want to have a functioning version of risk which is simple to play and can be extended on. We also want the ui to be simple but understandable.
 
+## Technologies
+We used two main technologies in the server:
+-   Spring Boot
+-   Gradle
+
+## High-level Components
+We have three main Components in our project:
+-   [User]: It saves the data after registration and is the personifaction of the user
+-   [Lobby]: It is created before entering the game so many different users can join one Lobby and then start the game
+-   [Game]: It is where the game Risk takes place. All territories, players, cards, etc. are saved in it.
+They each are interlinked. The userIds of users who joined a lobby are saved in said lobby. The id of a game is saved in its respective lobby.
+
 ## Getting started with Spring Boot
 -   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 -   Guides: http://spring.io/guides
@@ -87,19 +99,6 @@ To configure a debugger for SpringBoot's Tomcat servlet (i.e. the process you st
 
 ## Testing
 Have a look here: https://www.baeldung.com/spring-boot-testing
-
-## Technologies
-We used two main technologies in the server:
--   Spring Boot
--   Gradle
-
-## High-level Components
-We have three main Components in our project:
--   [User]: It saves the data after registration and is the personifaction of the user
--   [Lobby]: It is created before entering the game so many different users can join one Lobby and then start the game
--   [Game]: It is where the game Risk takes place. All territories, players, cards, etc. are saved in it.
-They each are interlinked. The userIds of users who joined a lobby are saved in said lobby. The id of a game is saved in its respective lobby. 
-
 
 ## Contributing
 Please read [CONTRIBUTING.md] for details on our code of conduct, and the process for submitting pull requests to us.
