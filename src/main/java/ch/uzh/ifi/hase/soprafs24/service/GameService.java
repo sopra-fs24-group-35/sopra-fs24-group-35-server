@@ -223,6 +223,7 @@ public class GameService {
 
             // reset card bonus of player after reinforcement phase has finished
             Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+            currentPlayer.setTroopBonus(0);
             currentPlayer.setCardBonus(0);
             
         }
@@ -439,7 +440,7 @@ public class GameService {
         }
         for (Player player : game.getPlayers()) {
             if (player.getPlayerId().equals(playerId)) {
-                player.setTroopBonus(Math.max(count/3, 3)); // set bonus to number of owned territories/3 and minimum 3
+                player.setTroopBonus(player.getTroopBonus() + Math.max(count/3, 3)); // set bonus to number of owned territories/3 and minimum 3
                 
                 int territoriesOwned;
                 int size;
@@ -847,7 +848,6 @@ public class GameService {
                 maxTroops = 1;
             }
         }
-
         //randomize order of players
         Collections.shuffle(game.getPlayers());
 
@@ -861,6 +861,18 @@ public class GameService {
 
         //save turn cycle to game
         game.setTurnCycle(turnCycle);
+
+        int whichplayer = 0;
+        for (Player player : game.getTurnCycle().getPlayerCycle()) {
+            whichplayer++;
+            if (whichplayer == 4){
+                player.setTroopBonus(1);
+            } else if(whichplayer == 5){
+                player.setTroopBonus(2);
+            } else if(whichplayer == 6){
+                player.setTroopBonus(3);
+            }
+        }
 
         //Distribute troops for reinforcement phase for first player
         game = distributeTroops(game, game.getTurnCycle().getCurrentPlayer().getPlayerId());
