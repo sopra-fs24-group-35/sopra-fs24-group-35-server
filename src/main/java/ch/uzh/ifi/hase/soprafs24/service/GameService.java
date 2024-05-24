@@ -170,6 +170,7 @@ public class GameService {
 
         Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
 
+        //change troopBonus to zero after playcing troops
         currentPlayer.setTroopBonus(0);
         currentPlayer.setCardBonus(0);
 
