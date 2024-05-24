@@ -563,6 +563,28 @@
         For Issue #138:
         - Created more Game Service tests to lift code coverage to above 75%
 
+    24.05.2024
+		Links:
+
+            Issue #159:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=63788086
+            Issue #101:
+            https://github.com/orgs/sopra-fs24-group-35/projects/3/views/9?pane=issue&itemId=61157713
+
+        Description:
+
+        I did the following:
+        For Issue #159:
+        - Changed the countdown such that the time is increased is certain instances, for example when trading
+
+        For Issue #101:
+        - Changed the Announcer such that it not only appears at the player playing, but also informs waiting players
+        - The announcer changes color depending on the color of the current player in turn.
+
+        Additionally, I fixed a problem with Sonarqube detecting duplicate lines, such that we get a pass on Sonarqube.
+        Then I also fixed some issues with the RNG.
+        And there was also a lot of bug detecting and fixing to do.
+
 
 
 
