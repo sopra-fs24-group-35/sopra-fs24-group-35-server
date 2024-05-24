@@ -691,3 +691,21 @@
 
         I mainly wrote tests for gameController. gameService, lobbyController and lobbyService
 
+    24.05.2024:
+        Links:
+            Issue #140:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/140
+
+            Issue #138:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/138
+
+            Issue #152:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/152
+
+            Issue #153:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/153
+
+        This week i wrote most parts of both ReadMe's and wrote some tests so SonarCloud would succeed.
+        We also stresstested our game and fixed bugs that appeared or changed some mechanics if we didn't like them.
+        I also helped in writing the report and in structuring out Github.
+
