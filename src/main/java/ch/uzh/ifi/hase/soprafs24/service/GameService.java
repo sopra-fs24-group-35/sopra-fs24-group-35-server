@@ -160,7 +160,7 @@ public class GameService {
         // throw error if game with given id doesn't exist
         boolean exists = checkIfGameExists(gameId, true);
         if (!exists) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game not found, because there is no game with this id.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found, because there is no game with this id.");
         }
 
         Game oldGame = getGameById(gameId);
@@ -172,6 +172,10 @@ public class GameService {
 
         currentPlayer.setTroopBonus(currentPlayer.getTroopBonus()-1);
         currentPlayer.setCardBonus(currentPlayer.getCardBonus()-1);
+
+        if (currentPlayer.getTroopBonus() < 0 | currentPlayer.getCardBonus() < 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Troop Bonus can't go below zero");
+        }
 
         game = gameRepository.save(game);
         gameRepository.flush();
