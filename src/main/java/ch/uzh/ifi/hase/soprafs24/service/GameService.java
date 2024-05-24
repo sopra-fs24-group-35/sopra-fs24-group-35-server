@@ -170,12 +170,8 @@ public class GameService {
 
         Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
 
-        currentPlayer.setTroopBonus(currentPlayer.getTroopBonus()-1);
-        currentPlayer.setCardBonus(currentPlayer.getCardBonus()-1);
-
-        if (currentPlayer.getTroopBonus() < 0 | currentPlayer.getCardBonus() < 0) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Troop Bonus can't go below zero");
-        }
+        currentPlayer.setTroopBonus(0);
+        currentPlayer.setCardBonus(0);
 
         game = gameRepository.save(game);
         gameRepository.flush();
