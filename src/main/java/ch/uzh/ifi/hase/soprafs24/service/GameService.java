@@ -888,10 +888,10 @@ public class GameService {
     private Game initializeGame(Game game) {
 
         //Set arrays of territories
-        String[] africaTerritories = {"North Africa", "Egypt", "East Africa", "Central Africa", "South Africa", "Madagascar"};
+        String[] africaTerritories = {"North Africa", "Egypt", "East Africa", "Congo", "South Africa", "Madagascar"};
         String[] asiaTerritories = {"Middle East", "Afghanistan", "Ural", "Siberia", "Yakutsk", "Kamchatka", "Irkutsk", "Mongolia", "China", "India", "Siam", "Japan"};
         String[] europeTerritories = {"Western Europe", "Southern Europe", "Northern Europe", "Great Britain", "Iceland", "Scandinavia", "Ukraine"};
-        String[] northAmericaTerritories = {"Alaska", "Northwest Territory", "Greenland", "Alberta", "Ontario", "Quebec", "Western United States", "Eastern United States", "Central America"};
+        String[] northAmericaTerritories = {"Alaska", "Northwest Territory", "Greenland", "Alberta", "Ontario", "Quebec", "Western US", "Eastern US", "Central America"};
         String[] southAmericaTerritories = {"Venezuela", "Peru", "Brazil", "Argentina"};
         String[] australiaTerritories = {"Indonesia", "New Guinea", "Eastern Australia", "Western Australia"};
 
