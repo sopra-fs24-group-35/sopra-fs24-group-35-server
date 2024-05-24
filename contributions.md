@@ -92,6 +92,25 @@
            Added ability for players to see how many troops they will recieve with the selected cards (if it is a valid combination).
            Added a selection to place 1, 5 or 10 troops while placing troops.
            Removed an annoying 0, no one knew where it came from.
+    
+    24.05.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/160
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/165
+
+        Description:
+            This week I basically finished the game by fixing some bugs that occured while thouroughly playtesting
+            List:
+                - Added a better selection for the troop placement 1, 5, 10
+                - Beautified the ugly red buttons
+                - Moved the leave button all the way to the right side
+                - Highlighted all pressable buttons in each phase
+                - Fixed issues that occured from the button highlights
+                - Fixed mid-turn troop placement during the attack phase
+                - Fixed endless troop bonus bug upon reload
+                - Added restriction to lobby so no more than 6 people can join
+                - Several other minor bug fixes
+
 
 #### Nico (Eposs111)
 
