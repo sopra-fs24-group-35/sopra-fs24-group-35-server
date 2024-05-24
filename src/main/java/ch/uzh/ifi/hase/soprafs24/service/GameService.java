@@ -160,13 +160,16 @@ public class GameService {
         // throw error if game with given id doesn't exist
         boolean exists = checkIfGameExists(gameId, true);
         if (!exists) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game deletion failed, because there is no game with this id.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Game not found, because there is no game with this id.");
         }
 
         Game oldGame = getGameById(gameId);
 
         //overwrite old game with new state
         game = doConsequences(game, oldGame);
+
+        game = gameRepository.save(game);
+        gameRepository.flush();
 
         return game;
     }
