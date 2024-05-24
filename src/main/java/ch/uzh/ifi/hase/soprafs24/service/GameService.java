@@ -165,6 +165,11 @@ public class GameService {
 
         Game oldGame = getGameById(gameId);
 
+        Player currentPlayer = game.getTurnCycle().getCurrentPlayer();
+
+        currentPlayer.setTroopBonus(currentPlayer.getTroopBonus()-1);
+        currentPlayer.setCardBonus(currentPlayer.getCardBonus()-1);
+
         //overwrite old game with new state
         game = doConsequences(game, oldGame);
 
