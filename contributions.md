@@ -362,6 +362,25 @@
         155 -> Automatically update all stats icon sizes with window size and window ratio
 
 
+            24.05.2024
+        Links:
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-server/issues/97
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/98
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/99
+            https://github.com/sopra-fs24-group-35/sopra-fs24-group-35-client/issues/100
+            
+
+
+    Description:
+        97 -> Implement feedback on what the current player is doing, to know what has changed on the game board
+        98 -> Highlight when the current player reinforces a territory in the reinforce phase
+        99 -> Highlight which territory attacks and which gets attacked
+        100 -> Highlight when troops get moved to a different territory
+        Addition: A lot of bug fixes.
+
+        
+
+
 
 #### Robin Burkard (roburkUZH):
 
